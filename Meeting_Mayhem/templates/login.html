@@ -1,0 +1,67 @@
+<!-- 
+    File: login.html
+    Author: Robert Shovan /Voitheia
+    Date: 6/15/2021
+    E-mail: rshovan1@umbc.edu
+    Description: html and jinja file for handling the login page
+-->
+
+{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
+{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <!-- TODO: the error messages for these only kinda work, the error messages aren't being pulled correctly -->
+                <!-- these form groups are basically the same thing, just for each field needed for login -->
+                <legend class="border-bottom mb4">Log In</legend>
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if form.username.errors %} <!-- if there are errors in the form... -->
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.username.errors %}
+                                <span>{{ error }}</span> <!-- display the errors (but doesn't work lol) -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                    </div>
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}
+
+                    {% if form.password.errors %} <!-- if there are errors in the form... -->
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.password.errors %}
+                                <span>{{ error }}</span> <!-- display the errors (but doesn't work lol) -->
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}                    
+                </div>
+                <!-- check box for if the user wants to be remembered on this computer. not sure if this does anything -->
+                <div class="form-check">
+                    {{ form.remember(class="form-check-input") }}
+                    {{ form.remember.label(class="form-check-label") }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+            <!-- forgot password link, doesn't do anything, can be deleted-->
+            <small class="text-muted ml-2">
+                <a href="#">Forgot Password?</a>
+            </small>
+        </form>
+    </div>
+    <div class="border-top pt-3">
+        <!-- link at the bottom of the page if user doesn't have an account yet -->
+        <small class="text-muted">
+            Don't Have An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
+        </small>
+    </div>
+{% endblock content %}
