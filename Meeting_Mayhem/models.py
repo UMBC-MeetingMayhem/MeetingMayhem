@@ -22,14 +22,36 @@ def load_user(user_id):
 
 #this is basically creating the tables for the database
 #i feel like fields and variables are pretty self explanatory here
+#user table
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    #packets = db.relationship('Packet', backref='sender', lazy=True) #the backref allows the posts to reference the users without needing a column in the posts table, not sure if this will work properly
+    #role = db.Column(db.Integer, nullable=False) #contains if the user is a player or adversary, also GM later
 
     def __repr__(self): #this is what gets printed out for the User
         return f"User('{self.username}','{self.email}')"
+
+"""
+#added this part 6/16/21
+#packet table
+#the intent is to have the round get passed from routes.py, as I think that is a good place to keep track of it
+#sender and recipient should get pulled from the current user and a dropdown respectivley
+#content gets pulled should get pulled from a text box
+#later, a packet will need a boolean to indicate if the packet has been edited by the adversary or not
+#the packet will also need an "edited_content" field
+class Packet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    round = db.Column(db.Integer, nullable=False)
+    sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    
+    def __repr__(self):
+        return f"Packet('{self.round}','{self.sender}','{self.recipient}','{self.content}'"
+"""
 
 #--------------------info about database stuff with python--------------------#
 # this section should probably be moved to not here 
