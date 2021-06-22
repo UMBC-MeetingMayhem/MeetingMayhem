@@ -22,7 +22,7 @@
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for errors in form.username.errors %}
-                                <span>{{ error }}</span> <!-- display the errors (but doesn't work lol) -->
+                                <span>{{ errors }}</span> <!-- display the errors -->
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
@@ -36,7 +36,7 @@
                         {{ form.email(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for errors in form.email.errors %}
-                                <span>{{ error }}</span> <!-- display the errors (but doesn't work lol) -->
+                                <span>{{ errors }}</span> <!-- display the errors -->
                             {% endfor %}
                         </div>
                     {% else %}
@@ -50,7 +50,7 @@
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for errors in form.password.errors %}
-                                <span>{{ error }}</span> <!-- display the errors (but doesn't work lol) -->
+                                <span>{{ errors }}</span> <!-- display the errors -->
                             {% endfor %}
                         </div>
                     {% else %}
@@ -64,7 +64,7 @@
                         {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for errors in form.confirm_password.errors %}
-                                <span>{{ error }}</span> <!-- display the errors (but doesn't work lol) -->
+                                <span>{{ errors }}</span> <!-- display the errors -->
                             {% endfor %}
                         </div>
                     {% else %}

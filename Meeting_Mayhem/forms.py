@@ -30,7 +30,7 @@ class RegistrationForm(FlaskForm):
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
         if user: #if there is, throw an error
-            raise ValidationError('That username is taken. Please choose a different one.')
+            raise ValidationError('That username is already in use. Please choose a different one.')
     
     def validate_email(self, email):
         email = User.query.filter_by(email=email.data).first() #check if there is already a user with the passed email in the db
@@ -44,3 +44,16 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+"""
+#added this part 6/16/21
+#Packet form
+#need to from wtforms import SelectField
+#need to from Meeting_Mayhem.models import Packet?
+class PacketForm(FlaskForm):
+    #choice db call would probably be something like User.query.all() for now, later when we have the int to indicate role, it could be User.query.filter_by(role=player)
+    recipient = SelectField(u'Recipient', choices=[some kinda database call goes in here to pull users], validators=[DataRequired()])
+    content = StringField('Packet', validators=[DataRequired()])
+    submit = SubmitField('Send Packet')
+    #round, sender should get automatically pulled
+"""

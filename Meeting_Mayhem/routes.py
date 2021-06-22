@@ -65,7 +65,7 @@ def login():
             next_page = request.args.get('next') #check if the next argument exists (i.e. user tried to go somewhere they needed to login to see)
             return redirect(next_page) if next_page else redirect(url_for('home')) #redir the user to the next_page arg if it exists, if not send them to home page
         else:
-            flash('Login Unsuccessful. Please check username and password.', 'danger') #display error message
+            flash(f'Login Unsuccessful. Please check username and password.', 'danger') #display error message
     return render_template('login.html', title='Login', form=form)
 
 #logout route
@@ -79,3 +79,31 @@ def logout():
 @login_required #enforces that the the user needs to be logged in if they navigate to this page
 def account():
     return render_template('account.html', title='Account')
+
+
+"""
+#added this part 6/16/21
+#packet page
+#need to from Meeting_Mayhem.forms import PacketForm
+#need to from Meeting_Mayhem.models import Packet
+#need var current_round to keep track of round in routes.py
+#current_round probably starts at 1 for now, gets advanced when a player send a packet
+#this will be changed later when we add the adversary, as their submit will advance the round counter
+@app.route('/packtes', methods=['GET', 'POST'])
+@login_required
+def packets():
+    form = PacketForm()
+    if current_round>1: #need to know how to do this properly in python lol
+        #pull packtes from current_round-1 where the current user is the recipient
+        display_packet = Packet.query.filter_by(round=current_round-1).filter_by(recipient=current_user.id)
+    else:
+        #make the prev packet section blank
+        #do we need jinja logic in the html file to check if messsage has content? 
+    if form.validate_on_submit():
+        #should we be passing the usernames or the ids? the dropdown needs to display usernames, so can we convert that to user id?
+        new_packet = Packet(round=current_round, sender=current_user.username, recipient=form.recipient.data, content=form.content.data)
+        db.session.add(new_packet)
+        db.session.commit()
+        flash(f'Your packet has been sent!', 'success')
+    return render_template('packets.html', title='Packets', form=form, packet=display_packet)
+"""
