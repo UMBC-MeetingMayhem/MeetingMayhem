@@ -51,7 +51,7 @@
 
                 <!-- Navbar Right Side -->
                 <!-- TODO: this doesn't seem to move the links to the right side properly -->
-                <div class="navbar-nav">
+                <div class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
                         <a class="nav-item nav-link" href="{{ url_for('packets') }}">Packets</a>
                         <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
@@ -90,14 +90,14 @@
         <div class="col-md-4">
         <div class="content-section">
             <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.
+            <p class='text-muted'>You can put any information here you'd like.</p>
             <ul class="list-group">
                 <li class="list-group-item list-group-item-light">Latest Posts</li>
                 <li class="list-group-item list-group-item-light">Announcements</li>
                 <li class="list-group-item list-group-item-light">Calendars</li>
                 <li class="list-group-item list-group-item-light">etc</li>
             </ul>
-            </p>
+            
         </div>
         </div>
     </div>
