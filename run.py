@@ -1,9 +1,10 @@
 """
 File: run.py
 Author: Robert Shovan /Voitheia
-Date: 6/15/2021
+Date Created: 6/15/2021
+Last Modified: 6/24/2021
 E-mail: rshovan1@umbc.edu
-Description: python file responsible for running the website
+Description: python file responsible for running the Meeting Mayhem website/package
 
 Initially, this project was largley based on the tutorial video series:
 https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH

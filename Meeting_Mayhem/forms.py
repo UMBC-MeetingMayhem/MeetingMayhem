@@ -1,7 +1,8 @@
 """
 File: forms.py
 Author: Robert Shovan /Voitheia
-Date: 6/15/2021
+Date Created: 6/15/2021
+Last Modified: 6/24/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the registraion and login forms for the website
 """
@@ -15,6 +16,7 @@ User - import the User class from the models.py file so that we can check if a u
 """
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from Meeting_Mayhem.models import User
 
@@ -45,15 +47,14 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
-"""
-#added this part 6/16/21
 #Packet form
 #need to from wtforms import SelectField
 #need to from Meeting_Mayhem.models import Packet?
 class PacketForm(FlaskForm):
     #choice db call would probably be something like User.query.all() for now, later when we have the int to indicate role, it could be User.query.filter_by(role=player)
-    recipient = SelectField(u'Recipient', choices=[some kinda database call goes in here to pull users], validators=[DataRequired()])
-    content = StringField('Packet', validators=[DataRequired()])
+    #TODO: figure out how to query all users and just spit out their username instead of limiting the model print to just the username
+    recipient = QuerySelectField(u'Recipient', query_factory=lambda: User.query.all(), allow_blank=False)
+    #recipient = SelectField(u'Recipient', choices=[some kinda database call goes in here to pull users], validators=[DataRequired()])
+    content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Packet')
     #round, sender should get automatically pulled
-"""

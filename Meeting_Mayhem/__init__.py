@@ -1,9 +1,10 @@
 """
 File: __init__.py
 Author: Robert Shovan /Voitheia
-Date: 6/15/2021
+Date Created: 6/15/2021
+Last Modified: 6/24/2021
 E-mail: rshovan1@umbc.edu
-Description: python file that manages the package
+Description: python file that manages the Meeting Mayhem package
 This file does a lot of initialization of things that are used later
 """
 

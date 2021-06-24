@@ -1,7 +1,8 @@
 <!-- 
     File: layout.html
     Author: Robert Shovan /Voitheia
-    Date: 6/15/2021
+    Date Created: 6/15/2021
+    Last Modified: 6/24/2021
     E-mail: rshovan1@umbc.edu
     Description: html and jinja file that provides the default layout of all other html files in the website.
     we use a layout template so that we do not repeat code for things we do on each page.
@@ -25,10 +26,10 @@
 
     <!-- we use an if else statement here to determine what the title of the page should be based on what is passed from the title variable from routes.py -->
     {% if title %}
-        <title>Flask Test - {{ title }}</title>
+        <title>Meeting Mayhem - {{ title }}</title>
     {% else %}
     <!-- if no title is found, just use the default title below -->
-        <title>Flask Test</title>
+        <title>Meeting Mayhem</title>
     {% endif %}
 </head>
 <body>
@@ -38,7 +39,7 @@
     <header class="site-header">
         <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
             <div class="container">
-            <a class="navbar-brand mr-4" href="/">Flask Test</a>
+            <a class="navbar-brand mr-4" href="/">Meeting Mayhem</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -52,6 +53,7 @@
                 <!-- TODO: this doesn't seem to move the links to the right side properly -->
                 <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
+                        <a class="nav-item nav-link" href="{{ url_for('packets') }}">Packets</a>
                         <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% else %}

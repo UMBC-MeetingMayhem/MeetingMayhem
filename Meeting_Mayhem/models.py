@@ -1,7 +1,8 @@
 """
 File: models.py
 Author: Robert Shovan /Voitheia
-Date: 6/15/2021
+Date Created: 6/15/2021
+Last Modified: 6/24/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the database
 """
@@ -32,32 +33,36 @@ class User(db.Model, UserMixin):
     #role = db.Column(db.Integer, nullable=False) #contains if the user is a player or adversary, also GM later
 
     def __repr__(self): #this is what gets printed out for the User
-        return f"User('{self.username}','{self.email}')"
+        return f"{self.username}" #this is short compared to the old print below because User.query.all() is used for the recipient dropdown
+        #TODO: this print should probably be changed back in the future
 
+""" This is the old print, keeping it because I might need it
+    def __repr__(self): #this is what gets printed out for the User
+        return f"User('{self.id}','{self.username}','{self.email}','{self.password}')"
 """
-#added this part 6/16/21
+
 #packet table
 #the intent is to have the round get passed from routes.py, as I think that is a good place to keep track of it
 #sender and recipient should get pulled from the current user and a dropdown respectivley
 #content gets pulled should get pulled from a text box
 #later, a packet will need a boolean to indicate if the packet has been edited by the adversary or not
-#the packet will also need an "edited_content" field
+#the packet will also need an "edited_content" field, as we want to store the initial and edited message separatley so we can look at them both later
 class Packet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round = db.Column(db.Integer, nullable=False)
-    sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    recipient = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
+    recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     
-    def __repr__(self):
-        return f"Packet('{self.round}','{self.sender}','{self.recipient}','{self.content}'"
-"""
+    def __repr__(self): #this is what gets printed out for the packet, just spits out everything
+        return f"Packet('{self.id}','{self.round}','{self.sender}','{self.recipient}','{self.content}'"
+
 
 #--------------------info about database stuff with python--------------------#
 # this section should probably be moved to not here 
 #run python
 #from <filename> import db (ex: from Meeting_Mayhem import db)
-#from <filename> import User (ex: from Meeting_Mayhem import User)
+#from <filename> import User (ex: from Meeting_Mayhem.models import User)
 #-these imports allow us to use the classes and db on the python command line
 #db.create_all()
 #-creates all the tables needed for the db
@@ -87,3 +92,5 @@ class Packet(db.Model):
 #-makes a new post variable with information in it that has an author of the user variable
 #db.drop_all()
 #-drops all tables
+#Packet.query.delete()
+#-deletes all entrys in the packet table

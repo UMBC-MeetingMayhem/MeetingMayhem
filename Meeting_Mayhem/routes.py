@@ -1,7 +1,8 @@
 """
 File: routes.py
 Author: Robert Shovan /Voitheia
-Date: 6/15/2021
+Date Created: 6/15/2021
+Last Modified: 6/24/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the routes for the website.
 """
@@ -15,13 +16,13 @@ redirect - used to redirect the user to a different page when something happens
 request - used to see if there is a next_page argument in the url so the user can be redirected there upon login
 app, db, bcrypt - import the app, database, and encryption functionality from the package we initialized in the __init__.py file
 forms - import the forms we created in the forms.py file
-User - imports the User model so we can make users
+User, Packet - imports the User and Packet models so we can make users and packets
 flask_login - different utilities used for loggin the user in, seeing which user is logged in, logging the user out, and requireing login for a page
 """
 from flask import render_template, url_for, flash, redirect, request
 from Meeting_Mayhem import app, db, bcrypt
-from Meeting_Mayhem.forms import RegistrationForm, LoginForm
-from Meeting_Mayhem.models import User
+from Meeting_Mayhem.forms import RegistrationForm, LoginForm, PacketForm
+from Meeting_Mayhem.models import User, Packet
 from flask_login import login_user, current_user, logout_user, login_required
 
 #root route, basically the homepage, this page doesn't really do anything right now
@@ -74,36 +75,29 @@ def logout():
     logout_user() #logout user
     return redirect(url_for('home')) #redir the user to the home page
 
-#account page route, this page doesn't really do anything right now
+#account page route, this page just displays the current user's username for dev purposes
 @app.route('/account')
 @login_required #enforces that the the user needs to be logged in if they navigate to this page
 def account():
     return render_template('account.html', title='Account')
 
-
-"""
-#added this part 6/16/21
 #packet page
-#need to from Meeting_Mayhem.forms import PacketForm
-#need to from Meeting_Mayhem.models import Packet
-#need var current_round to keep track of round in routes.py
 #current_round probably starts at 1 for now, gets advanced when a player send a packet
+#TODO: make current_round advance automatically, this will be done by the adversary's actions eventually
 #this will be changed later when we add the adversary, as their submit will advance the round counter
-@app.route('/packtes', methods=['GET', 'POST'])
+current_round = 2 #keeps track of what round it is so the page knows which packets to display
+@app.route('/packets', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create packets with
 @login_required
 def packets():
-    form = PacketForm()
-    if current_round>1: #need to know how to do this properly in python lol
-        #pull packtes from current_round-1 where the current user is the recipient
-        display_packet = Packet.query.filter_by(round=current_round-1).filter_by(recipient=current_user.id)
-    else:
-        #make the prev packet section blank
-        #do we need jinja logic in the html file to check if messsage has content? 
-    if form.validate_on_submit():
-        #should we be passing the usernames or the ids? the dropdown needs to display usernames, so can we convert that to user id?
-        new_packet = Packet(round=current_round, sender=current_user.username, recipient=form.recipient.data, content=form.content.data)
-        db.session.add(new_packet)
-        db.session.commit()
-        flash(f'Your packet has been sent!', 'success')
-    return render_template('packets.html', title='Packets', form=form, packet=display_packet)
-"""
+    form = PacketForm() #use the packet form
+    display_packet = None #set the display_packet to None initially so that if there is no packet to display it doesn't break the website
+    if (current_round>1): 
+        #pull packets from current_round-1 where the current user is the recipient
+        display_packet = Packet.query.filter_by(round=current_round-1).filter_by(recipient=current_user.username)
+    if form.validate_on_submit(): #when the user submits the packet form and it is valid
+        #create the new packet. grab the current_round for the round var, current user's username for the sender var, dropdown selected user's username for the recipient var, and the message content
+        new_packet = Packet(round=current_round, sender=current_user.username, recipient=form.recipient.data.username, content=form.content.data)
+        db.session.add(new_packet) #stage the packet
+        db.session.commit() #commit the packet to the db
+        flash(f'Your packet has been sent!', 'success') #success message to let user know it worked
+    return render_template('packets.html', title='Packets', form=form, packet=display_packet) #give the template the vars it needs
