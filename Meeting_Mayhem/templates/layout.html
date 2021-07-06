@@ -24,6 +24,54 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
+    <link rel="icon" href="{{ url_for('static', filename='MM_white.svg') }}">
+
+    <style>
+        @keyframes logbox {
+            from {height:0;}
+            to {height:350px;}
+        }
+        @keyframes joinbox {
+            from {width:0;}
+            to {width:500px;}
+        }
+        @keyframes form-fadein {
+            0% {visibility:hidden;opacity:0;}
+            50% {visibility:hidden;opacity:0;}
+            100% {visibility:visible;opacity:1;}
+        }
+        .box-bkg {
+            background: #000011;
+        }
+        .box-border {
+            border: 8px solid #eeeeff;
+        }
+        .logobox {
+            display: flex;
+            width: 500px;
+            height: 500px;
+        }
+        .logbox {
+            display: flex;
+            width: 500px;
+            animation-name: logbox;
+            animation-duration: 1s;
+        }
+        .joinbox {
+            display: flex;
+            height: 500px;
+            animation-name: joinbox;
+            animation-duration: 1s;
+        }
+        .logform {
+            width: 90%;
+            text-align: center;
+            margin: auto;
+            animation-name: form-fadein;
+            animation-duration: 2s;
+        }
+    </style>
+
     <!-- we use an if else statement here to determine what the title of the page should be based on what is passed from the title variable from routes.py -->
     {% if title %}
         <title>Meeting Mayhem - {{ title }}</title>
@@ -37,7 +85,7 @@
     <!-- navigation bar, shamelessly stolen from the below repo -->
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
     <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top >
             <div class="container">
             <a class="navbar-brand mr-4" href="/">Meeting Mayhem</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,6 +135,7 @@
         </div>
 
         <!-- this is where the sidebar is managed. I haven't changed it yet -->
+<!--
         <div class="col-md-4">
         <div class="content-section">
             <h3>Our Sidebar</h3>
@@ -102,7 +151,7 @@
         </div>
     </div>
     </main>
-
+-->
     <!-- bootstrap required stuff begins here -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
     <!-- bootstrap required stuff ends here -->

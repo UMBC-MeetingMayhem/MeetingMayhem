@@ -1,21 +1,25 @@
 <!-- 
     File: login.html
     Author: Robert Shovan /Voitheia
-    Date Created: 6/15/2021
-    Last Modified: 6/23/2021
+    Date: 6/15/2021
     E-mail: rshovan1@umbc.edu
     Description: html and jinja file for handling the login page
 -->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <div class="content-section">
-        <form method="POST" action="">
+<div style="margin:auto;width:1000px;display:flex;flex-direction:column;">
+<div class="logobox box-bkg box-border">
+        <img src="{{ url_for('static', filename='MM_white.svg') }}" 
+        style="width:90%;margin:30px auto;display:block;">
+    </div>
+    <div class="logbox box-bkg box-border" style="line-height:175%;height:350px;flex-direction:column;border-top:none;">
+        <form method="POST" action="" class="logform" style="height:300px;">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for login -->
-                <legend class="border-bottom mb4">Log In</legend>
-                <div class="form-group">
+                <legend class="border-bottom mb4" style="text-align:center;">Log In</legend>
+                <div class="form-group" >
                     {{ form.username.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
                     {% if form.username.errors %} <!-- if there are errors in the form... -->
@@ -43,11 +47,13 @@
                         {{ form.password(class="form-control form-control-lg") }}
                     {% endif %}                    
                 </div>
+
                 <!-- check box for if the user wants to be remembered on this computer. not sure if this does anything -->
-                <div class="form-check">
+                <div class="form-check" style="text-align:left;">
                     {{ form.remember(class="form-check-input") }}
                     {{ form.remember.label(class="form-check-label") }}
                 </div>
+
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
@@ -56,12 +62,13 @@
             <small class="text-muted ml-2">
                 <a href="#">Forgot Password?</a>
             </small>
+            <br>
+                        <!-- link at the bottom of the page if user doesn't have an account yet -->
+                        <small class="text-muted">
+                            Don't Have An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
+                        </small>
         </form>
     </div>
-    <div class="border-top pt-3">
-        <!-- link at the bottom of the page if user doesn't have an account yet -->
-        <small class="text-muted">
-            Don't Have An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
-        </small>
     </div>
+
 {% endblock content %}

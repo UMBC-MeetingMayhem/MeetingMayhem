@@ -9,20 +9,35 @@ Shamelessly stolen from the tutorial:
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/main.css 
 */
 
+html {
+  height:100%;
+}
+
 body {
-    background: #fafafa;
-    color: #333333;
+  background: rgb(0,0,0);
+  background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgba(10,10,47,1) 15%, rgba(86,103,131,1) 67%, rgba(190,230,245,1) 100%);
+    color: #dbcdc6;
     margin-top: 5rem;
   }
   
+.darkbkg {
+  background:rgb(10,10,47);
+}
+
   h1, h2, h3, h4, h5, h6 {
-    color: #444444;
+    color: white;
   }
-  
-  .bg-steel {
-    background-color: #5f788a;
+
+  .home-logo {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left:50%;
+    top:50%;
+    border: 1px solid #dbcdc6;
+    border-radius: 3px;
   }
-  
+
   .site-header .navbar-nav .nav-link {
     color: #cbd5db;
   }
@@ -36,7 +51,7 @@ body {
   }
   
   .content-section {
-    background: #ffffff;
+    background: #888888;
     padding: 10px 20px;
     border: 1px solid #dddddd;
     border-radius: 3px;

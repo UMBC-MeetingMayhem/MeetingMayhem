@@ -1,16 +1,21 @@
 <!-- 
     File: register.html
     Author: Robert Shovan /Voitheia
-    Date Created: 6/15/2021
-    Last Modified: 6/23/2021
+    Date: 6/15/2021
     E-mail: rshovan1@umbc.edu
     Description: html and jinja file for handling the registration page
 -->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <div class="content-section">
-        <form method="POST" action="">
+<div style="margin:auto;width:fit-content;display:flex;">
+<div class="logobox box-bkg box-border style="flex-direction:row;">
+    <img src="{{ url_for('static', filename='MM_white.svg') }}" 
+    style="width:90%;margin:30px auto;display:block;">
+</div>
+<div class="joinbox box-bkg box-border" style="line-height:175%;flex-direction:row;border-left:none;width:500px;">
+        <form method="POST" action="" style="width:90%;text-align:center;margin:auto;
+        animation-name:form-fadein;animation-duration:2s;">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- TODO: the error messages for these only kinda work, the error messages aren't being pulled correctly -->
@@ -73,15 +78,16 @@
                     {% endif %}
                 </div>
             </fieldset>
+            <br>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
+            <small class="text-muted">
+                Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
+            </small>
         </form>
+
     </div>
-    <div class="border-top pt-3">
-        <!-- link at the bottom of the page for if the user already has an account -->
-        <small class="text-muted">
-            Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
-        </small>
     </div>
+
 {% endblock content %}
