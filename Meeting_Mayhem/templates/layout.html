@@ -2,7 +2,7 @@
     File: layout.html
     Author: Robert Shovan /Voitheia
     Date Created: 6/15/2021
-    Last Modified: 6/24/2021
+    Last Modified: 7/6/2021
     E-mail: rshovan1@umbc.edu
     Description: html and jinja file that provides the default layout of all other html files in the website.
     we use a layout template so that we do not repeat code for things we do on each page.
@@ -33,35 +33,58 @@
         }
         @keyframes joinbox {
             from {width:0;}
-            to {width:500px;}
+            to {width:600px;}
         }
         @keyframes form-fadein {
             0% {visibility:hidden;opacity:0;}
             50% {visibility:hidden;opacity:0;}
             100% {visibility:visible;opacity:1;}
         }
+        body {
+            background: rgb(0,0,0);
+            background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgba(10,10,47,1) 15%, rgba(86,103,131,1) 67%, rgba(190,230,245,1) 100%);
+            color: #dbcdc6;
+            margin-top: 5rem;
+            background-attachment: fixed;
+        }
         .box-bkg {
             background: #000011;
         }
+        .nav-style {
+            background:#000011;
+        }
         .box-border {
-            border: 8px solid #eeeeff;
+            border: 12px solid #eeeeff;
         }
         .logobox {
             display: flex;
-            width: 500px;
-            height: 500px;
+            width: 550px;
+            height: 550px;
+            border-radius: 15px;
         }
         .logbox {
             display: flex;
-            width: 500px;
+            width: 550px;
             animation-name: logbox;
             animation-duration: 1s;
+            border-bottom-right-radius: 15px;
+            border-bottom-left-radius: 15px;
+        }
+        .log-logo {
+            border-bottom-right-radius: 0px;
+            border-bottom-left-radius: 0px;
         }
         .joinbox {
             display: flex;
-            height: 500px;
+            height: 550px;
             animation-name: joinbox;
             animation-duration: 1s;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+        .reg-logo {
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
         }
         .logform {
             width: 90%;
@@ -69,6 +92,33 @@
             margin: auto;
             animation-name: form-fadein;
             animation-duration: 2s;
+        }
+        .dark-bg {
+            background-color: #000011;
+            border-bottom: 2px solid rgba(86,103,131,1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #f5f5ff;
+        }
+        .site-header .navbar-nav .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(86,103,131,1);
+        }
+        .content-section {
+            background: #dce0f1;
+            padding: 10px 20px;
+            border: 5px solid #a2b3d8;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .account-opt {
+            width:90%;
+            margin:auto;
+            background-color: #a2b3d8;
+            border: 8px solid #a2b3d8;
+            border-radius: 5px;
+            text-align:center;
+            color:rgb(49, 67, 124);
         }
     </style>
 
@@ -85,7 +135,7 @@
     <!-- navigation bar, shamelessly stolen from the below repo -->
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
     <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top >
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
             <div class="container">
             <a class="navbar-brand mr-4" href="/">Meeting Mayhem</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +151,9 @@
                 <!-- TODO: this doesn't seem to move the links to the right side properly -->
                 <div class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
-                        <a class="nav-item nav-link" href="{{ url_for('packets') }}">Packets</a>
+                        <p class="nav-item nav-link" >{{ current_user.username }}</p>
+                        <p class="nav-item nav-link">|</p>
+                        <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
                         <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% else %}
@@ -149,8 +201,14 @@
             
         </div>
         </div>
+-->
     </div>
     </main>
+<!--
+    <footer>
+        <br><br><br><br><hr>
+        @2021 UMBC
+    </footer>
 -->
     <!-- bootstrap required stuff begins here -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>

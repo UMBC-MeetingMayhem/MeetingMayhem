@@ -2,6 +2,7 @@
     File: register.html
     Author: Robert Shovan /Voitheia
     Date: 6/15/2021
+    Last Modified: 7/6/2021
     E-mail: rshovan1@umbc.edu
     Description: html and jinja file for handling the registration page
 -->
@@ -9,7 +10,7 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 <div style="margin:auto;width:fit-content;display:flex;">
-<div class="logobox box-bkg box-border style="flex-direction:row;">
+<div class="logobox box-bkg box-border" style="flex-direction:row;">
     <img src="{{ url_for('static', filename='MM_white.svg') }}" 
     style="width:90%;margin:30px auto;display:block;">
 </div>

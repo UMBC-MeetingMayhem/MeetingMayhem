@@ -2,7 +2,7 @@
 File: models.py
 Author: Robert Shovan /Voitheia
 Date Created: 6/15/2021
-Last Modified: 6/24/2021
+Last Modified: 7/6/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the database
 """
@@ -11,9 +11,12 @@ Description: python file that handles the database
 info about imports
 db, login_manager - import from __init__.py the database and login manager so we can put users in the database and do login stuff
 UserMixin - does some magic so that handling user login is easy
+partial, orm - used for getUserFactory for the dropdown menus in writing messages
 """
 from Meeting_Mayhem import db, login_manager
 from flask_login import UserMixin
+from functools import partial
+from sqlalchemy import orm
 
 #login management
 
@@ -29,40 +32,66 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    #packets = db.relationship('Packet', backref='sender', lazy=True) #the backref allows the posts to reference the users without needing a column in the posts table, not sure if this will work properly
-    #role = db.Column(db.Integer, nullable=False) #contains if the user is a player or adversary, also GM later
+    #roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user
+    #admin: is able to changes the roles of the users incase we need to do this
+    #GM: game master, puts different users and adversaries into a specific game instance
+    #adversary: edits messages from users
+    #user: plays the game
+    role = db.Column(db.Integer, nullable=False) #contains if the user is a player or adversary, also GM later
+    
+    def __repr__(self): #this is what gets printed out for the User when a basic query is run
+        return f"User('{self.id}','{self.username}','{self.email}','{self.password}','{self.role}')"
 
-    def __repr__(self): #this is what gets printed out for the User
-        return f"{self.username}" #this is short compared to the old print below because User.query.all() is used for the recipient dropdown
-        #TODO: this print should probably be changed back in the future
+#this is how the message forms pulls the users it needs for the recipient dropdown, I don't really know how it works lol
+#https://stackoverflow.com/questions/26254971/more-specific-sql-query-with-flask-wtf-queryselectfield
+def getUser(columns=None):
+    u = User.query.filter_by(role=4)
+    #TODO: once fuctionality for multiple games is added, we need to also filter by the game session
+    #this will also keep the admin and GM users from getting included in the dropdown
+    #this should allow us to be able to choose which users come up in the dropdown
+    if columns:
+        u = u.options(orm.load_only(*columns))
+    return u
 
-""" This is the old print, keeping it because I might need it
-    def __repr__(self): #this is what gets printed out for the User
-        return f"User('{self.id}','{self.username}','{self.email}','{self.password}')"
-"""
+def getUserFactory(columns=None):
+    return partial(getUser, columns=columns)
 
-#packet table
+#message table
 #the intent is to have the round get passed from routes.py, as I think that is a good place to keep track of it
 #sender and recipient should get pulled from the current user and a dropdown respectivley
 #content gets pulled should get pulled from a text box
-#later, a packet will need a boolean to indicate if the packet has been edited by the adversary or not
-#the packet will also need an "edited_content" field, as we want to store the initial and edited message separatley so we can look at them both later
-class Packet(db.Model):
+class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round = db.Column(db.Integer, nullable=False)
     sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    is_edited = db.Column(db.Boolean, nullable=False)
+    new_sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
+    new_recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
+    edited_content = db.Column(db.Text, nullable=True)
     
-    def __repr__(self): #this is what gets printed out for the packet, just spits out everything
-        return f"Packet('{self.id}','{self.round}','{self.sender}','{self.recipient}','{self.content}'"
+    def __repr__(self): #this is what gets printed out for the message, just spits out everything
+        return f"Message('{self.id}','{self.round}','{self.sender}','{self.recipient}','{self.content}','{self.is_edited}','{self.new_sender}','{self.new_recipient}','{self.edited_content}')"
 
+#metadata table, name subject to change to something like "Gamestate"
+#include information about the game in here so it can by dynamically pulled
+#also allows for scaling once we allow for multiple game sessions
+class Metadata(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    adversary = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
+    current_round = db.Column(db.Integer, nullable=False)
+    adv_current_msg = db.Column(db.Integer, nullable=False)
+    adv_current_msg_list_size = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"Metadata('{self.id}','{self.adversary}','{self.current_round}','{self.adv_current_msg}','{self.adv_current_msg_list_size}',)"
 
 #--------------------info about database stuff with python--------------------#
 # this section should probably be moved to not here 
 #run python
 #from <filename> import db (ex: from Meeting_Mayhem import db)
-#from <filename> import User (ex: from Meeting_Mayhem.models import User)
+#from <filename> import User (ex: from Meeting_Mayhem.models import User, Message)
 #-these imports allow us to use the classes and db on the python command line
 #db.create_all()
 #-creates all the tables needed for the db
@@ -92,5 +121,5 @@ class Packet(db.Model):
 #-makes a new post variable with information in it that has an author of the user variable
 #db.drop_all()
 #-drops all tables
-#Packet.query.delete()
-#-deletes all entrys in the packet table
+#Message.query.delete()
+#-deletes all entrys in the message table, also need to do a commit so changes take place
