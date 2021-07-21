@@ -2,7 +2,7 @@
 File: models.py
 Author: Robert Shovan /Voitheia
 Date Created: 6/15/2021
-Last Modified: 7/6/2021
+Last Modified: 7/21/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the database
 """
@@ -17,27 +17,32 @@ from Meeting_Mayhem import db, login_manager
 from flask_login import UserMixin
 from functools import partial
 from sqlalchemy import orm
+#all this code is basically creating the tables for the database
 
 #login management
-
 @login_manager.user_loader #tells login manager that this is the user loader function
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-#this is basically creating the tables for the database
-#i feel like fields and variables are pretty self explanatory here
+#i feel like fields and variables are pretty self explanatory for the models
 #user table
+#contains information about the user
+#might need to be updated later to include metrics, or maybe metrics can be its own model
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    #roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user
-    #admin: is able to changes the roles of the users incase we need to do this
-    #GM: game master, puts different users and adversaries into a specific game instance
-    #adversary: edits messages from users
-    #user: plays the game
-    role = db.Column(db.Integer, nullable=False) #contains if the user is a player or adversary, also GM later
+    role = db.Column(db.Integer, nullable=False) #dictates what role the account is
+    """
+    roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
+    admin: is able to changes the roles of the users incase we need to do this
+    GM: game master, puts different users and adversaries into a specific game instance
+    adversary: edits messages from users
+    user: plays the game
+    spectator: is able to see results for game, probably also messages for each round
+    we might also want to make a role thats both an adversary and a user at some point
+    """
     
     def __repr__(self): #this is what gets printed out for the User when a basic query is run
         return f"User('{self.id}','{self.username}','{self.email}','{self.password}','{self.role}')"
@@ -57,12 +62,13 @@ def getUserFactory(columns=None):
     return partial(getUser, columns=columns)
 
 #message table
-#the intent is to have the round get passed from routes.py, as I think that is a good place to keep track of it
-#sender and recipient should get pulled from the current user and a dropdown respectivley
-#content gets pulled should get pulled from a text box
+#contains the messages that users send to each other and the adversary
+#two sets of sender, recipient, content so that when the adversary edits a message, we can see both the before and after
+#is_edited indicates if the message has been edited
+#also used for a message that the adversary wrote, is_edited will be true without any content in the secondary sender/recipient/content in that case
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    round = db.Column(db.Integer, nullable=False)
+    round = db.Column(db.Integer, nullable=False) #keeps track of which round the message was created on
     sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -84,42 +90,66 @@ class Metadata(db.Model):
     adv_current_msg = db.Column(db.Integer, nullable=False)
     adv_current_msg_list_size = db.Column(db.Integer, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
         return f"Metadata('{self.id}','{self.adversary}','{self.current_round}','{self.adv_current_msg}','{self.adv_current_msg_list_size}',)"
 
-#--------------------info about database stuff with python--------------------#
-# this section should probably be moved to not here 
-#run python
-#from <filename> import db (ex: from Meeting_Mayhem import db)
-#from <filename> import User (ex: from Meeting_Mayhem.models import User, Message)
-#-these imports allow us to use the classes and db on the python command line
-#db.create_all()
-#-creates all the tables needed for the db
-#user_1 = User(username='bob', email='bob@gmail.com', password='password')
-#-this creates a user variable
-#db.session.add(user_1)
-#-this adds the user we created to the "stack" that is waiting to be committed to the db
-#user_2 = User(username='joe', email='joe@gmail.com', password='password')
-#db.session.add(user_2)
-#db.session.commit()
-#-commits the users we added to the "stack" to the db
-#User.query.all()
-#-querys the database for all users
-#User.query.first()
-#-gets the first user
-#User.query.filter_by(username='bob').all()
-#-querys the database for all users with username of 'bob'
-#user = User.query.filter_by(username='bob').first()
-#-puts the bob user into a variable of "user"
-#user
-#-will print out the information of the user in the user variable
-#user.id
-#-will print out the id of the user in the user variable
-#user = User.query.get(2)
-#-sets the user variable to the user of id 2
-#post_1 = Post(title='thingy', content='this has stuff in it yeee', user_id=user.id)
-#-makes a new post variable with information in it that has an author of the user variable
-#db.drop_all()
-#-drops all tables
-#Message.query.delete()
-#-deletes all entrys in the message table, also need to do a commit so changes take place
+"""
+
+-----------------------info about database stuff with python-----------------------
+ this section should probably be moved to not here 
+run python in powershell prompt
+
+from <filename> import db (ex: from Meeting_Mayhem import db)
+from <filename> import User (ex: from Meeting_Mayhem.models import User, Message)
+-these imports allow us to use the classes and db on the python command line
+
+db.create_all()
+-creates all the tables needed for the db
+
+user_1 = User(username='bob', email='bob@gmail.com', password='password')
+-this creates a user variable
+
+db.session.add(user_1)
+-this adds the user we created to the "stack" that is waiting to be committed to the db
+
+user_2 = User(username='joe', email='joe@gmail.com', password='password')
+db.session.add(user_2)
+db.session.commit()
+-commits the users we added to the "stack" to the db
+
+User.query.all()
+-querys the database for all users
+
+User.query.first()
+-gets the first user
+
+User.query.filter_by(username='bob').all()
+-querys the database for all users with username of 'bob'
+
+user = User.query.filter_by(username='bob').first()
+-puts the bob user into a variable of "user"
+
+user
+-will print out the information of the user in the user variable
+
+user.id
+-will print out the id of the user in the user variable
+
+user = User.query.get(2)
+-sets the user variable to the user of id 2
+
+post_1 = Post(title='thingy', content='this has stuff in it yeee', user_id=user.id)
+-makes a new post variable with information in it that has an author of the user variable
+
+db.drop_all()
+-drops all tables
+
+Message.query.delete()
+-deletes all entrys in the message table, also need to do a commit so changes take place
+
+change the role of a user:
+    adv = User.query.filter_by(username='adversary').first()
+    adv.role = 3
+    db.session.commit()
+
+"""

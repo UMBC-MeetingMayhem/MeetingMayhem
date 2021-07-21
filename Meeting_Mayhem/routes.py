@@ -79,7 +79,7 @@ def logout():
 @app.route('/account', methods=['GET', 'POST']) #, methods=['GET', 'POST']) needs to be removed when the decrement round button is
 @login_required #enforces that the the user needs to be logged in if they navigate to this page
 def account():
-    #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary users
+    #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
     form = AdversaryAdvanceRoundForm()
     current_game = Metadata.query.filter_by(adversary='adversary').first()
     if form.advance_round.data:
@@ -106,6 +106,7 @@ def messages():
         db.session.commit()
 
     #setup the current_game variable so that we can pull game state information from it
+    #TODO: this needs to be changed once game instances are implemented, should be dynamic
     current_game = Metadata.query.filter_by(adversary='adversary').first()
 
     #if the current_user is of the adversary role, then display the adversary version of the page
@@ -137,13 +138,18 @@ def messages():
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
             #create the new message variable with the information from the form
-            new_message = Message(round=(current_game.current_round+1), sender=msg_form.sender.data.username, recipient=msg_form.recipient.data.username, content=msg_form.content.data, is_edited=True, new_sender=None, new_recipient=None, edited_content=None)
+            new_message = Message(round=(current_game.current_round+1), sender=msg_form.sender.data.username,
+            recipient=msg_form.recipient.data.username, content=msg_form.content.data, is_edited=True, new_sender=None,
+            new_recipient=None, edited_content=None)
+
             db.session.add(new_message) #stage the message
             db.session.commit() #commit the message to the db
             flash(f'Your message has been sent!', 'success') #success message to let user know it worked
 
             #render the webpage
-            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form, adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game, current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+            current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
         
         elif ((is_prev_submit or is_next_submit or is_submit_edits)): #if any of the prev/next/submit buttons are clicked
             if is_prev_submit: #if the prev button is clicked
@@ -156,7 +162,8 @@ def messages():
                     db.session.commit()
             
             elif is_next_submit: #if the next button is clicked
-                if current_game.adv_current_msg == (current_game.adv_current_msg_list_size - 1): #if the adversary tries to go forwards on the last message
+                #if the adversary tries to go forwards on the last message
+                if current_game.adv_current_msg == (current_game.adv_current_msg_list_size - 1):
                     current_game.adv_current_msg = 0 #loop back around
                     db.session.commit() #update the current message
 
@@ -188,7 +195,9 @@ def messages():
             is_submit_edits = False
 
             #render the webpage
-            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form, adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game, current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
         
         elif adv_next_round_form.advance_round.data: #if the adversary clicks the advance round button
             #increment the current_round and reset the current message and current message list size, then commit changes
@@ -198,11 +207,15 @@ def messages():
             db.session.commit()
 
             #render the webpage
-            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form, adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game, current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+            current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
         
         else:
             # display normally
-            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form, adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game, current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+            current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
     
     #for all other users
     form = MessageForm() #use the message form
@@ -210,9 +223,12 @@ def messages():
         #pull messages from current_round-1 where the current user is the recipient
         display_message = Message.query.filter_by(round=current_game.current_round-1).filter_by(recipient=current_user.username)
     if form.validate_on_submit(): #when the user submits the message form and it is valid
-        #create the new message. grab the current_round for the round var, current user's username for the sender var, dropdown selected user's username for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round, sender=current_user.username, recipient=form.recipient.data.username, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None)
+        #create the new message. grab the current_round for the round var, current user's username for the sender var,
+        #dropdown selected user's username for the recipient var, and the message content
+        new_message = Message(round=current_game.current_round, sender=current_user.username, recipient=form.recipient.data.username,
+        content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None)
         db.session.add(new_message) #stage the message
         db.session.commit() #commit the message to the db
         flash(f'Your message has been sent!', 'success') #success message to let user know it worked
-    return render_template('messages.html', title='Messages', form=form, message=display_message) #give the template the vars it needs
+    #give the template the vars it needs
+    return render_template('messages.html', title='Messages', form=form, message=display_message)

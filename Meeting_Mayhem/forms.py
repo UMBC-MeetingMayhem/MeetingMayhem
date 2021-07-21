@@ -2,7 +2,7 @@
 File: forms.py
 Author: Robert Shovan /Voitheia
 Date Created: 6/15/2021
-Last Modified: 7/6/2021
+Last Modified: 7/21/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the registraion and login forms for the website
 """

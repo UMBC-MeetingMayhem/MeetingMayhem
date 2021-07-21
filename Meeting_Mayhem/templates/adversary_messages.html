@@ -5,6 +5,8 @@
     Last Modified: 7/6/2021
     E-mail: rshovan1@umbc.edu
     Description: html and jinja file for handling the adversary messages page
+    messages.html and this file could be combined using if statements to check if the current user is an adversary
+    we might want to do that in the future so that we don't have to edit two message sections in two documents
 -->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
@@ -68,8 +70,6 @@
     </div>
 
     <h2>Round {{ game.current_round }} Message {{ current_msg }}/{{ msg_list_size }}</h2>
-
-{# THIS SECTION WILL PROBABLY BREAK IF NO MESSAGES ARE PASSED THROUGH THE ROUTE #}
 
     {% if message %} <!-- if there is a message passed, display it and the edit message stuff -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
