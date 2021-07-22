@@ -149,7 +149,7 @@ def messages():
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-            current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
         
         elif ((is_prev_submit or is_next_submit or is_submit_edits)): #if any of the prev/next/submit buttons are clicked
             if is_prev_submit: #if the prev button is clicked
@@ -179,6 +179,10 @@ def messages():
                 display_message.new_sender = adv_msg_edit_form.new_sender.data.username
                 display_message.new_recipient = adv_msg_edit_form.new_recipient.data.username
                 display_message.edited_content = adv_msg_edit_form.edited_content.data
+                #pull the messages again since the messages we want to display has changed
+                messages = Message.query.filter_by(round=current_game.current_round).all()
+                current_game.adv_current_msg = 0
+                current_game.adv_current_msg_list_size = len(messages)
                 #commit the messages to the database
                 db.session.commit()
 
@@ -209,13 +213,13 @@ def messages():
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-            current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
         
         else:
             # display normally
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-            current_msg=current_game.adv_current_msg, msg_list_size=current_game.adv_current_msg_list_size)
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
     
     #for all other users
     form = MessageForm() #use the message form
