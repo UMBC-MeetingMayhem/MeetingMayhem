@@ -224,8 +224,8 @@ def messages():
     #for all other users
     form = MessageForm() #use the message form
     if (current_game.current_round>1): 
-        #pull messages from current_round-1 where the current user is the recipient
-        display_message = Message.query.filter_by(round=current_game.current_round-1).filter_by(recipient=current_user.username)
+        #pull messages from current_round where the current user is the recipient
+        display_message = Message.query.filter_by(round=current_game.current_round).filter_by(recipient=current_user.username)
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         #create the new message. grab the current_round for the round var, current user's username for the sender var,
         #dropdown selected user's username for the recipient var, and the message content
