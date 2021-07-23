@@ -5,6 +5,7 @@ Date Created: 6/15/2021
 Last Modified: 7/21/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the database
+Whenever you make a change to the models, I believe you need to reset the DB
 """
 
 """
@@ -13,7 +14,7 @@ db, login_manager - import from __init__.py the database and login manager so we
 UserMixin - does some magic so that handling user login is easy
 partial, orm - used for getUserFactory for the dropdown menus in writing messages
 """
-from Meeting_Mayhem import db, login_manager
+from MeetingMayhem import db, login_manager
 from flask_login import UserMixin
 from functools import partial
 from sqlalchemy import orm
@@ -45,7 +46,7 @@ class User(db.Model, UserMixin):
     """
     
     def __repr__(self): #this is what gets printed out for the User when a basic query is run
-        return f"User('{self.id}','{self.username}','{self.email}','{self.password}','{self.role}')"
+        return f"User(ID='{self.id}', Username='{self.username}', Email='{self.email}', Pwd Hash='{self.password}', Role='{self.role}')\n"
 
 #this is how the message forms pulls the users it needs for the recipient dropdown, I don't really know how it works lol
 #https://stackoverflow.com/questions/26254971/more-specific-sql-query-with-flask-wtf-queryselectfield
@@ -68,7 +69,7 @@ def getUserFactory(columns=None):
 #also used for a message that the adversary wrote, is_edited will be true without any content in the secondary sender/recipient/content in that case
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    round = db.Column(db.Integer, nullable=False) #keeps track of which round the message was created on
+    round = db.Column(db.Integer, nullable=False) #keeps track of which round the message needs to be displayed for users in
     sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -76,9 +77,10 @@ class Message(db.Model):
     new_sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
     new_recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
     edited_content = db.Column(db.Text, nullable=True)
+    is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message('{self.id}','{self.round}','{self.sender}','{self.recipient}','{self.content}','{self.is_edited}','{self.new_sender}','{self.new_recipient}','{self.edited_content}')"
+        return f"Message(ID='{self.id}', Round='{self.round}', Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}')\n"
 
 #metadata table, name subject to change to something like "Gamestate"
 #include information about the game in here so it can by dynamically pulled
@@ -91,28 +93,30 @@ class Metadata(db.Model):
     adv_current_msg_list_size = db.Column(db.Integer, nullable=False)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
-        return f"Metadata('{self.id}','{self.adversary}','{self.current_round}','{self.adv_current_msg}','{self.adv_current_msg_list_size}',)"
+        return f"Metadata(ID='{self.id}', Adversary='{self.adversary}', Round='{self.current_round}', Current Msg='{self.adv_current_msg}', Msg List Size='{self.adv_current_msg_list_size}')\n"
 
 """
 
 -----------------------info about database stuff with python-----------------------
- this section should probably be moved to not here 
+this section should probably be moved to not here
+CREATING USERS THIS WAY IS INSECURE BECAUSE WE'RE COPYING THE PWD HASH, NOT HOW BCRYPT IS SUPPOSED TO WORK
+
 run python in powershell prompt
 
-from <filename> import db (ex: from Meeting_Mayhem import db)
-from <filename> import User (ex: from Meeting_Mayhem.models import User, Message)
+from <filename> import db (ex: from MeetingMayhem import db)
+from <filename> import User (ex: from MeetingMayhem.models import User, Message, Metadata)
 -these imports allow us to use the classes and db on the python command line
 
 db.create_all()
 -creates all the tables needed for the db
 
-user_1 = User(username='bob', email='bob@gmail.com', password='password')
+user_1 = User(username='bob', email='bob@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
 -this creates a user variable
 
 db.session.add(user_1)
 -this adds the user we created to the "stack" that is waiting to be committed to the db
 
-user_2 = User(username='joe', email='joe@gmail.com', password='password')
+user_2 = User(username='joe', email='joe@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
 db.session.add(user_2)
 db.session.commit()
 -commits the users we added to the "stack" to the db
@@ -135,21 +139,37 @@ user
 user.id
 -will print out the id of the user in the user variable
 
-user = User.query.get(2)
--sets the user variable to the user of id 2
-
-post_1 = Post(title='thingy', content='this has stuff in it yeee', user_id=user.id)
--makes a new post variable with information in it that has an author of the user variable
-
 db.drop_all()
 -drops all tables
 
 Message.query.delete()
 -deletes all entrys in the message table, also need to do a commit so changes take place
 
-change the role of a user:
-    adv = User.query.filter_by(username='adversary').first()
-    adv.role = 3
-    db.session.commit()
+User.query.filter_by(id=123).delete()
+-delete a user, make sure to commit
+
+Change the role of a user:
+adv = User.query.filter_by(username='adversary').first()
+adv.role = 3
+db.session.commit()
+
+Reset DB:
+from MeetingMayhem import db
+from MeetingMayhem.models import User, Message, Metadata
+db.drop_all()
+db.session.commit()
+db.create_all()
+
+Create adversary:
+adv = User(username='adversary', email='adv@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=3)
+db.session.add(adv)
+db.session.commit()
+
+Create test users:
+user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+db.session.add(user1)
+db.session.add(user2)
+db.session.commit()
 
 """

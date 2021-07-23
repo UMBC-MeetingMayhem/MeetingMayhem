@@ -11,7 +11,7 @@ https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUx
 """
 
 #import the app from the package so that we can run it here
-from Meeting_Mayhem import app
+from MeetingMayhem import app
 
 """
 Runs the app. For now, the app is run in debug mode for ease of development. This allows us to see changes we make to

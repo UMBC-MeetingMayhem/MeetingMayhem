@@ -45,4 +45,4 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
 #this import is done here to prevent circular imports
-from Meeting_Mayhem import routes
+from MeetingMayhem import routes

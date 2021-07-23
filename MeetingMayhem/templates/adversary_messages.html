@@ -79,7 +79,9 @@
                 <div class="article-metadata">
                 <a>Sender: {{ message.new_sender }}</a>
                 <a>Recipient: {{ message.new_recipient }}</a>
+                <!-- Removing this since the round is indicated above
                 <small class="text-muted">Round: {{ message.round }}</small>
+                -->
                 </div>
                 <p class="article-content">{{ message.edited_content }}</p>
             </div>
@@ -90,7 +92,9 @@
                 <div class="article-metadata">
                 <a>Sender: {{ message.sender }}</a>
                 <a>Recipient: {{ message.recipient }}</a>
+                <!-- Removing this since the round is indicated above
                 <small class="text-muted">Round: {{ message.round }}</small>
+                -->
                 </div>
                 <p class="article-content">{{ message.content }}</p>
             </div>
@@ -151,10 +155,11 @@
                 </div>
             </fieldset>
             <div class="form-group">
-                <!-- previous, submit, and next buttons for message editing -->
+                <!-- previous, next, delete, and submit buttons for message editing -->
                 {{ adv_buttons_form.prev_submit(class="btn btn-outline-info") }}
-                {{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
                 {{ adv_buttons_form.next_submit(class="btn btn-outline-info") }}
+                {{ adv_buttons_form.delete_msg(class="btn btn-outline-info") }}
+                {{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>

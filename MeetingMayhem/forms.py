@@ -19,7 +19,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from Meeting_Mayhem.models import User, getUserFactory
+from MeetingMayhem.models import User, getUserFactory
 
 #this part handles the registraion form for new users
 #i feel like these fields and variables are pretty self-explanatory, the first string passed is the title of the field
@@ -71,10 +71,11 @@ class AdversaryMessageEditForm(FlaskForm):
     edited_content = StringField('Edited Message')
     submit_edits = SubmitField('Submit Edits')
 
-#Form for the adversary to choose their message to edit
-class AdversaryMessageSubmitForm(FlaskForm):
+#Form for the adversary to choose their message to edit or delete message
+class AdversaryMessageButtonForm(FlaskForm):
     prev_submit = SubmitField('Previous Message')
     next_submit = SubmitField('Next Message')
+    delete_msg = SubmitField('Delete Message')
 
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):
