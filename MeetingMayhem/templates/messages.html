@@ -20,6 +20,7 @@
             <div class="media-body">
                 <div class="article-metadata">
                 <a>Sender: {{ message.new_sender }}</a>
+                <a>Recipient: {{ message.new_recipient }}</a>
                 <small class="text-muted">Round: {{ message.round }}</small>
                 </div>
                 <p class="article-content">{{ message.edited_content }}</p>
@@ -30,6 +31,7 @@
             <div class="media-body">
                 <div class="article-metadata">
                 <a>Sender: {{ message.sender }}</a>
+                <a>Recipient: {{ message.recipient }}</a>
                 <small class="text-muted">Round: {{ message.round }}</small>
                 </div>
                 <p class="article-content">{{ message.content }}</p>

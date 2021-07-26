@@ -242,14 +242,47 @@ def messages():
     form = MessageForm() #use the message form
     if (current_game.current_round>1): 
         #pull messages from current_round where the current user is the recipient
-        display_message = Message.query.filter_by(round=current_game.current_round).filter_by(recipient=current_user.username,is_deleted=False)
+        #display_message = Message.query.filter_by(round=current_game.current_round).filter_by(recipient=current_user.username,is_deleted=False)
+        display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False)
+
+        #this section creates a list of lists of usernames that is parallel to display_message
+        #i.e. the first item in bigusers is a list of the recipients for the first item in display_message
+        #the ids of the messsages are also captured so that we can easily call the message later
+        bigusers=[]
+        msg_ids=[]
+        for message in display_message.all():
+            users=[]
+            parse_for_username(message.recipient, users)
+            bigusers.append(users)
+            msg_ids.append(message.id)
+
+        #this section goes back through bigusers and checks if any of the recipients are the current user
+        #if true, then the corresponding message is added to a list of messages that is passed to the template
+        i=0
+        msgs=[]
+        for users in bigusers:
+            for user in users:
+                if user==current_user.username:
+                    msgs.append(Message.query.filter_by(id=msg_ids[i]).first())
+            i+=1
+        
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         #create the new message. grab the current_round for the round var, current user's username for the sender var,
         #dropdown selected user's username for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=form.recipient.data.username,
+        recipients = ' '.join(map(str, form.recipient.data)) #this converts the list of recipients into a string
+        new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=recipients,
         content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
         db.session.add(new_message) #stage the message
         db.session.commit() #commit the message to the db
         flash(f'Your message has been sent!', 'success') #success message to let user know it worked
     #give the template the vars it needs
-    return render_template('messages.html', title='Messages', form=form, message=display_message)
+    return render_template('messages.html', title='Messages', form=form, message=msgs)
+
+#recursivley parse the given string for usernames, return a list of usernames
+def parse_for_username(str, users):
+    str1=str.partition("Username='")[2]
+    str2=str1.partition("', ")
+    if str2[2]:
+        users.append(str2[0])
+        parse_for_username(str2[2], users)    
+    return users

@@ -71,7 +71,8 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round = db.Column(db.Integer, nullable=False) #keeps track of which round the message needs to be displayed for users in
     sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
-    recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
+    #recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
+    recipient = db.Column(db.String)
     content = db.Column(db.Text, nullable=False)
     is_edited = db.Column(db.Boolean, nullable=False)
     new_sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
