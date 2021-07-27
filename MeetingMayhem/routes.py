@@ -139,10 +139,16 @@ def messages():
 
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
+            users_recipients=[] #make a list to put usernames in for the recipient
+            users_senders=[] #make a list to put usernames in for the sender
+            #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
+            #then maps the list of usernames into a string to pass into the db
+            recipients = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.recipient.data)), users_recipients)))
+            senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
+
             #create the new message variable with the information from the form
-            new_message = Message(round=(current_game.current_round+1), sender=msg_form.sender.data.username,
-            recipient=msg_form.recipient.data.username, content=msg_form.content.data, is_edited=True, new_sender=None,
-            new_recipient=None, edited_content=None, is_deleted=False)
+            new_message = Message(round=(current_game.current_round+1), sender=senders, recipient=recipients, content=msg_form.content.data,
+            is_edited=True, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
 
             db.session.add(new_message) #stage the message
             db.session.commit() #commit the message to the db
@@ -241,15 +247,51 @@ def messages():
     #for regular users
     form = MessageForm() #use the message form
     if (current_game.current_round>1): 
-        #pull messages from current_round where the current user is the recipient
-        display_message = Message.query.filter_by(round=current_game.current_round).filter_by(recipient=current_user.username,is_deleted=False)
+        #pull messages from current_round where the message isn't deleted
+        display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
+
+        msgs=[] #create a list to store the messages to dispay to pass to the template
+        for message in display_message: #for each message
+            if message.recipient: #if the message has a recipient
+                if check_for_username(message.recipient, current_user.username):
+                    #check if one of the recipients is the same as the current user, and append it to the list
+                    msgs.append(message)
+        
     if form.validate_on_submit(): #when the user submits the message form and it is valid
+        users=[] #make a list to put usernames in for the recipient
+        #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
+        #then maps the list of usernames into a string to pass into the db
+        recipients = ''.join(map(str, parse_for_username(''.join(map(str, form.recipient.data)), users)))
+        
         #create the new message. grab the current_round for the round var, current user's username for the sender var,
-        #dropdown selected user's username for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=form.recipient.data.username,
+        #selected user's usernames for the recipient var, and the message content
+        new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=recipients,
         content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
         db.session.add(new_message) #stage the message
         db.session.commit() #commit the message to the db
         flash(f'Your message has been sent!', 'success') #success message to let user know it worked
     #give the template the vars it needs
-    return render_template('messages.html', title='Messages', form=form, message=display_message)
+    return render_template('messages.html', title='Messages', form=form, message=msgs)
+
+#recursivley parse the given string for usernames, return a list of usernames delimited by commas
+def parse_for_username(str, users):
+    str1=str.partition("Username='")[2] #grabs all the stuff in the string after the text "Username='"
+    str2=str1.partition("', ") #separates the remaining string into the username, the "', ", and the rest of the string
+    if str2[2]: #if there is content in the rest of the string
+        if (str2[2].find('Username') != -1): #if we can find the text 'Username' in the rest of the string
+            user = str2[0] + ', ' #put a comma and space after the username
+            users.append(user) #append it to the list
+            parse_for_username(str2[2], users) #call this method again
+        else: #if not
+            users.append(str2[0]) #just append the username as it is the last one
+    return users #return the list of usernames
+
+#recursivley parse the given string for usernames, return true if the given username is found
+def check_for_username(str, username):
+    str1=str.partition(', ') #split the string into the username, the "', ", and the rest of the string
+    if str1[0] == username: #if the first part of str is the username we are looking for
+        return True
+    if not str1[2]: #if there is nothing in the rest of str, it means there are no more usernames to look for
+        return False
+    else:
+        check_for_username(str1[2], username) #call this method again if there is more string to look through
