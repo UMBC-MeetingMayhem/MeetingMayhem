@@ -51,7 +51,6 @@ class LoginForm(FlaskForm):
 #Message form for users to construct messages with
 class MessageForm(FlaskForm):
     #the whole query_factory thing is responsible for pulling the users to select for the dropdown
-    #recipient = QuerySelectField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', allow_blank=False)
     recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', allow_blank=False)
     content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Message')
@@ -60,8 +59,6 @@ class MessageForm(FlaskForm):
 #The adversary forms are split up in this way so that it was easier to figure out what the adversary was doing in the routes.py file
 #Form for the adversary to create a message. Needed the sender field on top of the other things the Message form has
 class AdversaryMessageSendForm(FlaskForm):
-    #sender = QuerySelectField(u'Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
-    #recipient = QuerySelectField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     sender = QuerySelectMultipleField(u'Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
     recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     content = StringField('Message')
@@ -69,8 +66,6 @@ class AdversaryMessageSendForm(FlaskForm):
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
-    #new_sender = QuerySelectField(u'New Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
-    #new_recipient = QuerySelectField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     new_sender = QuerySelectMultipleField(u'New Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
     new_recipient = QuerySelectMultipleField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     edited_content = StringField('Edited Message')

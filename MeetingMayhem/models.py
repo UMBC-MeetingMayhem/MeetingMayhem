@@ -70,9 +70,8 @@ def getUserFactory(columns=None):
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round = db.Column(db.Integer, nullable=False) #keeps track of which round the message needs to be displayed for users in
-    sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
-    #recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
-    recipient = db.Column(db.String)
+    sender = db.Column(db.String, nullable=False)
+    recipient = db.Column(db.String, nullable=False)
     content = db.Column(db.Text, nullable=False)
     is_edited = db.Column(db.Boolean, nullable=False)
     new_sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
@@ -166,9 +165,18 @@ adv = User(username='adversary', email='adv@gmail.com', password='$2b$12$XKWaEWQ
 db.session.add(adv)
 db.session.commit()
 
+Create game:
+game = Metadata(adversary='adversary', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+db.session.add(game)
+db.session.commit()
+
 Create test users:
 user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
 user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+user_1 = User(username='bob', email='bob@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+user_2 = User(username='joe', email='joe@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+db.session.add(user_1)
+db.session.add(user_2)
 db.session.add(user1)
 db.session.add(user2)
 db.session.commit()

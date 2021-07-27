@@ -20,6 +20,7 @@
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
                 <legend class="border-bottom mb4">Send a Message</legend>
+                <p>Use CTRL+Click or SHIFT+Click to select multiple.</p>
                 <div class="form-group">
                     {{ msg_form.sender.label(class="form-control-label") }}
 
@@ -69,9 +70,9 @@
         </form>
     </div>
 
-    <h2>Round {{ game.current_round }} Message {{ current_msg }}/{{ msg_list_size }}</h2>
 
     {% if message %} <!-- if there is a message passed, display it and the edit message stuff -->
+    <h2>Round {{ game.current_round }} Message {{ current_msg }}/{{ msg_list_size }}</h2>
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
         {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
         <article class="media content-section">
@@ -164,6 +165,7 @@
         </form>
     </div>
     {% else %} <!-- if no messages are passed, just display this -->
+    <h2>Round {{ game.current_round }} </h2>
     <h3>No messages for the current round.</h3>
     {% endif %}
     
