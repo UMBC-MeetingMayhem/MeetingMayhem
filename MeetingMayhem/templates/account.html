@@ -12,7 +12,7 @@
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
     
     <!-- the below is in place for testing only, only displays for adversary -->
-    {% if role == 3 %}
+    {% if current_user.role == 3 %}
     <div class="content-section">
         <form method="POST" action="">
             <div class="form-group">
@@ -46,14 +46,16 @@
         </div>
         <div class="content-section" style="width:30%;margin:1%;height:fit-content;">
             <h3 style="font-family:Verdana, Geneva, Tahoma, sans-serif;font-weight: bold;color:rgb(49, 67, 124)">You are currently:</h3>
-            {% if role == 1 %}
+            {% if current_user.role == 1 %}
             <h3 style="color:rgb(49, 67, 124);">an Admin</h3>
-            {% elif role == 2 %}
+            {% elif current_user.role == 2 %}
             <h3 style="color:rgb(49, 67, 124);">a Game Master</h3>
-            {% elif role == 3 %}
+            {% elif current_user.role == 3 %}
             <h3 style="color:rgb(49, 67, 124);">an Adversary</h3>
-            {% elif role == 4 %}
+            {% elif current_user.role == 4 %}
             <h3 style="color:rgb(49, 67, 124);">a User</h3>
+            {% elif current_user.role == 5 %}
+            <h3 style="color:rgb(49, 67, 124);">a Sectator</h3>
             {% endif %}
             <br>
             <hr style="color:rgb(49, 67, 124);">

@@ -15,11 +15,12 @@ validators - allows the forms to validate different things about the information
 User - import the User class from the models.py file so that we can check if a username or email is already in use
 getUserFactory - used to pull the usernames for the recipient selection
 """
+from re import U
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from MeetingMayhem.models import User, getUserFactory
+from MeetingMayhem.models import User, getAdversaryFactory, getUserFactory, getAllUserFactory, getGameFactory
 
 #this part handles the registraion form for new users
 #i feel like these fields and variables are pretty self-explanatory, the first string passed is the title of the field
@@ -80,3 +81,17 @@ class AdversaryMessageButtonForm(FlaskForm):
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):
     advance_round = SubmitField('Advance Round')
+
+class GMSetupGameForm(FlaskForm):
+    name = StringField('Game Name')
+    #adversary = StringField('adversary')
+    adversary = QuerySelectField(u'Adversary', query_factory=getAdversaryFactory(['id', 'username']), get_label='username')
+    #adversary = QuerySelectField(u'Adversary', query_factory=lambda: User.query.filter_by(role=3).all(), get_label='username')
+    players = QuerySelectMultipleField(u'Players', query_factory=getAllUserFactory(['id', 'username']), get_label='username')
+    #players = QuerySelectMultipleField(u'Players', query_factory=lambda: User.query.filter_by(role=4).all(), get_label='username')
+    create_game = SubmitField('Create Game')
+
+class GMManageGameForm(FlaskForm):
+    games = QuerySelectMultipleField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name')
+    #games = StringField('games')
+    end_game = SubmitField('End Game')

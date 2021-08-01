@@ -21,9 +21,44 @@ flask_login - different utilities used for loggin the user in, seeing which user
 """
 from flask import render_template, url_for, flash, redirect, request
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm
-from MeetingMayhem.models import User, Message, Metadata
-from flask_login import login_user, current_user, logout_user, login_required
+from MeetingMayhem.forms import RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
+from MeetingMayhem.models import User, Message, Game
+from flask_login import login_user, logout_user, login_required, current_user
+
+#recursivley parse the given string for usernames, return a list of usernames delimited by commas
+def parse_for_username(str, users):
+    str1=str.partition("Username='")[2] #grabs all the stuff in the string after the text "Username='"
+    str2=str1.partition("', ") #separates the remaining string into the username, the "', ", and the rest of the string
+    if str2[2]: #if there is content in the rest of the string
+        if (str2[2].find('Username') != -1): #if we can find the text 'Username' in the rest of the string
+            user = str2[0] + ', ' #put a comma and space after the username
+            users.append(user) #append it to the list
+            parse_for_username(str2[2], users) #call this method again
+        else: #if not
+            users.append(str2[0]) #just append the username as it is the last one
+    return users #return the list of usernames
+
+def parse_for_game(str, games):
+    str1=str.partition("Name='")[2]
+    str2=str1.partition("', ")
+    if str2[2]:
+        if (str2[2].find('Name') != -1):
+            game = str2[0] + ', '
+            games.append(game)
+            parse_for_game(str2[2], games)
+        else:
+            games.append(str2[0])
+    return games
+
+#recursivley parse the given string for usernames, return true if the given username is found
+def check_for_str(str, check):
+    str1=str.partition(', ') #split the string into the username, the "', ", and the rest of the string
+    if str1[0] == check: #if the first part of str is the username we are looking for
+        return True
+    if not str1[2]: #if there is nothing in the rest of str, it means there are no more usernames to look for
+        return False
+    else:
+        check_for_str(str1[2], check) #call this method again if there is more string to look through
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -81,13 +116,13 @@ def logout():
 def account():
     #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
     form = AdversaryAdvanceRoundForm()
-    current_game = Metadata.query.filter_by(adversary='adversary').first()
+    current_game = Game.query.filter_by(adversary='adversary').first()
     if form.advance_round.data:
         current_game.current_round -= 1
         current_game.adv_current_msg = 0
         current_game.adv_current_msg_list_size = 0
         db.session.commit()
-    return render_template('account.html', title='Account', form=form, role=User.query.filter_by(username=current_user.username).first().role)
+    return render_template('account.html', title='Account', form=form)
 
 #message page
 #TODO: check for duplicate post request when sending messages
@@ -99,19 +134,19 @@ def messages():
 
     #TODO: these few lines need to be changed when we can put users into a game instance, it should search dynamically for the game
     #since there is only one adversary and one instance of the game this will work for now
-    #if (not (Metadata.query.filter_by(adversary=current_user.username).first())):
-    if (not (Metadata.query.filter_by(adversary='adversary').first())): #if there isn't a game with the adversary user as the adversary...
+    #if (not (Game.query.filter_by(adversary=current_user.username).first())):
+    if (not (Game.query.filter_by(adversary='adversary').first())): #if there isn't a game with the adversary user as the adversary...
         #create a new game and add it to the database
-        new_game = Metadata(adversary=current_user.username, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+        new_game = Game(adversary=current_user.username, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
         db.session.add(new_game)
         db.session.commit()
 
     #setup the current_game variable so that we can pull game state information from it
     #TODO: this needs to be changed once game instances are implemented, should be dynamic
-    current_game = Metadata.query.filter_by(adversary='adversary').first()
+    current_game = Game.query.filter_by(adversary='adversary').first()
 
-    #if the current_user is of the adversary role, then display the adversary version of the page
-    if (current_user.role==3):
+    #if the current_user is of the game master or adversary role, then display the adversary version of the page
+    if (current_user.role==2 or current_user.role==3):
 
         #setup variables for the forms the adversary needs to use
         msg_form = AdversaryMessageSendForm()
@@ -253,7 +288,7 @@ def messages():
         msgs=[] #create a list to store the messages to dispay to pass to the template
         for message in display_message: #for each message
             if message.recipient: #if the message has a recipient
-                if check_for_username(message.recipient, current_user.username):
+                if check_for_str(message.recipient, current_user.username):
                     #check if one of the recipients is the same as the current user, and append it to the list
                     msgs.append(message)
         
@@ -273,25 +308,32 @@ def messages():
     #give the template the vars it needs
     return render_template('messages.html', title='Messages', form=form, message=msgs)
 
-#recursivley parse the given string for usernames, return a list of usernames delimited by commas
-def parse_for_username(str, users):
-    str1=str.partition("Username='")[2] #grabs all the stuff in the string after the text "Username='"
-    str2=str1.partition("', ") #separates the remaining string into the username, the "', ", and the rest of the string
-    if str2[2]: #if there is content in the rest of the string
-        if (str2[2].find('Username') != -1): #if we can find the text 'Username' in the rest of the string
-            user = str2[0] + ', ' #put a comma and space after the username
-            users.append(user) #append it to the list
-            parse_for_username(str2[2], users) #call this method again
-        else: #if not
-            users.append(str2[0]) #just append the username as it is the last one
-    return users #return the list of usernames
+# game setup route for the game master
+@app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
+@login_required #requires the user to be logged in
+def game_setup():
+    if current_user.role != 2: #if the user isn't a game master
+        return render_template('home.html', title='Home') #display the home page when they try to access this page directly.
+    mng_form = GMManageGameForm()
+    setup_form = GMSetupGameForm()
 
-#recursivley parse the given string for usernames, return true if the given username is found
-def check_for_username(str, username):
-    str1=str.partition(', ') #split the string into the username, the "', ", and the rest of the string
-    if str1[0] == username: #if the first part of str is the username we are looking for
-        return True
-    if not str1[2]: #if there is nothing in the rest of str, it means there are no more usernames to look for
-        return False
-    else:
-        check_for_username(str1[2], username) #call this method again if there is more string to look through
+    is_mng_submit = mng_form.end_game.data
+    is_setup_submit = setup_form.create_game.data
+
+    #msg setup
+    if is_mng_submit:
+        targets = parse_for_game(''.join(map(str, mng_form.games.data)))
+        for target in targets:
+            game = Game.query.filter_by(name=target)
+            game.is_running = False
+            db.session.commit()
+
+    #msg management
+    if is_setup_submit:
+        users_players = []
+        players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), users_players)))
+        new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.id, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+        db.session.add(new_game)
+        db.session.commit()
+
+    return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form)

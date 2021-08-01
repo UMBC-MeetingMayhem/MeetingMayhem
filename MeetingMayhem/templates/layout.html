@@ -148,11 +148,13 @@
                 </div>
 
                 <!-- Navbar Right Side -->
-                <!-- TODO: this doesn't seem to move the links to the right side properly -->
                 <div class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
                         <p class="nav-item nav-link" >{{ current_user.username }}</p>
                         <p class="nav-item nav-link">|</p>
+                        {% if current_user.role == 2 %}
+                        <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                        {% endif %}
                         <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
                         <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>

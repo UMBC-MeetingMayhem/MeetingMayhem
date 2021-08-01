@@ -15,7 +15,7 @@ UserMixin - does some magic so that handling user login is easy
 partial, orm - used for getUserFactory for the dropdown menus in writing messages
 """
 from MeetingMayhem import db, login_manager
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from functools import partial
 from sqlalchemy import orm
 #all this code is basically creating the tables for the database
@@ -35,6 +35,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.Integer, nullable=False) #dictates what role the account is
+    game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
     """
     roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
     admin: is able to changes the roles of the users incase we need to do this
@@ -46,21 +47,42 @@ class User(db.Model, UserMixin):
     """
     
     def __repr__(self): #this is what gets printed out for the User when a basic query is run
-        return f"User(ID='{self.id}', Username='{self.username}', Email='{self.email}', Pwd Hash='{self.password}', Role='{self.role}')\n"
+        return f"User(ID='{self.id}', Username='{self.username}', Email='{self.email}', Pwd Hash='{self.password}', Role='{self.role}', Game='{self.game}')\n"
 
 #this is how the message forms pulls the users it needs for the recipient dropdown, I don't really know how it works lol
 #https://stackoverflow.com/questions/26254971/more-specific-sql-query-with-flask-wtf-queryselectfield
 def getUser(columns=None):
-    u = User.query.filter_by(role=4)
+    user = User.query.filter_by(role=4,game=current_user.game)
     #TODO: once fuctionality for multiple games is added, we need to also filter by the game session
     #this will also keep the admin and GM users from getting included in the dropdown
     #this should allow us to be able to choose which users come up in the dropdown
+    #currently unsure how to filter by game, hoping i can use current_user or pass a value from routes
     if columns:
-        u = u.options(orm.load_only(*columns))
-    return u
+        user = user.options(orm.load_only(*columns))
+    return user
 
 def getUserFactory(columns=None):
     return partial(getUser, columns=columns)
+
+#queryfactory for all users, used for gm to pick users in a game
+def getAllUser(columns=None):
+    all_user = User.query.filter_by(role=4)
+    if columns:
+        all_user = all_user.options(orm.load_only(*columns))
+    return all_user
+
+def getAllUserFactory(columns=None):
+    return partial(getAllUser, columns=columns)
+
+#queryfactory for adversary, used for gm to pick adversary for a game
+def getAdversary(columns=None):
+    adv = User.query.filter_by(role=3)
+    if columns:
+        adv = adv.options(orm.load_only(*columns))
+    return adv
+
+def getAdversaryFactory(columns=None):
+    return partial(getAdversary, columns=columns)
 
 #message table
 #contains the messages that users send to each other and the adversary
@@ -74,26 +96,41 @@ class Message(db.Model):
     recipient = db.Column(db.String, nullable=False)
     content = db.Column(db.Text, nullable=False)
     is_edited = db.Column(db.Boolean, nullable=False)
-    new_sender = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
-    new_recipient = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
+    new_sender = db.Column(db.String, nullable=True)
+    new_recipient = db.Column(db.String, nullable=True)
     edited_content = db.Column(db.Text, nullable=True)
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(ID='{self.id}', Round='{self.round}', Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}')\n"
 
-#metadata table, name subject to change to something like "Gamestate"
+#game table
 #include information about the game in here so it can by dynamically pulled
 #also allows for scaling once we allow for multiple game sessions
-class Metadata(db.Model):
+class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)
+    is_running = db.Column(db.Boolean, nullable=False)
     adversary = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
+    players = db.Column(db.String, nullable=False)
     current_round = db.Column(db.Integer, nullable=False)
     adv_current_msg = db.Column(db.Integer, nullable=False)
     adv_current_msg_list_size = db.Column(db.Integer, nullable=False)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
-        return f"Metadata(ID='{self.id}', Adversary='{self.adversary}', Round='{self.current_round}', Current Msg='{self.adv_current_msg}', Msg List Size='{self.adv_current_msg_list_size}')\n"
+        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Round='{self.current_round}', Current Msg='{self.adv_current_msg}', Msg List Size='{self.adv_current_msg_list_size}')\n"
+
+#queryfactory for games, used for gm to modify specific games
+def getGame(columns=None):
+    game = Game.query.filter_by(is_running=True)
+
+    if columns:
+        game = game.options(orm.load_only(*columns))
+    return game
+
+def getGameFactory(columns=None):
+    return partial(getGame, columns=columns)
+
 
 """
 
@@ -155,10 +192,15 @@ db.session.commit()
 
 Reset DB:
 from MeetingMayhem import db
-from MeetingMayhem.models import User, Message, Metadata
+from MeetingMayhem.models import User, Message, Game
 db.drop_all()
 db.session.commit()
 db.create_all()
+
+Create gm:
+gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+db.session.add(gm)
+db.session.commit()
 
 Create adversary:
 adv = User(username='adversary', email='adv@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=3)
@@ -166,19 +208,19 @@ db.session.add(adv)
 db.session.commit()
 
 Create game:
-game = Metadata(adversary='adversary', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+game = Game(name='game', is_running=True, adversary='adversary', players='test', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
 db.session.add(game)
 db.session.commit()
 
 Create test users:
 user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
 user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
-user_1 = User(username='bob', email='bob@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
-user_2 = User(username='joe', email='joe@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
-db.session.add(user_1)
-db.session.add(user_2)
+user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
 db.session.add(user1)
 db.session.add(user2)
+db.session.add(user3)
+db.session.add(user4)
 db.session.commit()
 
 """
