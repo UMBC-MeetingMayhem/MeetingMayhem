@@ -14,6 +14,7 @@ db, login_manager - import from __init__.py the database and login manager so we
 UserMixin - does some magic so that handling user login is easy
 partial, orm - used for getUserFactory for the dropdown menus in writing messages
 """
+from operator import or_
 from MeetingMayhem import db, login_manager
 from flask_login import UserMixin, current_user
 from functools import partial
@@ -83,6 +84,15 @@ def getAdversary(columns=None):
 
 def getAdversaryFactory(columns=None):
     return partial(getAdversary, columns=columns)
+
+def getAllUserAdversary(columns=None):
+    adv = User.query.filter(or_(User.role.__eq__(3),User.role.__eq__(4)))
+    if columns:
+        adv = adv.options(orm.load_only(*columns))
+    return adv
+
+def getAllUserAdversaryFactory(columns=None):
+    return partial(getAllUserAdversary, columns=columns)
 
 #message table
 #contains the messages that users send to each other and the adversary

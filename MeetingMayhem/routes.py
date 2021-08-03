@@ -21,7 +21,7 @@ flask_login - different utilities used for loggin the user in, seeing which user
 """
 from flask import render_template, url_for, flash, redirect, request
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -53,12 +53,44 @@ def parse_for_game(str, games):
 #recursivley parse the given string for usernames, return true if the given username is found
 def check_for_str(str, check):
     str1=str.partition(', ') #split the string into the username, the "', ", and the rest of the string
-    if str1[0] == check: #if the first part of str is the username we are looking for
+    if (str1[0] == check): #if the first part of str is the username we are looking for
         return True
-    if not str1[2]: #if there is nothing in the rest of str, it means there are no more usernames to look for
+    if (not str1[2]): #if there is nothing in the rest of str, it means there are no more usernames to look for
         return False
     else:
-        check_for_str(str1[2], check) #call this method again if there is more string to look through
+        return check_for_str(str1[2], check) #call this method again if there is more string to look through
+
+def strip_list_str(str_list):
+    new_str_list = []
+    for str in str_list:
+        new_str = str.partition(",")[0]
+        new_str_list.append(new_str)
+    return new_str_list
+
+"""
+def username_str_to_list(usernames):
+    username_list = []
+    username_list.append(usernames.partition(',')[0])
+    new_usernames = usernames.partition(',')[2]
+    if new_usernames:
+        username_to_str_list_rec(new_usernames, username_list)
+    return username_list
+"""
+"""
+def username_to_str_list(usernames, username_list):
+    print('start')
+    print(usernames)
+    print(username_list)
+    username_list.append(usernames.partition(',')[0])
+    new_usernames = usernames.partition(',')[2]
+    print(new_usernames)
+    print(username_list)
+    if new_usernames:
+        username_list = username_to_str_list(new_usernames, username_list)
+        print(username_list)
+        print('if')
+    return username_list
+"""
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -116,8 +148,8 @@ def logout():
 def account():
     #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
     form = AdversaryAdvanceRoundForm()
-    current_game = Game.query.filter_by(adversary='adversary').first()
-    if form.advance_round.data:
+    current_game = Game.query.filter_by(adversary=current_user.username).first()
+    if form.advance_round.data and current_game:
         current_game.current_round -= 1
         current_game.adv_current_msg = 0
         current_game.adv_current_msg_list_size = 0
@@ -129,8 +161,15 @@ def account():
 @app.route('/messages', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
 @login_required
 def messages():
+
+    if not current_user.game: #if the current user isn't in a game, send them to the homepage
+        flash(f'You are not currently in a game. Please have your game master put you in a game.', 'danger')
+        return render_template('home.html', title='Home')
+
     #set the display_message to None initially so that if there is no message to display it doesn't break the website
     display_message = None
+
+    """
 
     #TODO: these few lines need to be changed when we can put users into a game instance, it should search dynamically for the game
     #since there is only one adversary and one instance of the game this will work for now
@@ -145,8 +184,12 @@ def messages():
     #TODO: this needs to be changed once game instances are implemented, should be dynamic
     current_game = Game.query.filter_by(adversary='adversary').first()
 
+    """
+
     #if the current_user is of the game master or adversary role, then display the adversary version of the page
     if (current_user.role==2 or current_user.role==3):
+
+        current_game = Game.query.filter_by(adversary=current_user.username).first()
 
         #setup variables for the forms the adversary needs to use
         msg_form = AdversaryMessageSendForm()
@@ -280,7 +323,16 @@ def messages():
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
     
     #for regular users
+    game_id = None
+    games = Game.query.filter_by(is_running=True).all()
+    for game in games:
+        if check_for_str(game.players, current_user.username):
+            game_id = game.id
+
+    current_game = Game.query.filter_by(id=game_id).first()
+
     form = MessageForm() #use the message form
+    msgs = None
     if (current_game.current_round>1): 
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
@@ -313,27 +365,63 @@ def messages():
 @login_required #requires the user to be logged in
 def game_setup():
     if current_user.role != 2: #if the user isn't a game master
+        flash(f'Your permissions are insufficient to access this page.', 'danger')
         return render_template('home.html', title='Home') #display the home page when they try to access this page directly.
     mng_form = GMManageGameForm()
     setup_form = GMSetupGameForm()
+    usr_form = GMManageUserForm()
 
     is_mng_submit = mng_form.end_game.data
     is_setup_submit = setup_form.create_game.data
-
-    #msg setup
-    if is_mng_submit:
-        targets = parse_for_game(''.join(map(str, mng_form.games.data)))
-        for target in targets:
-            game = Game.query.filter_by(name=target)
-            game.is_running = False
-            db.session.commit()
+    is_usr_form = usr_form.update.data
 
     #msg management
-    if is_setup_submit:
-        users_players = []
-        players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), users_players)))
-        new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.id, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+    #TODO: need validation to ensure a game is selected
+    if is_mng_submit and mng_form.validate():
+        targets = []
+        targets = parse_for_game(''.join(map(str, mng_form.games.data)), targets)
+        for target in strip_list_str(targets):
+            game = Game.query.filter_by(name=target).first()
+            game.is_running = False
+            #TODO: need to also remove users and adversary from game here
+            adv = User.query.filter_by(username=game.adversary).first()
+            adv.game = None
+            player_list = []
+            player_list = parse_for_username(game.players, player_list)
+            for player in player_list:
+                user = User.query.filter_by(username=player.username)
+                user.game = None
+            db.session.commit()
+        flash(f'The game has been ended.', 'success')
+        mng_form = GMManageGameForm()
+        setup_form = GMSetupGameForm()
+
+    #msg setup
+    #TODO: need validation to ensure players are selected and a name is chosen
+    if is_setup_submit and setup_form.validate():
+        player_list = []
+        players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list)))
+        new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
         db.session.add(new_game)
         db.session.commit()
-
-    return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form)
+        #TODO: once the game is created, I need to add the users and adversary to it on their end
+        game = Game.query.order_by(-Game.id).filter_by(adversary=setup_form.adversary.data.username,players=players).first() #this finds the last game in the db with the passed players and adversary
+        adv = User.query.filter_by(username=setup_form.adversary.data.username).first()
+        print(game)
+        adv.game=game.id
+        for player in strip_list_str(player_list):
+            user = User.query.filter_by(username=player).first()
+            user.game=game.id
+        db.session.commit()
+        flash(f'The game ' + setup_form.name.data + ' has been created.', 'success')
+    
+    if is_usr_form and usr_form.validate():
+        user = User.query.filter_by(username=usr_form.user.data.username).first()
+        if usr_form.role.data == 'adv':
+            user.role = 3
+        if usr_form.role.data == 'usr':
+            user.role = 4
+        db.session.commit()
+        flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success')
+    
+    return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)

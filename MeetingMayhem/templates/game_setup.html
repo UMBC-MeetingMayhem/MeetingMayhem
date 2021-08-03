@@ -92,4 +92,45 @@
             </div>
         </form>
     </div>
+
+    <div class="content-section">
+        <form method="POST" action="">        
+            {{ usr_form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb4">Manage a User</legend>
+                <div class="form-group">
+                    {{ usr_form.user.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if usr_form.user.errors %} <!-- if there are errors in the form... -->
+                        {{ usr_form.user(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in usr_form.user.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ usr_form.user(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ usr_form.role.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if usr_form.role.errors %} <!-- if there are errors in the form... -->
+                        {{ usr_form.role(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in usr_form.role.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ usr_form.role(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ usr_form.update(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+
 {% endblock content %}
