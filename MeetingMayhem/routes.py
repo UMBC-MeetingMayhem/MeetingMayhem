@@ -259,10 +259,16 @@ def messages():
             
             #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
             elif is_submit_edits: #if the submit button is clicked
+                users_recipients=[] #make a list to put usernames in for the recipient
+                users_senders=[] #make a list to put usernames in for the sender
+                #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
+                #then maps the list of usernames into a string to pass into the db
+                new_recipients = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.recipient.data)), users_recipients)))
+                new_senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
                 #setup the changes to be made to the current message
                 display_message.is_edited = True
-                display_message.new_sender = adv_msg_edit_form.new_sender.data.username
-                display_message.new_recipient = adv_msg_edit_form.new_recipient.data.username
+                display_message.new_sender = new_senders
+                display_message.new_recipient = new_recipients
                 display_message.edited_content = adv_msg_edit_form.edited_content.data
                 #pull the messages again since the messages we want to display has changed
                 messages = Message.query.filter_by(round=current_game.current_round+1).all()
