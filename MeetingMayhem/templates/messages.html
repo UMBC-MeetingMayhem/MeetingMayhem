@@ -12,11 +12,11 @@
     <h1>Messages</h1>
 
     {% if message is iterable %} <!-- this checks if the passed message var has content in it -->
-    <legend class="border-bottom mb4">Previous Round Messages</legend>
+    <legend class="border-bottom mb4">Messages last round:</legend>
     {% for message in message%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
         {% if message.is_edited %}
-        <article class="media content-section">
+        <article class="media content-section bg-dark">
             <div class="media-body">
                 <div class="article-metadata">
                 <a>Sender: {{ message.new_sender }}</a>

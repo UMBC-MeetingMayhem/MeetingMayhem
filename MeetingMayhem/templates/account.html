@@ -11,6 +11,11 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
     
+
+
+
+
+
     <!-- the below is in place for testing only, only displays for adversary -->
     {% if current_user.role == 3 %}
     <div class="content-section">

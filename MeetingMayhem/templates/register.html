@@ -10,13 +10,13 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 <div style="margin:auto;width:fit-content;display:flex;">
-<div class="logobox box-bkg box-border" style="flex-direction:row;">
-    <img src="{{ url_for('static', filename='MM_white.svg') }}" 
-    style="width:90%;margin:30px auto;display:block;">
-</div>
-<div class="joinbox box-bkg box-border" style="line-height:175%;flex-direction:row;border-left:none;width:500px;">
+        <div class="logobox bg-dark" style="border-top-right-radius:0px;border-bottom-right-radius:0px;margin:auto;">
+                <img src="{{ url_for('static', filename='MM_white.svg') }}" 
+                style="width:90%;margin:30px auto;display:block;">
+            </div>
+    <div class="joinbox bg-dark" style="line-height:175%;flex-direction:row;border-left:none;width:500px;">
         <form method="POST" action="" style="width:90%;text-align:center;margin:auto;
-        animation-name:form-fadein;animation-duration:2s;">
+        animation-name:form-fadein;animation-duration:1s;">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- TODO: the error messages for these only kinda work, the error messages aren't being pulled correctly -->

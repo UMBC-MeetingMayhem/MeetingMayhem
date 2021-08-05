@@ -9,12 +9,12 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<div style="margin:auto;width:1000px;display:flex;flex-direction:column;">
-<div class="logobox box-bkg box-border">
+<div style="margin:auto;padding:auto;display:flex;flex-direction:column;width:100%;">
+<div class="logobox bg-dark" style="border-bottom-left-radius:0px;border-bottom-right-radius:0px;margin:auto;">
         <img src="{{ url_for('static', filename='MM_white.svg') }}" 
         style="width:90%;margin:30px auto;display:block;">
     </div>
-    <div class="logbox box-bkg box-border" style="line-height:175%;height:350px;flex-direction:column;border-top:none;">
+    <div class="logbox bg-dark" style="line-height:175%;height:350px;flex-direction:column;border-top:none;margin:auto;">
         <form method="POST" action="" class="logform" style="height:300px;">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
