@@ -11,11 +11,6 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
     
-
-
-
-
-
     <!-- the below is in place for testing only, only displays for adversary -->
     {% if current_user.role == 3 %}
     <div class="content-section">
@@ -60,7 +55,7 @@
             {% elif current_user.role == 4 %}
             <h3 style="color:rgb(49, 67, 124);">a User</h3>
             {% elif current_user.role == 5 %}
-            <h3 style="color:rgb(49, 67, 124);">a Sectator</h3>
+            <h3 style="color:rgb(49, 67, 124);">a Spectator</h3>
             {% endif %}
             <br>
             <hr style="color:rgb(49, 67, 124);">

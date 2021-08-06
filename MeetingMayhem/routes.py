@@ -431,3 +431,18 @@ def game_setup():
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success')
     
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+
+
+
+
+"""
+#sample route for testing pages
+#when you copy this to test a page, make sure to change all instances of "testing"
+
+@app.route('/testing') #this decorator tells the website what to put after the http://<IP>
+#@app.route('/testing', methods=['GET', 'POST']) #this is needed if the user is doing to submit forms and things
+#@login_required #enforce that the user is logged in
+def testing():
+    return render_template('testing.html', title='Testing') #this tells the app what html template to use. Title isn't needed
+
+"""
