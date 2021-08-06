@@ -1,3 +1,37 @@
+
+Skip to content
+Pull requests
+Issues
+Marketplace
+Explore
+@Voitheia
+eyeclept /
+MeetingMayhem
+
+2
+0
+
+    0
+
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+
+    Insights
+
+MeetingMayhem/MeetingMayhem/templates/layout.html
+@JuliNau
+JuliNau sprint 4 changes
+Latest commit 2ad2a44 yesterday
+History
+2 contributors
+@Voitheia
+@JuliNau
+229 lines (217 sloc) 8.51 KB
 <!-- 
     File: layout.html
     Author: Robert Shovan /Voitheia
@@ -33,7 +67,7 @@
         }
         @keyframes joinbox {
             from {width:0;}
-            to {width:600px;}
+            to {width:500px;}
         }
         @keyframes form-fadein {
             0% {visibility:hidden;opacity:0;}
@@ -42,10 +76,11 @@
         }
         body {
             background: rgb(0,0,0);
-            background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgba(10,10,47,1) 15%, rgba(86,103,131,1) 67%, rgba(190,230,245,1) 100%);
+            background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgb(19, 19, 22) 10%, rgb(106, 108, 110) 64%, rgb(219, 222, 223) 100%);
             color: #444;
             margin-top: 5rem;
             background-attachment: fixed;
+            color:#dce0f1;
         }
         .box-bkg {
             background: #000011;
@@ -91,7 +126,7 @@
             text-align: center;
             margin: auto;
             animation-name: form-fadein;
-            animation-duration: 2s;
+            animation-duration: 1s;
         }
         .dark-bg {
             background-color: #000011;
@@ -105,9 +140,9 @@
             background-color: rgba(86,103,131,1);
         }
         .content-section {
-            background: #dce0f1;
+            background: #272822;
             padding: 10px 20px;
-            border: 5px solid #a2b3d8;
+            border:none;
             border-radius: 10px;
             margin-bottom: 20px;
         }
@@ -119,6 +154,10 @@
             border-radius: 5px;
             text-align:center;
             color:rgb(49, 67, 124);
+        }
+        input[type=text], select {
+            background-color:#b0b4bd;
+            border:none;
         }
     </style>
 
@@ -135,7 +174,7 @@
     <!-- navigation bar, shamelessly stolen from the below repo -->
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
     <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
             <div class="container">
             <a class="navbar-brand mr-4" href="/">MeetingMayhem</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,10 +211,10 @@
 
     <!-- use the container class from bootstrap for fancy -->
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/main.html -->
-    <main role="main" class="container">
-    <div class="row">
+    <main role="main" class="container" style="width:100%;">
+    <div class="row" style="width:100%;margin:auto;">
         <!-- this is for displaying alerts on the webpage -->
-        <div class="col-md-8">
+        <div style="width:100%;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -207,6 +246,9 @@
         </div>
 -->
     </div>
+    <div>
+        <br><br><br>
+    </div>
     </main>
 <!--
     <footer>
@@ -219,3 +261,19 @@
     <!-- bootstrap required stuff ends here -->
 </body>
 </html>
+
+    © 2021 GitHub, Inc.
+    Terms
+    Privacy
+    Security
+    Status
+    Docs
+
+    Contact GitHub
+    Pricing
+    API
+    Training
+    Blog
+    About
+
+Loading complete
