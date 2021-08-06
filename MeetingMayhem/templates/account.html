@@ -1,0 +1,69 @@
+<!-- 
+    File: account.html
+    Author: Robert Shovan /Voitheia
+    Date Created: 6/15/2021
+    Last Modified: 7/16/2021
+    E-mail: rshovan1@umbc.edu
+    Description: html and jinja file for handling the account page
+    this page is just used for checking which account you are logged in as if you need to
+-->
+
+{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
+{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+    
+    <!-- the below is in place for testing only, only displays for adversary -->
+    {% if current_user.role == 3 %}
+    <div class="content-section">
+        <form method="POST" action="">
+            <div class="form-group">
+                <p>decrement round number</p>
+                {{ form.advance_round(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    
+    <div class="box-border" style="margin:30px;width:fit-content;float:left;border-width:8px;border-radius:20px;background-color:rgb(49, 67, 124)">
+        <svg width="100" height="100">
+            <circle cx="50" cy="50" r="32" stroke="#eeeeff" stroke-width="8" fill="none" />
+        </svg>
+    </div> <div style="height:150px;display:flex;float:left;">
+    <h1 style="align-self:flex-end;font-size:80px;font-family:Verdana, Geneva, Tahoma, sans-serif"> {{ current_user.username }}</h1>
+    </div>
+    <br>
+    <div style="width: 1200px;;margin:auto;display:flex;">
+
+        <div class="content-section" style="width:60%;margin:1%;height:fit-content;text-align:center;">
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+        </div>
+        <div class="content-section" style="width:30%;margin:1%;height:fit-content;">
+            <h3 style="font-family:Verdana, Geneva, Tahoma, sans-serif;font-weight: bold;color:rgb(49, 67, 124)">You are currently:</h3>
+            {% if current_user.role == 1 %}
+            <h3 style="color:rgb(49, 67, 124);">an Admin</h3>
+            {% elif current_user.role == 2 %}
+            <h3 style="color:rgb(49, 67, 124);">a Game Master</h3>
+            {% elif current_user.role == 3 %}
+            <h3 style="color:rgb(49, 67, 124);">an Adversary</h3>
+            {% elif current_user.role == 4 %}
+            <h3 style="color:rgb(49, 67, 124);">a User</h3>
+            {% elif current_user.role == 5 %}
+            <h3 style="color:rgb(49, 67, 124);">a Spectator</h3>
+            {% endif %}
+            <br>
+            <hr style="color:rgb(49, 67, 124);">
+            <div class="account-opt">
+                <h5 style="color:rgb(49, 67, 124);">Edit Account</h5>
+            </div>
+        </div>
+
+
+    </div>
+{% endblock content %}

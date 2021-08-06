@@ -1,0 +1,221 @@
+<!-- 
+    File: layout.html
+    Author: Robert Shovan /Voitheia
+    Date Created: 6/15/2021
+    Last Modified: 7/6/2021
+    E-mail: rshovan1@umbc.edu
+    Description: html and jinja file that provides the default layout of all other html files in the website.
+    we use a layout template so that we do not repeat code for things we do on each page.
+    a whole bunch of the code in here was shamelessly stolen from the tutorial.
+    https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- bootstrap required stuff begins here -->
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <!-- bootstrap required stuff ends here -->
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    <link rel="icon" href="{{ url_for('static', filename='MM_white.svg') }}">
+
+    <style>
+        @keyframes logbox {
+            from {height:0;}
+            to {height:350px;}
+        }
+        @keyframes joinbox {
+            from {width:0;}
+            to {width:600px;}
+        }
+        @keyframes form-fadein {
+            0% {visibility:hidden;opacity:0;}
+            50% {visibility:hidden;opacity:0;}
+            100% {visibility:visible;opacity:1;}
+        }
+        body {
+            background: rgb(0,0,0);
+            background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgba(10,10,47,1) 15%, rgba(86,103,131,1) 67%, rgba(190,230,245,1) 100%);
+            color: #444;
+            margin-top: 5rem;
+            background-attachment: fixed;
+        }
+        .box-bkg {
+            background: #000011;
+        }
+        .nav-style {
+            background:#000011;
+        }
+        .box-border {
+            border: 12px solid #eeeeff;
+        }
+        .logobox {
+            display: flex;
+            width: 550px;
+            height: 550px;
+            border-radius: 15px;
+        }
+        .logbox {
+            display: flex;
+            width: 550px;
+            animation-name: logbox;
+            animation-duration: 1s;
+            border-bottom-right-radius: 15px;
+            border-bottom-left-radius: 15px;
+        }
+        .log-logo {
+            border-bottom-right-radius: 0px;
+            border-bottom-left-radius: 0px;
+        }
+        .joinbox {
+            display: flex;
+            height: 550px;
+            animation-name: joinbox;
+            animation-duration: 1s;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+        .reg-logo {
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+        }
+        .logform {
+            width: 90%;
+            text-align: center;
+            margin: auto;
+            animation-name: form-fadein;
+            animation-duration: 2s;
+        }
+        .dark-bg {
+            background-color: #000011;
+            border-bottom: 2px solid rgba(86,103,131,1);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #f5f5ff;
+        }
+        .site-header .navbar-nav .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(86,103,131,1);
+        }
+        .content-section {
+            background: #dce0f1;
+            padding: 10px 20px;
+            border: 5px solid #a2b3d8;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .account-opt {
+            width:90%;
+            margin:auto;
+            background-color: #a2b3d8;
+            border: 8px solid #a2b3d8;
+            border-radius: 5px;
+            text-align:center;
+            color:rgb(49, 67, 124);
+        }
+    </style>
+
+    <!-- we use an if else statement here to determine what the title of the page should be based on what is passed from the title variable from routes.py -->
+    {% if title %}
+        <title>MeetingMayhem - {{ title }}</title>
+    {% else %}
+    <!-- if no title is found, just use the default title below -->
+        <title>MeetingMayhem</title>
+    {% endif %}
+</head>
+<body>
+
+    <!-- navigation bar, shamelessly stolen from the below repo -->
+    <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+            <div class="container">
+            <a class="navbar-brand mr-4" href="/">MeetingMayhem</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
+                <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                </div>
+
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <p class="nav-item nav-link" >{{ current_user.username }}</p>
+                        <p class="nav-item nav-link">|</p>
+                        {% if current_user.role == 2 %}
+                        <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                        {% endif %}
+                        {% if current_user.game != None %}
+                        <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
+                        {% endif %}
+                        <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
+                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
+                        <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- use the container class from bootstrap for fancy -->
+    <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/main.html -->
+    <main role="main" class="container">
+    <div class="row">
+        <!-- this is for displaying alerts on the webpage -->
+        <div class="col-md-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- this is where the child templates can overwrite content -->
+        {% block content %}{% endblock %}
+        </div>
+
+        <!-- this is where the sidebar is managed. I haven't changed it yet -->
+<!--
+        <div class="col-md-4">
+        <div class="content-section">
+            <h3>Our Sidebar</h3>
+            <p class='text-muted'>You can put any information here you'd like.</p>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Announcements</li>
+                <li class="list-group-item list-group-item-light">Calendars</li>
+                <li class="list-group-item list-group-item-light">etc</li>
+            </ul>
+            
+        </div>
+        </div>
+-->
+    </div>
+    </main>
+<!--
+    <footer>
+        <br><br><br><br><hr>
+        @2021 UMBC
+    </footer>
+-->
+    <!-- bootstrap required stuff begins here -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+    <!-- bootstrap required stuff ends here -->
+</body>
+</html>
