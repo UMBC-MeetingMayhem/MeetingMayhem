@@ -54,10 +54,6 @@ class User(db.Model, UserMixin):
 #https://stackoverflow.com/questions/26254971/more-specific-sql-query-with-flask-wtf-queryselectfield
 def getUser(columns=None):
     user = User.query.filter_by(role=4,game=current_user.game)
-    #TODO: once fuctionality for multiple games is added, we need to also filter by the game session
-    #this will also keep the admin and GM users from getting included in the dropdown
-    #this should allow us to be able to choose which users come up in the dropdown
-    #currently unsure how to filter by game, hoping i can use current_user or pass a value from routes
     if columns:
         user = user.options(orm.load_only(*columns))
     return user
@@ -85,6 +81,7 @@ def getAdversary(columns=None):
 def getAdversaryFactory(columns=None):
     return partial(getAdversary, columns=columns)
 
+#queryfactory for all users and adversaries, use for gm to manage roles
 def getAllUserAdversary(columns=None):
     adv = User.query.filter(or_(User.role.__eq__(3),User.role.__eq__(4)))
     if columns:
@@ -110,6 +107,8 @@ class Message(db.Model):
     new_recipient = db.Column(db.String, nullable=True)
     edited_content = db.Column(db.Text, nullable=True)
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
+
+    #game = db.Column(db.Integer, db.ForeignKey(game.id), nullable=False)
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(ID='{self.id}', Round='{self.round}', Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}')\n"

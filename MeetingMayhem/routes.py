@@ -25,6 +25,8 @@ from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, M
 from MeetingMayhem.models import User, Message, Game
 from flask_login import login_user, logout_user, login_required, current_user
 
+#TODO: need validation on all these helper methods to ensure that the string has contents
+
 #recursivley parse the given string for usernames, return a list of usernames delimited by commas
 def parse_for_username(str, users):
     str1=str.partition("Username='")[2] #grabs all the stuff in the string after the text "Username='"
@@ -38,6 +40,14 @@ def parse_for_username(str, users):
             users.append(str2[0]) #just append the username as it is the last one
     return users #return the list of usernames
 
+def parse_for_players(str, players):
+    players.append(str.partition(', ')[0])
+    str1=str.partition(', ')[2]
+    if str1:
+        parse_for_players(str1, players)
+    return players
+
+#same thing as the parse_for_username function, just for games instead
 def parse_for_game(str, games):
     str1=str.partition("Name='")[2]
     str2=str1.partition("', ")
@@ -60,37 +70,13 @@ def check_for_str(str, check):
     else:
         return check_for_str(str1[2], check) #call this method again if there is more string to look through
 
+#used to strip commas and white spaces out of lists of strings
 def strip_list_str(str_list):
     new_str_list = []
     for str in str_list:
-        new_str = str.partition(",")[0]
+        new_str = str.partition(",")[0] #put everything before the comma into the new list
         new_str_list.append(new_str)
     return new_str_list
-
-"""
-def username_str_to_list(usernames):
-    username_list = []
-    username_list.append(usernames.partition(',')[0])
-    new_usernames = usernames.partition(',')[2]
-    if new_usernames:
-        username_to_str_list_rec(new_usernames, username_list)
-    return username_list
-"""
-"""
-def username_to_str_list(usernames, username_list):
-    print('start')
-    print(usernames)
-    print(username_list)
-    username_list.append(usernames.partition(',')[0])
-    new_usernames = usernames.partition(',')[2]
-    print(new_usernames)
-    print(username_list)
-    if new_usernames:
-        username_list = username_to_str_list(new_usernames, username_list)
-        print(username_list)
-        print('if')
-    return username_list
-"""
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -98,6 +84,10 @@ def username_to_str_list(usernames, username_list):
 @app.route('/') #this line states that if the user tries to access http:/<IP>:5000/ it will use the home funciton
 @app.route('/home') #likewise, this line is for http:/<IP>:5000/home
 def home():
+    if current_user.is_anonymous:
+        flash(f'Please register for an account or login to proceed.', 'info')
+    elif not current_user.game and current_user.role > 2:
+        flash(f'You are not currently in a game. Please have your game master create a game to proceed.', 'info')
     return render_template('home.html', title='Home') #this line passes the template we want to use and any variables it needs to it
 
 #about page route, this page doesn't really do anything right now
@@ -116,7 +106,7 @@ def register():
         user = User(username=form.username.data, email=form.email.data, password=hashed_password, role='4') #create the user for the db
         db.session.add(user) #stage the user for the db
         db.session.commit() #commit new user to db
-        flash(f'Your account has been created! Please login', 'success') #flash a success message to let the user know the account was made
+        flash(f'Your account has been created! Please login.', 'success') #flash a success message to let the user know the account was made
         return redirect(url_for('login')) #redir the user to the login page
     return render_template('register.html', title='Register', form=form)
 
@@ -169,23 +159,6 @@ def messages():
     #set the display_message to None initially so that if there is no message to display it doesn't break the website
     display_message = None
 
-    """
-
-    #TODO: these few lines need to be changed when we can put users into a game instance, it should search dynamically for the game
-    #since there is only one adversary and one instance of the game this will work for now
-    #if (not (Game.query.filter_by(adversary=current_user.username).first())):
-    if (not (Game.query.filter_by(adversary='adversary').first())): #if there isn't a game with the adversary user as the adversary...
-        #create a new game and add it to the database
-        new_game = Game(adversary=current_user.username, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
-        db.session.add(new_game)
-        db.session.commit()
-
-    #setup the current_game variable so that we can pull game state information from it
-    #TODO: this needs to be changed once game instances are implemented, should be dynamic
-    current_game = Game.query.filter_by(adversary='adversary').first()
-
-    """
-
     #if the current_user is of the game master or adversary role, then display the adversary version of the page
     if (current_user.role==2 or current_user.role==3):
 
@@ -217,12 +190,26 @@ def messages():
 
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
+            #if sender, recipient, or content are None, display an error
+            if not msg_form.sender.data or not msg_form.recipient.data or not msg_form.content.data:
+                flash(f'There was an error in creating your message. Please try again.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
+            
             users_recipients=[] #make a list to put usernames in for the recipient
             users_senders=[] #make a list to put usernames in for the sender
             #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
             #then maps the list of usernames into a string to pass into the db
             recipients = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.recipient.data)), users_recipients)))
             senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
+
+            #if the message is a duplicate display an error and don't put the message in the db
+            if Message.query.filter_by(sender=senders, recipient=recipients, content=msg_form.content.data, round=current_game.current_round+1).first():
+                flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
 
             #create the new message variable with the information from the form
             new_message = Message(round=(current_game.current_round+1), sender=senders, recipient=recipients, content=msg_form.content.data,
@@ -351,11 +338,22 @@ def messages():
                     msgs.append(message)
         
     if form.validate_on_submit(): #when the user submits the message form and it is valid
+        
+        #if recipient or content are None display an error and don't put the message in the db
+        if not form.recipient.data or not form.content.data:
+            flash(f'There was an error in creating your message. Please try again.', 'danger')
+            return render_template('messages.html', title='Messages', form=form, message=msgs)
+
         users=[] #make a list to put usernames in for the recipient
         #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
         #then maps the list of usernames into a string to pass into the db
         recipients = ''.join(map(str, parse_for_username(''.join(map(str, form.recipient.data)), users)))
         
+        #if the message is a duplicate display an error and don't put the message in the db
+        if Message.query.filter_by(sender=current_user.username, recipient=recipients, content=form.content.data, round=current_game.current_round+1).first():
+            flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
+            return render_template('messages.html', title='Messages', form=form, message=msgs)
+
         #create the new message. grab the current_round for the round var, current user's username for the sender var,
         #selected user's usernames for the recipient var, and the message content
         new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=recipients,
@@ -382,47 +380,47 @@ def game_setup():
     is_usr_form = usr_form.update.data
 
     #msg management
-    #TODO: need validation to ensure a game is selected
     if is_mng_submit and mng_form.validate():
         targets = []
         targets = parse_for_game(''.join(map(str, mng_form.games.data)), targets)
         for target in strip_list_str(targets):
             game = Game.query.filter_by(name=target).first()
             game.is_running = False
-            #TODO: need to also remove users and adversary from game here
             adv = User.query.filter_by(username=game.adversary).first()
             adv.game = None
-            player_list = []
-            player_list = parse_for_username(game.players, player_list)
-            for player in player_list:
-                user = User.query.filter_by(username=player.username)
-                user.game = None
             db.session.commit()
+            player_list = []
+            player_list = parse_for_players(game.players, player_list)
+            for player in player_list:
+                user = User.query.filter_by(username=player).first()
+                user.game = None
+                db.session.commit()
         flash(f'The game has been ended.', 'success')
         mng_form = GMManageGameForm()
         setup_form = GMSetupGameForm()
 
     #msg setup
-    #TODO: need validation to ensure players are selected and a name is chosen
     if is_setup_submit and setup_form.validate():
         player_list = []
         players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list)))
         new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
         db.session.add(new_game)
         db.session.commit()
-        #TODO: once the game is created, I need to add the users and adversary to it on their end
         game = Game.query.order_by(-Game.id).filter_by(adversary=setup_form.adversary.data.username,players=players).first() #this finds the last game in the db with the passed players and adversary
         adv = User.query.filter_by(username=setup_form.adversary.data.username).first()
-        print(game)
         adv.game=game.id
+        db.session.commit()
         for player in strip_list_str(player_list):
             user = User.query.filter_by(username=player).first()
             user.game=game.id
-        db.session.commit()
+            db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success')
     
     if is_usr_form and usr_form.validate():
         user = User.query.filter_by(username=usr_form.user.data.username).first()
+        if user.game:
+            flash(f'Unable to change a user\'s role while they are in a game. Please end the game first.', 'danger')
+            return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
         if usr_form.role.data == 'adv':
             user.role = 3
         if usr_form.role.data == 'usr':
