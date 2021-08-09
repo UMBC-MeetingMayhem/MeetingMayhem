@@ -60,7 +60,7 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
         if user: #if there is, throw an error
             raise ValidationError('That username is already in use. Please choose a different one.')
-        if re.compile("[A-Za-z0-9]").fullmatch(username.data) is None: #check if the username only has letters and numbers, if not, throw an error
+        if re.compile("[A-Za-z0-9]+").fullmatch(username.data) is None: #check if the username only has letters and numbers, if not, throw an error
             raise ValidationError('Please only use letters and numbers for your username.')
     
     def validate_email(self, email):
@@ -98,6 +98,14 @@ class AdversaryMessageEditForm(FlaskForm):
     new_recipient = QuerySelectMultipleField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     edited_content = StringField('Edited Message')
     submit_edits = SubmitField('Submit Edits')
+
+    def validate_new_sender(self, new_sender):
+        if not new_sender.data:
+            raise ValidationError('Please select a sender.')
+    
+    def validate_new_recipient(self, new_recipient):
+        if not new_recipient.data:
+            raise ValidationError('Please select at least one recipient.')
 
 #Form for the adversary to choose their message to edit or delete message
 class AdversaryMessageButtonForm(FlaskForm):

@@ -162,7 +162,7 @@ def messages():
     #if the current_user is of the game master or adversary role, then display the adversary version of the page
     if (current_user.role==2 or current_user.role==3):
 
-        current_game = Game.query.filter_by(adversary=current_user.username).first()
+        current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
 
         #setup variables for the forms the adversary needs to use
         msg_form = AdversaryMessageSendForm()
@@ -171,9 +171,9 @@ def messages():
         adv_next_round_form = AdversaryAdvanceRoundForm()
 
         #setup variable to contain the messages that are in the current_round of this game
-        messages = Message.query.filter_by(round=current_game.current_round+1).all()
+        messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
         
-        if (messages): #if messages has content, set the display message to the adversary's current message
+        if messages: #if messages has content, set the display message to the adversary's current message
             display_message = messages[current_game.adv_current_msg]
 
         else: #if there are no messages, set display message to none
@@ -205,14 +205,14 @@ def messages():
             senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
 
             #if the message is a duplicate display an error and don't put the message in the db
-            if Message.query.filter_by(sender=senders, recipient=recipients, content=msg_form.content.data, round=current_game.current_round+1).first():
+            if Message.query.filter_by(sender=senders, recipient=recipients, content=msg_form.content.data, round=current_game.current_round+1, game=current_game.id).first():
                 flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
                 return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
                 adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
                 current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size)
 
             #create the new message variable with the information from the form
-            new_message = Message(round=(current_game.current_round+1), sender=senders, recipient=recipients, content=msg_form.content.data,
+            new_message = Message(round=(current_game.current_round+1), game=current_game.id, sender=senders, recipient=recipients, content=msg_form.content.data,
             is_edited=True, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
 
             db.session.add(new_message) #stage the message
@@ -245,20 +245,21 @@ def messages():
                     db.session.commit()
             
             #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
-            elif is_submit_edits: #if the submit button is clicked
+            elif is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
+            
                 users_recipients=[] #make a list to put usernames in for the recipient
                 users_senders=[] #make a list to put usernames in for the sender
                 #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
                 #then maps the list of usernames into a string to pass into the db
-                new_recipients = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.recipient.data)), users_recipients)))
-                new_senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
+                new_recipients = ''.join(map(str, parse_for_username(''.join(map(str, adv_msg_edit_form.new_recipient.data)), users_recipients)))
+                new_senders = ''.join(map(str, parse_for_username(''.join(map(str, adv_msg_edit_form.new_sender.data)), users_senders)))
                 #setup the changes to be made to the current message
                 display_message.is_edited = True
                 display_message.new_sender = new_senders
                 display_message.new_recipient = new_recipients
                 display_message.edited_content = adv_msg_edit_form.edited_content.data
                 #pull the messages again since the messages we want to display has changed
-                messages = Message.query.filter_by(round=current_game.current_round+1).all()
+                messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
                 current_game.adv_current_msg = 0
                 current_game.adv_current_msg_list_size = len(messages)
                 #commit the messages to the database
@@ -268,8 +269,9 @@ def messages():
                 #flag the message as edited and deleted
                 display_message.is_edited = True
                 display_message.is_deleted = True
+                db.session.commit()
                 #pull the messages again since the messages we want to display has changed
-                messages = Message.query.filter_by(round=current_game.current_round+1).all()
+                messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
                 current_game.adv_current_msg = 0
                 current_game.adv_current_msg_list_size = len(messages)
                 #commit the messages to the database
@@ -299,7 +301,7 @@ def messages():
             current_game.adv_current_msg = 0
             current_game.adv_current_msg_list_size = 0
             #pull the messages again since the messages we want to display has changed
-            messages = Message.query.filter_by(round=current_game.current_round+1).all()
+            messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
             current_game.adv_current_msg = 0
             current_game.adv_current_msg_list_size = len(messages)
             db.session.commit()
@@ -328,11 +330,15 @@ def messages():
     msgs = None
     if (current_game.current_round>1): 
         #pull messages from current_round where the message isn't deleted
-        display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
+        display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
 
         msgs=[] #create a list to store the messages to dispay to pass to the template
         for message in display_message: #for each message
-            if message.recipient: #if the message has a recipient
+            if message.is_edited:
+                if message.new_recipient:
+                    if check_for_str(message.new_recipient, current_user.username):
+                        msgs.append(message)
+            elif message.recipient: #if the message has a recipient                
                 if check_for_str(message.recipient, current_user.username):
                     #check if one of the recipients is the same as the current user, and append it to the list
                     msgs.append(message)
@@ -350,13 +356,13 @@ def messages():
         recipients = ''.join(map(str, parse_for_username(''.join(map(str, form.recipient.data)), users)))
         
         #if the message is a duplicate display an error and don't put the message in the db
-        if Message.query.filter_by(sender=current_user.username, recipient=recipients, content=form.content.data, round=current_game.current_round+1).first():
+        if Message.query.filter_by(sender=current_user.username, recipient=recipients, content=form.content.data, round=current_game.current_round+1, game=current_game.id).first():
             flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
             return render_template('messages.html', title='Messages', form=form, message=msgs)
 
         #create the new message. grab the current_round for the round var, current user's username for the sender var,
         #selected user's usernames for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=recipients,
+        new_message = Message(round=current_game.current_round+1, game=current_game.id, sender=current_user.username, recipient=recipients,
         content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
         db.session.add(new_message) #stage the message
         db.session.commit() #commit the message to the db

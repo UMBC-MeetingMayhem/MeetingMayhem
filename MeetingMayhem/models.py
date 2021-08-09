@@ -99,6 +99,7 @@ def getAllUserAdversaryFactory(columns=None):
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round = db.Column(db.Integer, nullable=False) #keeps track of which round the message needs to be displayed for users in
+    game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     sender = db.Column(db.String, nullable=False)
     recipient = db.Column(db.String, nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -107,11 +108,9 @@ class Message(db.Model):
     new_recipient = db.Column(db.String, nullable=True)
     edited_content = db.Column(db.Text, nullable=True)
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
-
-    #game = db.Column(db.Integer, db.ForeignKey(game.id), nullable=False)
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message(ID='{self.id}', Round='{self.round}', Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}')\n"
+        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}')\n"
 
 #game table
 #include information about the game in here so it can by dynamically pulled
@@ -148,6 +147,10 @@ this section should probably be moved to not here
 CREATING USERS THIS WAY IS INSECURE BECAUSE WE'RE COPYING THE PWD HASH, NOT HOW BCRYPT IS SUPPOSED TO WORK
 
 run python in powershell prompt
+------------------------------------------------------
+from MeetingMayhem import db
+from MeetingMayhem.models import User, Message, Game
+------------------------------------------------------
 
 from <filename> import db (ex: from MeetingMayhem import db)
 from <filename> import User (ex: from MeetingMayhem.models import User, Message, Metadata)
@@ -212,20 +215,20 @@ db.session.add(gm)
 db.session.commit()
 
 Create adversary:
-adv = User(username='adversary', email='adv@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=3)
+adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
 db.session.add(adv)
 db.session.commit()
 
-Create game:
+Create game: (don't really need anymore since GM can do this now)
 game = Game(name='game', is_running=True, adversary='adversary', players='test', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
 db.session.add(game)
 db.session.commit()
 
 Create test users:
-user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
-user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
-user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
-user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$XKWaEWQnp8e/uyDroUMCOeiqe82jnNn7sJzAfhbEOr1Y0HquInu0', role=4)
+user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 db.session.add(user1)
 db.session.add(user2)
 db.session.add(user3)
