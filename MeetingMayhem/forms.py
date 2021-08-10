@@ -22,7 +22,10 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleF
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from MeetingMayhem.models import Game, User, getAdversaryFactory, getUserFactory, getAllUserFactory, getGameFactory, getAllUserAdversaryFactory
+from MeetingMayhem.helper import usernames_to_str_list, parse_for_username
 
+"""
+these functions have been moved to the helper.py file, leaving them here for now until playtested properly
 #helper functions used in game validation
 #recursivley check a string with multiple usernames in it for usernames, and put them in a list
 def usernames_to_str_list(usernames, username_list):
@@ -46,6 +49,7 @@ def parse_for_username(str, users):
             else: #if not
                 users.append(str2[0]) #just append the username as it is the last one
     return users #return the list of usernames
+"""
 
 #this part handles the registraion form for new users
 #i feel like these fields and variables are pretty self-explanatory, the first string passed is the title of the field

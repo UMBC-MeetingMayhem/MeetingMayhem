@@ -20,11 +20,14 @@ models - imports the models created in models.py so that we can create new db it
 flask_login - different utilities used for loggin the user in, seeing which user is logged in, logging the user out, and requireing login for a page
 """
 from flask import render_template, url_for, flash, redirect, request
+from flask_login import login_user, logout_user, login_required, current_user
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
-from flask_login import login_user, logout_user, login_required, current_user
+from MeetingMayhem.helper import parse_for_username, parse_for_players, parse_for_game, check_for_str, strip_list_str
 
+"""
+all of this has been moved to helper.py, leaving it here for now until playtested properly
 #TODO: need validation on all these helper methods to ensure that the string has contents
 
 #recursivley parse the given string for usernames, return a list of usernames delimited by commas
@@ -78,6 +81,7 @@ def strip_list_str(str_list):
         new_str = str.partition(",")[0] #put everything before the comma into the new list
         new_str_list.append(new_str)
     return new_str_list
+"""
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
