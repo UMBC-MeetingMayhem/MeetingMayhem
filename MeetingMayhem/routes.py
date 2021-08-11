@@ -321,6 +321,14 @@ def messages():
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag)
         
         elif adv_next_round_form.advance_round.data: #if the adversary clicks the advance round button
+            #check if there are any messages sent in the current round, this is to prevent the round being accidentally increased, or increased from multiple of the same post requests
+            current_round_messages = Message.query.filter_by(round=current_game.current_round, game=current_game.id).all()
+            if not current_round_messages:
+                flash(f'The round cannot be advanced when no messages have been sent.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag)
+
             #increment the current_round and reset the current message and current message list size, then commit changes
             current_game.current_round += 1
             current_game.adv_current_msg = 0
