@@ -20,12 +20,12 @@
             <div class="media-body">
                 <div class="article-metadata">
                 {% if message.new_sender %}
-                <a>New Sender: {{ message.new_sender }} | </a>
+                <a>Sender: {{ message.new_sender }} | </a>
                 {% else %}
                 <a>Sender: {{ message.sender }} | </a>
                 {% endif %}
                 {% if message.new_recipient %}
-                <a>New Recipient: {{ message.new_recipient }}</a>
+                <a>Recipient: {{ message.new_recipient }}</a>
                 {% else %}
                 <a>Recipient: {{ message.recipient }}</a>
                 {% endif %}
