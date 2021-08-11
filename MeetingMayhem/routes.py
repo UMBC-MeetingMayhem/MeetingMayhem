@@ -322,7 +322,7 @@ def messages():
         
         elif adv_next_round_form.advance_round.data: #if the adversary clicks the advance round button
             #check if there are any messages sent in the current round, this is to prevent the round being accidentally increased, or increased from multiple of the same post requests
-            current_round_messages = Message.query.filter_by(round=current_game.current_round, game=current_game.id).all()
+            current_round_messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
             if not current_round_messages:
                 flash(f'The round cannot be advanced when no messages have been sent.', 'danger')
                 return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
