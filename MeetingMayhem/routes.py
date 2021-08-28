@@ -346,7 +346,7 @@ def messages():
         msgs=[] #create a list to store the messages to dispay to pass to the template
         for message in display_message: #for each message
             if message.recipient: #if the message has a recipient
-                if check_for_str(message.recipient, current_user.username) or check_for_str(message.sender, current_user.username):
+                if check_for_str(message.recipient, current_user.username) or (check_for_str(message.sender, current_user.username) and not message.is_edited):
                     #check if one of the recipients or sender is the same as the current user, and append it to the list
                     msgs.append(message)
         
