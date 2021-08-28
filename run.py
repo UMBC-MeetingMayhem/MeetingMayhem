@@ -20,5 +20,5 @@ the website without restarting the server. This will need to change in the futur
 #this is a change
 #this is another change
 if __name__ == '__main__':
-    app.run(debug=True) #use this one for local testing
-    #app.run(debug=True,host="0.0.0.0") #use this one to host for other computers
+    #app.run(debug=True) #use this one for local testing
+    app.run(debug=True,host="0.0.0.0") #use this one to host for other computers
