@@ -1,0 +1,85 @@
+<!-- 
+    File: messages.html
+    Author: Robert Shovan /Voitheia
+    Date Created: 6/24/2021
+    Last Modified: 7/6/2021
+    E-mail: rshovan1@umbc.edu
+    Description: html and jinja file for handling the messages page
+-->
+
+{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
+{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+    <h1>Messages</h1>
+
+    {% if message is iterable %} <!-- this checks if the passed message var has content in it -->
+    <legend class="border-bottom mb4">Messages last round:</legend>
+    {% for message in message%} <!-- if message has content, display it and some information about it like sender and round -->
+        <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+        {% if message.is_edited %}
+        <article class="media content-section bg-dark">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ message.new_sender }}</a>
+                <a>Recipient: {{ message.new_recipient }}</a>
+                <small class="text-muted">Round: {{ message.round }}</small>
+                </div>
+                <p class="article-content">{{ message.edited_content }}</p>
+            </div>
+        </article>
+        {% else %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ message.sender }}</a>
+                <a>Recipient: {{ message.recipient }}</a>
+                <small class="text-muted">Round: {{ message.round }}</small>
+                </div>
+                <p class="article-content">{{ message.content }}</p>
+            </div>
+        </article>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    <legend class="border-bottom mb4">Send a Message</legend>
+    <p>Use CTRL+Click or SHIFT+Click to select multiple.</p>
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <!-- these form groups are basically the same thing, just for each field needed for the messages -->
+                <div class="form-group">
+                    {{ form.recipient.label(class="form-control-label") }}
+
+                    {% if form.recipient.errors %} <!-- if there are errors in the form... -->
+                        {{ form.recipient(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.recipient.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.recipient(class="form-control form-control-lg") }}
+                    {% endif %}                    
+                </div>
+                <div class="form-group">
+                    {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if form.content.errors %} <!-- if there are errors in the form... -->
+                        {{ form.content(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.content.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ form.content(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}

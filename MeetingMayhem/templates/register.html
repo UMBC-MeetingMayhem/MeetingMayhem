@@ -1,0 +1,94 @@
+<!-- 
+    File: register.html
+    Author: Robert Shovan /Voitheia
+    Date: 6/15/2021
+    Last Modified: 7/6/2021
+    E-mail: rshovan1@umbc.edu
+    Description: html and jinja file for handling the registration page
+-->
+
+{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
+{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+<div style="margin:auto;width:fit-content;display:flex;">
+        <div class="logobox bg-dark" style="border-top-right-radius:0px;border-bottom-right-radius:0px;margin:auto;">
+                <img src="{{ url_for('static', filename='MM_white.svg') }}" 
+                style="width:90%;margin:30px auto;display:block;">
+            </div>
+    <div class="joinbox bg-dark" style="line-height:175%;flex-direction:row;border-left:none;width:500px;">
+        <form method="POST" action="" style="width:90%;text-align:center;margin:auto;
+        animation-name:form-fadein;animation-duration:1s;">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <!-- TODO: the error messages for these only kinda work, the error messages aren't being pulled correctly -->
+                <!-- these form groups are basically the same thing, just for each field needed for registration -->
+                <legend class="border-bottom mb4">Join Today</legend>
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+
+                    {% if form.username.errors %} <!-- if there are errors in the form... -->
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.username.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    
+                    {% if form.email.errors %} <!-- if there are errors in the form... -->
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.email.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                    </div>
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}
+
+                    {% if form.password.errors %} <!-- if there are errors in the form... -->
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.password.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}                    
+                </div>
+                <div class="form-group">
+                    {{ form.confirm_password.label(class="form-control-label") }}
+                    
+                    {% if form.confirm_password.errors %} <!-- if there are errors in the form... -->
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.confirm_password.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <br>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+            <small class="text-muted"> <!-- link asking user to login if they already have an account -->
+                Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
+            </small>
+        </form>
+
+    </div>
+    </div>
+
+{% endblock content %}
