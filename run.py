@@ -17,6 +17,7 @@ from MeetingMayhem import app
 Runs the app. For now, the app is run in debug mode for ease of development. This allows us to see changes we make to
 the website without restarting the server. This will need to change in the future
 """
+#this is a change
 if __name__ == '__main__':
     app.run(debug=True) #use this one for local testing
     #app.run(debug=True,host="0.0.0.0") #use this one to host for other computers
