@@ -18,5 +18,10 @@ Runs the app. For now, the app is run in debug mode for ease of development. Thi
 the website without restarting the server. This will need to change in the future
 """
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run(debug=True) #use this one for local testing
     #app.run(debug=True,host="0.0.0.0") #use this one to host for other computers
+=======
+    #app.run(debug=True) #use this one for local testing
+    app.run(debug=True,host="0.0.0.0") #use this one to host for other computers
+>>>>>>> origin/testing
