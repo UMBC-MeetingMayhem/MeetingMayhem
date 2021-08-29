@@ -51,7 +51,7 @@ def parse_for_players(str, players):
         list: the same list of players that was passed as an argument, filled out with any usernames found.
 
     Todo:
-        Explore combining this function with strip_list_str since they do similar things.
+        Explore combining this function with usernames_to_str_list since they do similar things.
     """
     if str: #check if the passed string is empty or not
         players.append(str.partition(', ')[0])
@@ -126,9 +126,6 @@ def strip_list_str(str_list):
     
     Returns:
         list: the same list of players that was passed as an argument with commas and white space removed from the end of the string.
-
-    Todo:
-        Explore combining this function with parse_for_players since they do similar things.
     """
     if str_list: #check if the passed list is empty or not
         new_str_list = []
@@ -151,6 +148,9 @@ def usernames_to_str_list(usernames, username_list):
 
     Returns:
         list: the same list of usernames that was passed as an argument, now filled with usernames that were in the passed username string.
+    
+    Todo:
+        Explore combining this function with parse_for_players since they do similar things.
     """
     if usernames: #check if usernames is empty or not
         username_list.append(usernames.partition(', ')[0]) #put the first username into the list

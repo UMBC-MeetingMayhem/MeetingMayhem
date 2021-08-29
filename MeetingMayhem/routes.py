@@ -21,6 +21,7 @@ flask_login - different utilities used for loggin the user in, seeing which user
 """
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
+from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
@@ -501,22 +502,25 @@ def game_setup():
         setup_form = GMSetupGameForm()
 
     #msg setup
-    #-------------------REENABLE VALIDATION-------------------------
-    if is_setup_submit:# and setup_form.validate(): #when the create game button is pressed and the form is valid
+    if is_setup_submit and setup_form.validate(): #when the create game button is pressed and the form is valid
         #capture the list of players from the checkboxes
-        test_players = request.form.getlist('players')
-        test_players2 = ''.join(map(str, test_players))
-        print(test_players2)
-        print(test_players2[:len(test_players2)-2])
+        checkbox_output_list = request.form.getlist('players')
+        checkbox_output_str = ''.join(map(str, checkbox_output_list))
+        players = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
         
-        """ old players capturing
+        """ old players capturing, leaving for now
         player_list = []
         players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list))) #make a string of players to put in the db
         """
-        #lazy compatability stuff before i fix it properly
-        players = test_players2[:len(test_players2)-2]
-        player_list = []
-        player_list = parse_for_players(players, player_list)
+
+        #"validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
+        #doing it this way is kinda janky, the error messages don't look the same as other validation, but it works
+        try:
+            GMSetupGameForm.validate_players_checkbox(players)
+        except ValidationError:
+            #if validation for players fails, display an error and refresh the page so the game doesn't get created 
+            flash(f'One of the selected users is already in a game.', 'danger')
+            return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
         #create the game with info from the form
         new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
@@ -526,8 +530,11 @@ def game_setup():
         adv = User.query.filter_by(username=setup_form.adversary.data.username).first() #grab the adversary user of the game we just made
         adv.game = game.id #set their game to this game
         db.session.commit()
+        player_list = []
+        player_list = parse_for_players(players, player_list)
         for player in strip_list_str(player_list): #for each player in the string of players
             user = User.query.filter_by(username=player).first() #grab their user object
+            print(user)
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
