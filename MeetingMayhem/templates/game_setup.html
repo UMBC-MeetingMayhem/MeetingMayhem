@@ -30,7 +30,7 @@
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {{ setup_form.name(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
+                </div> <br/>
                 <div class="form-group">
                     {{ setup_form.adversary.label(class="form-control-label") }}
 
@@ -44,7 +44,8 @@
                     {% else %}
                         {{ setup_form.adversary(class="form-control form-control-lg") }}
                     {% endif %}                    
-                </div>
+                </div> <br/>
+                {#
                 <div class="form-group">
                     {{ setup_form.players.label(class="form-control-label") }}
 
@@ -59,12 +60,17 @@
                         {{ setup_form.players(class="form-control form-control-lg") }}
                     {% endif %}                    
                 </div>
+                #}
                 <div class="form-group">
-                    <input type=checkbox name=people value='test1'> test1 <br/>
-                    <input type=checkbox name=people value='test2'> test2 <br/>
-                    <input type=checkbox name=people value='test3'> test3 <br/>
-                    <input type=checkbox name=people value='test4'> test4 <br/>
-                </div>
+                <label class="form-control-label" for="name">Players</label> <br/>
+                {% for username in usernames %}
+                    <div class="form-check form-check-inline">
+                        <!-- below line needs the ', ' in value to make processing usernames easier -->
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="players" value="{{ username }}, ">
+                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+                    </div>
+                {% endfor %}
+                </div> <br/>
             </fieldset>
             <div class="form-group">
                 {{ setup_form.create_game(class="btn btn-outline-info") }}
@@ -91,7 +97,7 @@
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {{ mng_form.games(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
+                </div> <br/>
             </fieldset>
             <div class="form-group">
                 {{ mng_form.end_game(class="btn btn-outline-info") }}
@@ -117,7 +123,7 @@
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {{ usr_form.user(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
+                </div> <br/>
                 <div class="form-group">
                     {{ usr_form.role.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
@@ -131,7 +137,7 @@
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {{ usr_form.role(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
+                </div> <br/>
             </fieldset>
             <div class="form-group">
                 {{ usr_form.update(class="btn btn-outline-info") }}

@@ -476,7 +476,6 @@ def game_setup():
     usernames = []
     for user in users:
         usernames.append(user.username)
-    print(usernames)
 
     #msg management
     if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
@@ -502,9 +501,23 @@ def game_setup():
         setup_form = GMSetupGameForm()
 
     #msg setup
-    if is_setup_submit and setup_form.validate(): #when the create game button is pressed and the form is valid
+    #-------------------REENABLE VALIDATION-------------------------
+    if is_setup_submit:# and setup_form.validate(): #when the create game button is pressed and the form is valid
+        #capture the list of players from the checkboxes
+        test_players = request.form.getlist('players')
+        test_players2 = ''.join(map(str, test_players))
+        print(test_players2)
+        print(test_players2[:len(test_players2)-2])
+        
+        """ old players capturing
         player_list = []
         players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list))) #make a string of players to put in the db
+        """
+        #lazy compatability stuff before i fix it properly
+        players = test_players2[:len(test_players2)-2]
+        player_list = []
+        player_list = parse_for_players(players, player_list)
+
         #create the game with info from the form
         new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
         db.session.add(new_game) #send to db
@@ -533,7 +546,7 @@ def game_setup():
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
     
     #display webpage normally
-    return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+    return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
 
 
