@@ -30,6 +30,27 @@
 			</div>
 		</div>
 	</article>
+	
+	            {% if message.new_sender %}
+                <a>Sender: {{ message.new_sender }} | </a>
+                {% else %}
+                <a>Sender: {{ message.sender }} | </a>
+                {% endif %}
+                {% if message.new_recipient %}
+                <a>Recipient: {{ message.new_recipient }}</a>
+                {% else %}
+                <a>Recipient: {{ message.recipient }}</a>
+                {% endif %}
+                </div>
+                {% if message.edited_content %}
+                <p class="article-content">{{ message.edited_content }}</p>
+                {% else %}
+                <p class="article-content">{{ message.content }}</p>
+                {% endif %}
+	
+	
+	
+	
 	{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
     {% for message in message%} 
 	
@@ -47,6 +68,7 @@
 					</div>
 					<p class="article-content"> {{message.content}} </p>
 				</div>
+				
 				<div class="media-body" style="width:50% ; text-align: center;" >
 					<h5> Deleted </h5>
 				</div>
@@ -88,8 +110,16 @@
 						<div class="media-body" style="width:50%;">
 							<h5> Modified: </h5>
 							<div class="article-metadata">
-							<a>Sender:  {{message.new_sender}} ({{game.adversary}})</a>
-							<a>Recipient:  {{message.new_recipient}} </a>
+							{% if message.new_sender %}
+							<a>Sender: {{ message.new_sender }} | </a>
+							{% else %}
+							<a>Sender: {{ message.sender }} | </a>
+							{% endif %}
+							{% if message.new_recipient %}
+							<a>Recipient: {{ message.new_recipient }}</a>
+							{% else %}
+							<a>Recipient: {{ message.recipient }}</a>
+							{% endif %}
 							<small class="text-muted">Round:  {{message.round}} </small>
 							</div>
 							<p class="article-content"> {{message.edited_content}} </p>
