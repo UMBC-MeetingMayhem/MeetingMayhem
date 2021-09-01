@@ -161,14 +161,17 @@ class GMSetupGameForm(FlaskForm):
     def validate_players_checkbox(players):
         user_list_self = [] #generate a list of players from above string
         user_list_self = usernames_to_str_list(players, user_list_self)
-        games = Game.query.filter_by(is_running=True).all() #for all of the running games
-        for game in games:
-            user_list_game = [] #make a list of players in the running games
-            user_list_game = usernames_to_str_list(game.players, user_list_game)
-            for user_self in user_list_self:
-                for user_game in user_list_game:
-                    if user_self == user_game: #compare each user in the new game to each user in the running games
-                        raise ValidationError('One of the selected users is already in a game.') #if there is a match, raise error
+        if len(user_list_self) > 4:
+            raise ValidationError('Each game session can only have a maximum of 4 players.')
+        else:
+            games = Game.query.filter_by(is_running=True).all() #for all of the running games
+            for game in games:
+                user_list_game = [] #make a list of players in the running games
+                user_list_game = usernames_to_str_list(game.players, user_list_game)
+                for user_self in user_list_self:
+                    for user_game in user_list_game:
+                        if user_self == user_game: #compare each user in the new game to each user in the running games
+                            raise ValidationError('One of the selected users is already in a game.') #if there is a match, raise error
 
 #Form for the game master to end a game
 class GMManageGameForm(FlaskForm):
