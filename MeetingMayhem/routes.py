@@ -301,9 +301,6 @@ def messages():
                 checkbox_output_list_new_recipients = request.form.getlist('new_recipients')
                 checkbox_output_list_new_senders = request.form.getlist('new_senders')
 
-                print(checkbox_output_list_new_recipients)
-                print(checkbox_output_list_new_senders)
-
                 #ensure the lists aren't empty
                 if not checkbox_output_list_new_recipients or not checkbox_output_list_new_senders:
                     flash(f'Please select at least one sender and one recipient.', 'danger')
@@ -585,7 +582,6 @@ def game_setup():
         player_list = parse_for_players(players, player_list)
         for player in strip_list_str(player_list): #for each player in the string of players
             user = User.query.filter_by(username=player).first() #grab their user object
-            print(user)
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
