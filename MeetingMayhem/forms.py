@@ -130,6 +130,7 @@ class GMSetupGameForm(FlaskForm):
     create_game = SubmitField('Create Game')
 
     def validate_name(self, name):
+        # A comment 
         game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
         if game: #if there is, throw an error
             raise ValidationError('That name is already in use. Please choose a different one.')
