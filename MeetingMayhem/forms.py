@@ -83,33 +83,52 @@ class LoginForm(FlaskForm):
 #Message form for users to construct messages with
 class MessageForm(FlaskForm):
     #the whole query_factory thing is responsible for pulling the users to select for the dropdown
-    recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', allow_blank=False, validators=[DataRequired()])
+    #recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', allow_blank=False, validators=[DataRequired()])
     content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Message')
     #round, sender should get automatically pulled in the route and send to db item when it is created in the route
 
+    """ unsure if i need this
+    def validate_recipient(recipient):
+        if not recipient:
+            raise ValidationError('Please select at least one recipient.')
+    """
+
 #The adversary forms are split up in this way so that it was easier to figure out what the adversary was doing in the routes.py file
 #Form for the adversary to create a message. Needed the sender field on top of the other things the Message form has
+#might be able to merge the MessageForm and AdversaryMessageSendForm since theyre the same now?
 class AdversaryMessageSendForm(FlaskForm):
-    sender = QuerySelectMultipleField(u'Sender', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-    recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+    #sender = QuerySelectMultipleField(u'Sender', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+    #recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
     content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Message')
 
+    """ unsure if i need this
+    def validate_sender(new_sender):
+        if not new_sender.data:
+            raise ValidationError('Please select at least one sender.')
+    
+    def validate_recipient(new_recipient):
+        if not new_recipient.data:
+            raise ValidationError('Please select at least one recipient.')
+    """
+
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
-    new_sender = QuerySelectMultipleField(u'New Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
-    new_recipient = QuerySelectMultipleField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
+    #new_sender = QuerySelectMultipleField(u'New Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
+    #new_recipient = QuerySelectMultipleField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     edited_content = StringField('Edited Message')
     submit_edits = SubmitField('Submit Edits')
 
-    def validate_new_sender(self, new_sender):
+    """ unsure if i need this
+    def validate_new_sender(new_sender):
         if not new_sender.data:
-            raise ValidationError('Please select a sender.')
+            raise ValidationError('Please select at least one sender.')
     
-    def validate_new_recipient(self, new_recipient):
+    def validate_new_recipient(new_recipient):
         if not new_recipient.data:
             raise ValidationError('Please select at least one recipient.')
+    """
 
 #Form for the adversary to choose their message to edit or delete message
 class AdversaryMessageButtonForm(FlaskForm):
