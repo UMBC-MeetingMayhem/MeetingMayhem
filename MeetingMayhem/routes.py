@@ -1,4 +1,3 @@
-#hello
 """
 File: routes.py
 Author: Robert Shovan /Voitheia
@@ -376,18 +375,9 @@ def messages():
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
         for message in display_message: #for each message
-            if message.is_edited: #if it has been edited
-                if message.new_recipient: #if there is stuff in the new_recipient field
-                    if check_for_str(message.new_recipient, current_user.username): #check that field for the current_user
-                        msgs.append(message) #append if true
-                elif message.recipient: #if not, and there is stuff in the recipient field
-                    if check_for_str(message.recipient, current_user.username): #check that field for the current_user
-                        #check if one of the recipients is the same as the current user, and append it to the list
-                        msgs.append(message) #append if true
-            elif message.recipient: #if the message has a recipient
-                if check_for_str(message.recipient, current_user.username):
-                    #check if one of the recipients is the same as the current user, and append it to the list
-                    msgs.append(message) #append if true
+            if check_for_str(message.recipient, current_user.username) or (check_for_str(message.sender, current_user.username) and not message.is_edited):
+                #check if one of the recipients or sender is the same as the current user, and append it to the list
+                msgs.append(message)
     
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
@@ -403,25 +393,16 @@ def messages():
         while msg_round>=2:
             for message in prev_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
                 if message.round == msg_round: #if the target message matches the round we are parsing this loop
-                    if message.is_edited: #if the target message has been edited
-                        if message.new_recipient: #if there is stuff in the new_recipient field
-                            if check_for_str(message.new_recipient, current_user.username): #check that field for the current_user
-                                prev_msgs.append(message) #append if true
-                        elif message.recipient: #if not, and there is stuff in the recipient field
-                            if check_for_str(message.recipient, current_user.username): #check that field for the current_user
-                                #check if one of the recipients is the same as the current user, and append it to the list
-                                prev_msgs.append(message) #append if true
-                    elif message.recipient: #if the message has a recipient
-                        if check_for_str(message.recipient, current_user.username):
-                            #check if one of the recipients is the same as the current user, and append it to the list
-                            prev_msgs.append(message) #append if true
+                    if check_for_str(message.recipient, current_user.username) or (check_for_str(message.sender, current_user.username) and not message.is_edited):
+                    #check if one of the recipients or sender is the same as the current user, and append it to the list
+                        prev_msgs.append(message)
             msg_round -= 1 #decrement iterator
 
     #setup previous message flag to tell template if it should display previous messages or not
     prev_msg_flag = True
     if not prev_msgs: #if the list of previous messages is empty, set the flag to false
         prev_msg_flag = False
-
+    
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         
         #if recipient or content are None display an error and don't put the message in the db
