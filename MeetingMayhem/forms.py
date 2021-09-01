@@ -83,33 +83,52 @@ class LoginForm(FlaskForm):
 #Message form for users to construct messages with
 class MessageForm(FlaskForm):
     #the whole query_factory thing is responsible for pulling the users to select for the dropdown
-    recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', allow_blank=False, validators=[DataRequired()])
+    #recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', allow_blank=False, validators=[DataRequired()])
     content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Message')
     #round, sender should get automatically pulled in the route and send to db item when it is created in the route
 
+    """ unsure if i need this
+    def validate_recipient(recipient):
+        if not recipient:
+            raise ValidationError('Please select at least one recipient.')
+    """
+
 #The adversary forms are split up in this way so that it was easier to figure out what the adversary was doing in the routes.py file
 #Form for the adversary to create a message. Needed the sender field on top of the other things the Message form has
+#might be able to merge the MessageForm and AdversaryMessageSendForm since theyre the same now?
 class AdversaryMessageSendForm(FlaskForm):
-    sender = QuerySelectMultipleField(u'Sender', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-    recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+    #sender = QuerySelectMultipleField(u'Sender', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+    #recipient = QuerySelectMultipleField(u'Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
     content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Message')
 
+    """ unsure if i need this
+    def validate_sender(new_sender):
+        if not new_sender.data:
+            raise ValidationError('Please select at least one sender.')
+    
+    def validate_recipient(new_recipient):
+        if not new_recipient.data:
+            raise ValidationError('Please select at least one recipient.')
+    """
+
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
-    new_sender = QuerySelectMultipleField(u'New Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
-    new_recipient = QuerySelectMultipleField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
+    #new_sender = QuerySelectMultipleField(u'New Sender', query_factory=getUserFactory(['id', 'username']), get_label='username')
+    #new_recipient = QuerySelectMultipleField(u'New Recipient', query_factory=getUserFactory(['id', 'username']), get_label='username')
     edited_content = StringField('Edited Message')
     submit_edits = SubmitField('Submit Edits')
 
-    def validate_new_sender(self, new_sender):
+    """ unsure if i need this
+    def validate_new_sender(new_sender):
         if not new_sender.data:
-            raise ValidationError('Please select a sender.')
+            raise ValidationError('Please select at least one sender.')
     
-    def validate_new_recipient(self, new_recipient):
+    def validate_new_recipient(new_recipient):
         if not new_recipient.data:
             raise ValidationError('Please select at least one recipient.')
+    """
 
 #Form for the adversary to choose their message to edit or delete message
 class AdversaryMessageButtonForm(FlaskForm):
@@ -125,7 +144,8 @@ class AdversaryAdvanceRoundForm(FlaskForm):
 class GMSetupGameForm(FlaskForm):
     name = StringField('Game Name', validators=[DataRequired()])
     adversary = QuerySelectField(u'Adversary', query_factory=getAdversaryFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-    players = QuerySelectMultipleField(u'Players', query_factory=getAllUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+    #old players selection field, leaving for now
+    #players = QuerySelectMultipleField(u'Players', query_factory=getAllUserFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
     create_game = SubmitField('Create Game')
 
     def validate_name(self, name):
@@ -139,12 +159,28 @@ class GMSetupGameForm(FlaskForm):
         if game:
             raise ValidationError('That adversary is already in a game. Please choose a different adversary.')
 
+    """ old player validation, leaving for now
     #check if any of the selected players are already in a game
     def validate_players(self, players):
         players_list = [] #generate a string of players for the new game
         players_list = ''.join(map(str, parse_for_username(''.join(map(str, players.data)), players_list)))
         user_list_self = [] #generate a list of players from above string
         user_list_self = usernames_to_str_list(players_list, user_list_self)
+        games = Game.query.filter_by(is_running=True).all() #for all of the running games
+        for game in games:
+            user_list_game = [] #make a list of players in the running games
+            user_list_game = usernames_to_str_list(game.players, user_list_game)
+            for user_self in user_list_self:
+                for user_game in user_list_game:
+                    if user_self == user_game: #compare each user in the new game to each user in the running games
+                        raise ValidationError('One of the selected users is already in a game.') #if there is a match, raise error
+    """
+
+    #check if any of the selected players are already in a game
+    #this gets called by the routes.py for validation
+    def validate_players_checkbox(players):
+        user_list_self = [] #generate a list of players from above string
+        user_list_self = usernames_to_str_list(players, user_list_self)
         if len(user_list_self) > 4:
             raise ValidationError('Each game session can only have a maximum of 4 players.')
         else:
