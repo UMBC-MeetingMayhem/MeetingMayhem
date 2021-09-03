@@ -31,26 +31,6 @@
 		</div>
 	</article>
 	
-	            {% if message.new_sender %}
-                <a>Sender: {{ message.new_sender }} | </a>
-                {% else %}
-                <a>Sender: {{ message.sender }} | </a>
-                {% endif %}
-                {% if message.new_recipient %}
-                <a>Recipient: {{ message.new_recipient }}</a>
-                {% else %}
-                <a>Recipient: {{ message.recipient }}</a>
-                {% endif %}
-                </div>
-                {% if message.edited_content %}
-                <p class="article-content">{{ message.edited_content }}</p>
-                {% else %}
-                <p class="article-content">{{ message.content }}</p>
-                {% endif %}
-	
-	
-	
-	
 	{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
     {% for message in message%} 
 	
