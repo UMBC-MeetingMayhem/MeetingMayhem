@@ -22,7 +22,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleF
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from MeetingMayhem.models import Game, User, getAdversaryFactory, getUserFactory, getAllUserFactory, getGameFactory, getAllUserAdversaryFactory
-from MeetingMayhem.helper import usernames_to_str_list, parse_for_username
+from MeetingMayhem.helper import usernames_to_str_list, parse_for_username, str_to_list
 
 """
 these functions have been moved to the helper.py file, leaving them here for now until playtested properly
@@ -180,14 +180,16 @@ class GMSetupGameForm(FlaskForm):
     #this gets called by the routes.py for validation
     def validate_players_checkbox(players):
         user_list_self = [] #generate a list of players from above string
-        user_list_self = usernames_to_str_list(players, user_list_self)
+        #user_list_self = usernames_to_str_list(players, user_list_self)
+        user_list_self = str_to_list(players, user_list_self)
         if len(user_list_self) > 4:
             raise ValidationError('Each game session can only have a maximum of 4 players.')
         else:
             games = Game.query.filter_by(is_running=True).all() #for all of the running games
             for game in games:
                 user_list_game = [] #make a list of players in the running games
-                user_list_game = usernames_to_str_list(game.players, user_list_game)
+                #user_list_game = usernames_to_str_list(game.players, user_list_game)
+                user_list_game = str_to_list(game.players, user_list_game)
                 for user_self in user_list_self:
                     for user_game in user_list_game:
                         if user_self == user_game: #compare each user in the new game to each user in the running games

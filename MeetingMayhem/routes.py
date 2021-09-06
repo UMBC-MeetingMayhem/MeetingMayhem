@@ -25,7 +25,7 @@ from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
-from MeetingMayhem.helper import parse_for_username, parse_for_players, parse_for_game, check_for_str, strip_list_str
+from MeetingMayhem.helper import parse_for_username, parse_for_players, parse_for_game, check_for_str, strip_list_str, str_to_list
 
 """
 all of this has been moved to helper.py, leaving it here for now until playtested properly
@@ -538,7 +538,8 @@ def game_setup():
             adv.game = None #remove the game from the user
             db.session.commit() #commit
             player_list = []
-            player_list = parse_for_players(game.players, player_list) #grab a list of players from the game
+            #player_list = parse_for_players(game.players, player_list) #grab a list of players from the game
+            player_list = str_to_list(game.players, player_list) #grab a list of players from the game
             for player in player_list:
                 user = User.query.filter_by(username=player).first() #find each of the player objects
                 user.game = None #remove the game from the user
@@ -579,7 +580,8 @@ def game_setup():
         adv.game = game.id #set their game to this game
         db.session.commit()
         player_list = []
-        player_list = parse_for_players(players, player_list)
+        #player_list = parse_for_players(players, player_list)
+        player_list = str_to_list(players, player_list)
         for player in strip_list_str(player_list): #for each player in the string of players
             user = User.query.filter_by(username=player).first() #grab their user object
             user.game = game.id #set their game to this game

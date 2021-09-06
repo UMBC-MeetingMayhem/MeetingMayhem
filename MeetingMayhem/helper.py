@@ -37,29 +37,6 @@ def parse_for_username(str, users):
                 users.append(str2[0]) #just append the username as it is the last one
     return users #return the list of usernames
 
-#recursivley parse the given string for players, return a list of players used for resetting a player's game when the game is ended
-def parse_for_players(str, players):
-    """Recursivley parse a given string for player's usernames using .partition to select usernames.
-
-    This is used by the game_seutp page for pulling usernames out of the players field of a game.
-
-    Args:
-        str (str): the string that contains the players
-        players (list): the list of players to be filled out
-    
-    Returns:
-        list: the same list of players that was passed as an argument, filled out with any usernames found.
-
-    Todo:
-        Explore combining this function with usernames_to_str_list since they do similar things.
-    """
-    if str: #check if the passed string is empty or not
-        players.append(str.partition(', ')[0])
-        str1=str.partition(', ')[2]
-        if str1:
-            parse_for_players(str1, players)
-    return players #return the list of players
-
 #same thing as the parse_for_username function, just for games instead
 def parse_for_game(str, games):
     """Recursivley parse a given string for names of games using .partition to select game names.
@@ -136,9 +113,62 @@ def strip_list_str(str_list):
     else:
         return str_list #if the passed list is empty return the list
 
+def str_to_list(st, li):
+    """Recursivley parse a string delimited by ", " and put the separate strings into a list
+
+    This is used in game validation when detecting players that are already in a game, and by
+    the game_setup page for pulling usernames out of the players field of a game.
+
+    Args:
+        st (str): a string delimited by ", " which we want to make into a list.
+        li (list): an empty list where we will put the list of strings.
+    
+    Returns:
+        list: the same list that was passed as an argument, now filled with strings.
+
+    Throws:
+        TypeError: when incorrect argument type or empty string is passed to function.
+    """
+    #check if the passed arguments are the correct type, and string isn't empty
+    if isinstance(st, str) and isinstance(li, list) and st:
+        li.append(st.partition(', ')[0]) #append the first part of the string to the list
+        new_st = st.partition(', ')[2] #capture the rest of the string and put it in a new str
+        if new_st: #if the new str has content
+            str_to_list(new_st, li) #call this function again with new str and same list
+    else:
+        #raise an exception
+        raise TypeError("Incorrect argument type or empty string passed to function.")
+    return li
+
+"""replaced by str_to_list
+#recursivley parse the given string for players, return a list of players used for resetting a player's game when the game is ended
+def parse_for_players(str, players):
+    Recursivley parse a given string for player's usernames using .partition to select usernames.
+
+    This is used by the game_seutp page for pulling usernames out of the players field of a game.
+
+    Args:
+        str (str): the string that contains the players
+        players (list): the list of players to be filled out
+    
+    Returns:
+        list: the same list of players that was passed as an argument, filled out with any usernames found.
+
+    Todo:
+        Explore combining this function with usernames_to_str_list since they do similar things.
+    
+    if str: #check if the passed string is empty or not
+        players.append(str.partition(', ')[0])
+        str1=str.partition(', ')[2]
+        if str1:
+            parse_for_players(str1, players)
+    return players #return the list of players
+"""
+
+"""replaced by str_to_list
 #recursivley check a string with multiple usernames in it for usernames, and put them in a list
 def usernames_to_str_list(usernames, username_list):
-    """Recursivley parse a string with multiple usernames in it, and append them to a list.
+    Recursivley parse a string with multiple usernames in it, and append them to a list.
 
     This is used in game validation when detecting players that are already in a game.
 
@@ -151,10 +181,11 @@ def usernames_to_str_list(usernames, username_list):
     
     Todo:
         Explore combining this function with parse_for_players since they do similar things.
-    """
+    
     if usernames: #check if usernames is empty or not
         username_list.append(usernames.partition(', ')[0]) #put the first username into the list
         new_usernames = usernames.partition(', ')[2] #grab the rest of the string
         if new_usernames: #if there are still usernames to parse
             username_list = usernames_to_str_list(new_usernames, username_list) #call this method again with the new string
     return username_list #return the list
+"""
