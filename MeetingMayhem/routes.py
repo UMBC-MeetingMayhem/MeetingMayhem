@@ -25,7 +25,7 @@ from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
-from MeetingMayhem.helper import parse_for_username, parse_for_players, parse_for_game, check_for_str, strip_list_str, str_to_list
+from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, parse_for_name
 
 """
 all of this has been moved to helper.py, leaving it here for now until playtested properly
@@ -526,10 +526,10 @@ def game_setup():
     for user in users:
         usernames.append(user.username)
 
-    #msg management
+    #game management
     if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
         targets = []
-        targets = parse_for_game(''.join(map(str, mng_form.games.data)), targets) #search for the games selected by name
+        targets = parse_for_name(''.join(map(str, mng_form.games.data)), targets) #search for the games selected by name
         #in theory, this should be able to end multiple games at once properly, but I haven't tested this
         for target in strip_list_str(targets):
             game = Game.query.filter_by(name=target).first() #find the selected game
@@ -550,7 +550,7 @@ def game_setup():
         mng_form = GMManageGameForm()
         setup_form = GMSetupGameForm()
 
-    #msg setup
+    #game setup
     if is_setup_submit and setup_form.validate(): #when the create game button is pressed and the form is valid
         #capture the list of players from the checkboxes and make it into a string delimited by commas
         checkbox_output_list = request.form.getlist('players')

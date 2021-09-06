@@ -21,8 +21,8 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from MeetingMayhem.models import Game, User, getAdversaryFactory, getUserFactory, getAllUserFactory, getGameFactory, getAllUserAdversaryFactory
-from MeetingMayhem.helper import usernames_to_str_list, parse_for_username, str_to_list
+from MeetingMayhem.models import Game, User, getAdversaryFactory, getGameFactory, getAllUserAdversaryFactory
+from MeetingMayhem.helper import str_to_list
 
 """
 these functions have been moved to the helper.py file, leaving them here for now until playtested properly
