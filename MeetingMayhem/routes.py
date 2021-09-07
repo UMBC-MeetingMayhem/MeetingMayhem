@@ -432,7 +432,7 @@ def game_setup():
     
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
 
-
+#hi 
 
 
 """
