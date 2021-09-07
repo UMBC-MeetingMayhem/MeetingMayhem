@@ -145,7 +145,7 @@ def logout():
 #account page route, this page has the user's username and areas for stats and account information when that gets implemented
 @app.route('/account', methods=['GET', 'POST']) #, methods=['GET', 'POST']) needs to be removed when the decrement round button is
 @login_required #enforces that the the user needs to be logged in if they navigate to this page
-def account():
+def accohellorobunt():
     #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
     form = AdversaryAdvanceRoundForm()
     current_game = Game.query.filter_by(adversary=current_user.username).first()
@@ -432,7 +432,7 @@ def game_setup():
     
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
 
-#hi 
+#hi
 
 
 """
