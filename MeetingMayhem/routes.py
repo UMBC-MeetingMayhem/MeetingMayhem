@@ -145,7 +145,7 @@ def logout():
 @login_required #enforces that the the user needs to be logged in if they navigate to this page
 def account():
     #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
-    #dumb thing form = AdversaryAdvanceRoundForm()
+    form = AdversaryAdvanceRoundForm()
     current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
     if form.advance_round.data and current_game:
         current_game.current_round -= 1
