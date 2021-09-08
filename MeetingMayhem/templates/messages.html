@@ -58,23 +58,6 @@
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <!-- these form groups are basically the same thing, just for each field needed for the messages -->
-                {# old recipient section
-                <div class="form-group">
-                    {{ form.recipient.label(class="form-control-label") }}
-
-                    {% if form.recipient.errors %} <!-- if there are errors in the form... -->
-                        {{ form.recipient(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.recipient.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.recipient(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
-                #}
                 <div class="form-group">
                 <label class="form-control-label" for="name">Recipients</label> <br/>
                 {% for username in usernames %}
