@@ -464,7 +464,6 @@ def game_setup():
         adv.game = game.id #set their game to this game
         db.session.commit()
         player_list = []
-        #player_list = parse_for_players(players, player_list)
         player_list = str_to_list(players, player_list)
         for player in strip_list_str(player_list): #for each player in the string of players
             user = User.query.filter_by(username=player).first() #grab their user object
@@ -480,7 +479,6 @@ def game_setup():
         adv.game = None #remove the game from the user
         db.session.commit() #commit
         player_list = []
-        #player_list = parse_for_players(game.players, player_list) #grab a list of players from the game
         player_list = str_to_list(game.players, player_list) #grab a list of players from the game
         for player in player_list:
             user = User.query.filter_by(username=player).first() #find each of the player objects
