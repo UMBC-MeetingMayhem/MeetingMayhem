@@ -23,7 +23,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import parse_for_username, parse_for_players, parse_for_game, check_for_str, strip_list_str
 
@@ -611,13 +611,13 @@ def spectate_game():
         flash(f'Your permissions are insufficient to access this page.', 'danger')
         return render_template('home.html', title='Home')
     else:
-        # Need a list of running games
-        running_games = Game.query.filter_by(is_running=True)
+        # Form for the selected game from running games list
+        select_game_form = SpectateGameSelectForm()
 
         # Send list of games to template
         # Need the kwarg to send list of games with
         # Need correct html file
-        return render_template('spectator_messages.html', title='Spectator Game')
+        return render_template('spectator_main.html', title='Spectate A Game', sg_form=select_game_form)
 
 
 """
