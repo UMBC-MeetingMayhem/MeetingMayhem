@@ -143,7 +143,7 @@ def logout():
 #account page route, this page has the user's username and areas for stats and account information when that gets implemented
 @app.route('/account', methods=['GET', 'POST']) #, methods=['GET', 'POST']) needs to be removed when the decrement round button is
 @login_required #enforces that the the user needs to be logged in if they navigate to this page
-def accohellorobunt():
+def account():
     #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
     form = AdversaryAdvanceRoundForm()
     current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
@@ -187,7 +187,7 @@ def messages():
         usernames = []
         for user in users:
             usernames.append(user.username)
-        
+
         if messages: #if messages has content, set the display message to the adversary's current message
             display_message = messages[current_game.adv_current_msg]
 
@@ -196,7 +196,7 @@ def messages():
 
         #set the adv_current_msg_list_size so that the edit message box "scrolling" works correctly
         current_game.adv_current_msg_list_size = len(messages)
-        
+
         #create variables for the edit message box buttons so that we only check their state once
         is_prev_submit = adv_buttons_form.prev_submit.data
         is_next_submit = adv_buttons_form.next_submit.data
@@ -228,7 +228,7 @@ def messages():
                 return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
                 adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
                 current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-            
+
             #capture the list of players from the checkboxes and make it into a string delimited by commas
             checkbox_output_list_recipients = request.form.getlist('recipients')
             checkbox_output_list_senders = request.form.getlist('senders')
@@ -244,7 +244,7 @@ def messages():
             checkbox_output_str_senders = ''.join(map(str, checkbox_output_list_senders))
             recipients = checkbox_output_str_recipients[:len(checkbox_output_str_recipients)-2]
             senders = checkbox_output_str_senders[:len(checkbox_output_str_senders)-2]
-            
+
             """ old stuff for gathering senders and recipients for sending a message for adv
             users_recipients=[] #make a list to put usernames in for the recipient
             users_senders=[] #make a list to put usernames in for the sender
@@ -273,7 +273,7 @@ def messages():
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-        
+
         elif (is_prev_submit or is_next_submit or is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
             if is_prev_submit: #if the prev button is clicked
                 if current_game.adv_current_msg == 0: #if the adversary tries to go backwards at the first message
@@ -283,7 +283,7 @@ def messages():
                 else: #decrement the current message normally and update the value
                     current_game.adv_current_msg -= 1
                     db.session.commit()
-            
+
             elif is_next_submit: #if the next button is clicked
                 #if the adversary tries to go forwards on the last message
                 if current_game.adv_current_msg == (current_game.adv_current_msg_list_size - 1):
@@ -293,10 +293,10 @@ def messages():
                 else: #increment the current message normally and update the value
                     current_game.adv_current_msg += 1
                     db.session.commit()
-            
+
             #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
             elif is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
-            
+
                 #capture the list of players from the checkboxes and make it into a string delimited by commas
                 checkbox_output_list_new_recipients = request.form.getlist('new_recipients')
                 checkbox_output_list_new_senders = request.form.getlist('new_senders')
@@ -363,7 +363,7 @@ def messages():
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-        
+
         elif adv_next_round_form.advance_round.data: #if the adversary clicks the advance round button
             #check if there are any messages sent in the current round, this is to prevent the round being accidentally increased, or increased from multiple of the same post requests
             current_round_messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
@@ -394,13 +394,13 @@ def messages():
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-        
+
         else:
             # display normally
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-    
+
     #for regular users
 
     #setup the current_game variable so we can pull information from it
@@ -420,7 +420,7 @@ def messages():
 
     form = MessageForm() #use the standard message form
     msgs = None
-    if (current_game.current_round>1): 
+    if (current_game.current_round>1):
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
@@ -450,9 +450,9 @@ def messages():
     prev_msg_flag = True
     if not prev_msgs: #if the list of previous messages is empty, set the flag to false
         prev_msg_flag = False
-    
+
     if form.validate_on_submit(): #when the user submits the message form and it is valid
-        
+
         """
         #if recipient or content are None display an error and don't put the message in the db
         #unsure if this is needed, but will need to put it back in if we end up having issues with empty messages
@@ -509,7 +509,7 @@ def game_setup():
     if current_user.role != 2: #if the user isn't a game master
         flash(f'Your permissions are insufficient to access this page.', 'danger') #flash error message
         return render_template('home.html', title='Home') #display the home page when they try to access this page directly.
-    
+
     #seutp the forms the gm uses
     mng_form = GMManageGameForm()
     setup_form = GMSetupGameForm()
@@ -555,7 +555,7 @@ def game_setup():
         checkbox_output_list = request.form.getlist('players')
         checkbox_output_str = ''.join(map(str, checkbox_output_list))
         players = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
-        
+
         """ old players capturing, leaving for now
         player_list = []
         players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list))) #make a string of players to put in the db
@@ -566,7 +566,7 @@ def game_setup():
         try:
             GMSetupGameForm.validate_players_checkbox(players)
         except ValidationError:
-            #if validation for players fails, display an error and refresh the page so the game doesn't get created 
+            #if validation for players fails, display an error and refresh the page so the game doesn't get created
             flash(f'One of the selected users is already in a game.', 'danger')
             return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
@@ -585,7 +585,7 @@ def game_setup():
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
-    
+
     if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
         user = User.query.filter_by(username=usr_form.user.data.username).first() #grab the targeted user
         if user.game: #if the user is in a game
@@ -598,11 +598,26 @@ def game_setup():
             user.role = 4 #update to user
         db.session.commit()
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
-    
+
     #display webpage normally
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
-#hi
+# Route for spectating
+@app.route('/spectate', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
+@login_required  # user must be logged in
+def spectate_game():
+    # If the user is not a spectator, flash a warning and send back to home
+    if current_user.role != 5:
+        flash(f'Your permissions are insufficient to access this page.', 'danger')
+        return render_template('home.html', title='Home')
+    else:
+        # Need a list of running games
+        running_games = Game.query.filter_by(is_running=True)
+
+        # Send list of games to template
+        # Need the kwarg to send list of games with
+        # Need correct html file
+        return render_template('spectator_messages.html', title='Spectator Game')
 
 
 """
