@@ -20,22 +20,6 @@
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
                 <legend class="border-bottom mb4">Send a Message</legend>
-                {# old senders section
-                <div class="form-group">
-                    {{ msg_form.sender.label(class="form-control-label") }}
-
-                    {% if msg_form.sender.errors %} <!-- if there are errors in the form... -->
-                        {{ msg_form.sender(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in msg_form.sender.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ msg_form.sender(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
-                #}
                 <div class="form-group">
                 <label class="form-control-label" for="name">Senders</label> <br/>
                 {% for username in usernames %}
@@ -46,22 +30,6 @@
                     </div>
                 {% endfor %}
                 </div> <br/>
-                {# old recipients section
-                <div class="form-group">
-                    {{ msg_form.recipient.label(class="form-control-label") }}
-
-                    {% if msg_form.recipient.errors %} <!-- if there are errors in the form... -->
-                        {{ msg_form.recipient(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in msg_form.recipient.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ msg_form.recipient(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
-                #}
                 <div class="form-group">
                 <label class="form-control-label" for="name">Recipients</label> <br/>
                 {% for username in usernames %}
@@ -111,6 +79,9 @@
                 {% else %}
                 <a>Recipient: {{ message.recipient }}</a>
                 {% endif %}
+                {% if message.adv_created %}
+                <a> | This message was created by the adversary.</a>
+                {% endif %}
                 {% if message.is_deleted %}
                 <a> | This message has been deleted.</a>
                 {% else %}
@@ -122,6 +93,17 @@
                 {% else %}
                 <p class="article-content">{{ message.content }}</p>
                 {% endif %}
+            </div>
+        </article>
+        {% elif message.adv_created %} <!-- if the adversary created the message -->
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ message.sender }} | </a>
+                <a>Recipient: {{ message.recipient }}</a>
+                <a> | This message was created by the adversary.</a>
+                </div>
+                <p class="article-content">{{ message.content }}</p>
             </div>
         </article>
         {% else %} <!-- if the message hasn't been edited, display normally -->
@@ -142,22 +124,6 @@
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
                 <legend class="border-bottom mb4">Edit a Message</legend>
-                {# old new senders section
-                <div class="form-group">
-                    {{ adv_msg_edit_form.new_sender.label(class="form-control-label") }}
-
-                    {% if adv_msg_edit_form.new_sender.errors %} <!-- if there are errors in the form... -->
-                        {{ adv_msg_edit_form.new_sender(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in adv_msg_edit_form.new_sender.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ adv_msg_edit_form.new_sender(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
-                #}
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Senders</label> <br/>
                 {% for username in usernames %}
@@ -168,22 +134,6 @@
                     </div>
                 {% endfor %}
                 </div> <br/>
-                {# old new recipients section
-                <div class="form-group">
-                    {{ adv_msg_edit_form.new_recipient.label(class="form-control-label") }}
-
-                    {% if adv_msg_edit_form.new_recipient.errors %} <!-- if there are errors in the form... -->
-                        {{ adv_msg_edit_form.new_recipient(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in adv_msg_edit_form.new_recipient.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ adv_msg_edit_form.new_recipient(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
-                #}
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Recipients</label> <br/>
                 {% for username in usernames %}
@@ -254,12 +204,14 @@
                 {% else %}
                 <a>Recipient: {{ prev_msg.recipient }}</a>
                 {% endif %}
+                {% if prev_msg.adv_created %}
+                <a> | This message was created by the adversary.</a>
+                {% endif %}
                 {% if prev_msg.is_deleted %}
                 <a> | This message has been deleted.</a>
                 {% else %}
                 <a> | This message has been edited.</a>
                 {% endif %}
-                <a> | Round: {{ prev_msg.round }}</a>
                 </div>
                 {% if prev_msg.edited_content %}
                 <p class="article-content">{{ prev_msg.edited_content }}</p>
@@ -268,13 +220,23 @@
                 {% endif %}
             </div>
         </article>
+        {% elif prev_msg.adv_created %}} <!-- if the adversary created the message -->
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ prev_msg.sender }} | </a>
+                <a>Recipient: {{ prev_msg.recipient }}</a>
+                <a> | This message was created by the adversary.</a>
+                </div>
+                <p class="article-content">{{ prev_msg.content }}</p>
+            </div>
+        </article>
         {% else %} <!-- if the message hasn't been edited, display normally -->
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg.sender }} | </a>
                 <a>Recipient: {{ prev_msg.recipient }}</a>
-                <a> | Round: {{ prev_msg.round }}</a>
                 </div>
                 <p class="article-content">{{ prev_msg.content }}</p>
             </div>
