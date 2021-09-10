@@ -11,7 +11,9 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
     <h1>Spectating {{game.name}}</h1>
-	
+	<div class="content-section">
+		<a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Return to Game Selection</a>
+	</div>
 	<div class="content-section">
 		<h2>Players</h1>
 		<p>{{game.players}}</p>

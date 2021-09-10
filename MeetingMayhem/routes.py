@@ -23,7 +23,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list
 
@@ -508,7 +508,38 @@ def game_setup():
     #display webpage normally
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
+"""
+#sample route for testing pages
+#when you copy this to test a page, make sure to change all instances of "testing"
 
+@app.route('/testing') #this decorator tells the website what to put after the http://<IP>
+#@app.route('/testing', methods=['GET', 'POST']) #this is needed if the user is doing to submit forms and things
+#@login_required #enforce that the user is logged in
+def testing():
+    return render_template('testing.html', title='Testing') #this tells the app what html template to use. Title isn't needed
+
+"""
+
+# Route for spectating
+@app.route('/spectate', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
+@login_required  # user must be logged in
+def spectate_game():
+    # If the user is not a spectator, flash a warning and send back to home
+    if current_user.role != 5:
+        flash(f'Your permissions are insufficient to access this page.', 'danger')
+        return render_template('home.html', title='Home')
+    else:
+        # Form for the selected game from running games list
+        select_game_form = SpectateGameSelectForm()
+        game_selected = select_game_form.select_game.data
+
+        # If the game is selected and the form is validated, move to spectator_game page
+        if game_selected and select_game_form.validate():
+            game = select_game_form.running_games.data
+            return render_template('spectator_game.html', title='Spectate Game Info', game=game, message=game.adv_current_msg)
+
+        # Send list of games to template
+        return render_template('spectator_main.html', title='Spectate A Game', sg_form=select_game_form)
 
 
 """
