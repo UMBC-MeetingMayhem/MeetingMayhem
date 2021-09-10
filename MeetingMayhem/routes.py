@@ -613,10 +613,14 @@ def spectate_game():
     else:
         # Form for the selected game from running games list
         select_game_form = SpectateGameSelectForm()
+        game_selected = select_game_form.select_game.data
+
+        # If the game is selected and the form is validated, move to spectator_game page
+        if game_selected and select_game_form.validate():
+            game = select_game_form.running_games.data
+            return render_template('spectator_game.html', title='Spectate Game Info', game=game, message=game.adv_current_msg)
 
         # Send list of games to template
-        # Need the kwarg to send list of games with
-        # Need correct html file
         return render_template('spectator_main.html', title='Spectate A Game', sg_form=select_game_form)
 
 
