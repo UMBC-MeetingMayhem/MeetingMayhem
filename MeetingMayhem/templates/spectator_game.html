@@ -21,6 +21,8 @@
 		<p>{{game.adversary}}</p>
 	</div>
 	
+	<!-- Add a legend article here or in the about page to explain game infomation to spectator -->
+	
 	<h1>Messages</h1>
 	<article class="media content-section bg-dark">
 		<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
@@ -35,48 +37,61 @@
 	
 	{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
     {% for message in message%} 
-	
-		{% if message.is_edited %}
-		
-			{% if message.is_deleted %}
-			<!-- Orignal message and deleted status -->
+
+		{% if message.adv_created %}
+			{% if not message.is_deleted %}
+			<!-- Adversary Created -->
+			<!-- Messages created then deleted by adversary are not shown -->
+			<!-- Messages created then edited by adversary only show edited message-->
 			<article class="media content-section">
 			<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
-				<div class="media-body" style="width:50%;">
-					<div class="article-metadata">
-					<a>Sender:  {{message.sender}} </a>
-					<a>Recipient:  {{message.recipient}} </a>
-					<small class="text-muted">Round:  {{message.round}} </small>
-					</div>
-					<p class="article-content"> {{message.content}} </p>
-				</div>
-				
 				<div class="media-body" style="width:50% ; text-align: center;" >
-					<h5> Deleted </h5>
+					<h5> Adversary Created</h5>
+				</div>
+					<div class="media-body" style="width:50%;">
+					<div class="article-metadata">
+						{% if message.new_sender %}
+						<a>Sender: {{ message.new_sender }} | </a>
+						{% else %}
+						<a>Sender: {{ message.sender }} | </a>
+						{% endif %}
+						{% if message.new_recipient %}
+						<a>Recipient: {{ message.new_recipient }}</a>
+						{% else %}
+						<a>Recipient: {{ message.recipient }}</a>
+						{% endif %}
+						<small class="text-muted">Round:  {{message.round}} </small>
+					</div>
+					{% if message.edited_content %}
+					<p class="article-content"> {{message.edited_content}} </p>
+					{% else %}
+					<p class="article-content"> {{message.content}} </p>
+					{% endif %}
 				</div>
 			</div>
 			</article>
-			{% else %}
-				<!-- Adversary creates message -->
-				{% if message.edited_content is none %}
+			{% endif %}		
+		{% else %}
+			{% if message.is_edited %}
+				{% if message.is_deleted %}
+				<!-- Orignal message and deleted status -->
 				<article class="media content-section">
-					<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
-						<div class="media-body" style="width:50% ; text-align: center;" >
-							<h5> </h5>
+				<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+					<div class="media-body" style="width:50%;">
+						<div class="article-metadata">
+						<a>Sender:  {{message.sender}} </a>
+						<a>Recipient:  {{message.recipient}} </a>
+						<small class="text-muted">Round:  {{message.round}} </small>
 						</div>
-						<div class="media-body" style="width:50%;">
-							<h5> Original : </h5>
-							<div class="article-metadata">
-							<a>Sender:  {{message.sender}} ({{game.adversary}})</a>
-							<a>Recipient:  {{message.recipient}} </a>
-							<small class="text-muted">Round:  {{message.round}} </small>
-							</div>
-							<p class="article-content"> {{message.content}} </p>
-						</div>
+						<p class="article-content"> {{message.content}} </p>
 					</div>
+					
+					<div class="media-body" style="width:50% ; text-align: center;" >
+						<h5> Deleted </h5>
+					</div>
+				</div>
 				</article>
-				{% else %}
-			
+				{% else %}	
 				<!-- Original and modified message side by side -->
 				<article class="media content-section">
 					<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
@@ -109,28 +124,27 @@
 					</div>
 				</article>
 				{% endif %}
-			{% endif %}
-		{% else %}
-		<!-- Just original message-->
-		<article class="media content-section">
-			<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
-				<div class="media-body" style="width:50%;">
-					<div class="article-metadata">
-					<a>Sender:  {{message.sender}} </a>
-					<a>Recipient:  {{message.recipient}} </a>
-					<small class="text-muted">Round:  {{message.round}} </small>
+			{% else %}
+			<!-- Just original message-->
+			<article class="media content-section">
+				<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+					<div class="media-body" style="width:50%;">
+						<div class="article-metadata">
+						<a>Sender:  {{message.sender}} </a>
+						<a>Recipient:  {{message.recipient}} </a>
+						<small class="text-muted">Round:  {{message.round}} </small>
+						</div>
+						<p class="article-content"> {{message.content}} </p>
 					</div>
-					<p class="article-content"> {{message.content}} </p>
+					<div class="media-body" style="width:50% ; text-align: center;" >
+						<h5> Unmodified </h5>
+					</div>
 				</div>
-				<div class="media-body" style="width:50% ; text-align: center;" >
-					<h5> Unmodified </h5>
-				</div>
-			</div>
-        </article>
-        {% endif %}
-    {% endfor %}
-    {% endif %}
-	
+			</article>
+			{% endif %}
+		{% endif %}
+	{% endfor %}	
+	{% endif %}
 	<!-- add stuff here -->
 	
 {% endblock content %}
