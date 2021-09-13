@@ -208,3 +208,4 @@ class GMManageUserForm(FlaskForm):
 class SpectateGameSelectForm(FlaskForm):
     running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
     select_game = SubmitField('Select Game')
+
