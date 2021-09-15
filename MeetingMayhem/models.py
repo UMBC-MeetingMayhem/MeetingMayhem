@@ -16,7 +16,7 @@ partial, orm - used for getUserFactory for the dropdown menus in writing message
 """
 from operator import or_
 from MeetingMayhem import db, login_manager
-from flask_login import UserMixin, current_user
+from flask_login import UserMixin
 from functools import partial
 from sqlalchemy import orm
 #all this code is basically creating the tables for the database
@@ -37,6 +37,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.Integer, nullable=False) #dictates what role the account is
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
+    
     """
     roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
     admin: is able to changes the roles of the users incase we need to do this
@@ -52,24 +53,6 @@ class User(db.Model, UserMixin):
 
 #this is how the message forms pulls the users it needs for the recipient dropdown, I don't really know how it works lol
 #https://stackoverflow.com/questions/26254971/more-specific-sql-query-with-flask-wtf-queryselectfield
-def getUser(columns=None):
-    user = User.query.filter_by(role=4,game=current_user.game)
-    if columns:
-        user = user.options(orm.load_only(*columns))
-    return user
-
-def getUserFactory(columns=None):
-    return partial(getUser, columns=columns)
-
-#queryfactory for all users, used for gm to pick users in a game
-def getAllUser(columns=None):
-    all_user = User.query.filter_by(role=4)
-    if columns:
-        all_user = all_user.options(orm.load_only(*columns))
-    return all_user
-
-def getAllUserFactory(columns=None):
-    return partial(getAllUser, columns=columns)
 
 #queryfactory for adversary, used for gm to pick adversary for a game
 def getAdversary(columns=None):
@@ -108,9 +91,12 @@ class Message(db.Model):
     new_recipient = db.Column(db.String, nullable=True)
     edited_content = db.Column(db.Text, nullable=True)
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
+    adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
+    is_encrypted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is encrypted or not
+    is_signed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is signed or not
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}')\n"
+        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}')\n"
 
 #game table
 #include information about the game in here so it can by dynamically pulled
@@ -209,6 +195,11 @@ db.drop_all()
 db.session.commit()
 db.create_all()
 
+Create game: (don't really need anymore since GM can do this now)
+game = Game(name='game', is_running=True, adversary='adversary', players='test', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+db.session.add(game)
+db.session.commit()
+
 Create gm:
 gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
 db.session.add(gm)
@@ -217,11 +208,6 @@ db.session.commit()
 Create adversary:
 adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
 db.session.add(adv)
-db.session.commit()
-
-Create game: (don't really need anymore since GM can do this now)
-game = Game(name='game', is_running=True, adversary='adversary', players='test', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
-db.session.add(game)
 db.session.commit()
 
 Create test users:

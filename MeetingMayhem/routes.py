@@ -23,66 +23,9 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
 from MeetingMayhem.models import User, Message, Game
-from MeetingMayhem.helper import parse_for_username, parse_for_players, parse_for_game, check_for_str, strip_list_str
-
-"""
-all of this has been moved to helper.py, leaving it here for now until playtested properly
-#TODO: need validation on all these helper methods to ensure that the string has contents
-
-#recursivley parse the given string for usernames, return a list of usernames delimited by commas
-def parse_for_username(str, users):
-    str1=str.partition("Username='")[2] #grabs all the stuff in the string after the text "Username='"
-    str2=str1.partition("', ") #separates the remaining string into the username, the "', ", and the rest of the string
-    if str2[2]: #if there is content in the rest of the string
-        if (str2[2].find('Username') != -1): #if we can find the text 'Username' in the rest of the string
-            user = str2[0] + ', ' #put a comma and space after the username
-            users.append(user) #append it to the list
-            parse_for_username(str2[2], users) #call this method again
-        else: #if not
-            users.append(str2[0]) #just append the username as it is the last one
-    return users #return the list of usernames
-
-#recursivley parse the given string for players, return a list of players used for resetting a player's game when the game is ended
-def parse_for_players(str, players):
-    players.append(str.partition(', ')[0])
-    str1=str.partition(', ')[2]
-    if str1:
-        parse_for_players(str1, players)
-    return players
-
-#same thing as the parse_for_username function, just for games instead
-def parse_for_game(str, games):
-    str1=str.partition("Name='")[2]
-    str2=str1.partition("', ")
-    if str2[2]:
-        if (str2[2].find('Name') != -1):
-            game = str2[0] + ', '
-            games.append(game)
-            parse_for_game(str2[2], games)
-        else:
-            games.append(str2[0])
-    return games
-
-#recursivley parse the given string for usernames, return true if the given username is found
-def check_for_str(str, check):
-    str1=str.partition(', ') #split the string into the username, the "', ", and the rest of the string
-    if (str1[0] == check): #if the first part of str is the username we are looking for
-        return True
-    if (not str1[2]): #if there is nothing in the rest of str, it means there are no more usernames to look for
-        return False
-    else:
-        return check_for_str(str1[2], check) #call this method again if there is more string to look through
-
-#used to strip commas and white spaces out of lists of strings
-def strip_list_str(str_list):
-    new_str_list = []
-    for str in str_list:
-        new_str = str.partition(",")[0] #put everything before the comma into the new list
-        new_str_list.append(new_str)
-    return new_str_list
-"""
+from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -92,7 +35,7 @@ def strip_list_str(str_list):
 def home():
     if current_user.is_anonymous: #ask the user to login or register if they aren't logged in
         flash(f'Please register for an account or login to proceed.', 'info')
-    elif not current_user.game and current_user.role > 2: #if the user is logged in but isn't in a game, display below message
+    elif not current_user.game and (current_user.role == 3 or current_user.role == 4): #if the user is logged in but isn't in a game, display below message
         flash(f'You are not currently in a game. Please have your game master create a game to proceed.', 'info')
     return render_template('home.html', title='Home') #this line passes the template we want to use and any variables it needs to it
 
@@ -174,7 +117,7 @@ def messages():
         current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
 
         #setup variables for the forms the adversary needs to use
-        msg_form = AdversaryMessageSendForm()
+        msg_form = MessageForm()
         adv_msg_edit_form = AdversaryMessageEditForm()
         adv_buttons_form = AdversaryMessageButtonForm()
         adv_next_round_form = AdversaryAdvanceRoundForm()
@@ -220,6 +163,7 @@ def messages():
         if not prev_msgs: #if the list of previous messages is empty, set the flag to false
             prev_msg_flag = False
 
+        #adversary message creation
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
             #if sender, recipient, or content are None, display an error
@@ -268,12 +212,23 @@ def messages():
             db.session.add(new_message) #stage the message
             db.session.commit() #commit the message to the db
             flash(f'Your message has been sent!', 'success') #success message to let user know it worked
+            
+            create_message(current_user, current_game, request.form, msg_form)
+
+            #pull the messages again since the messages we want to display has changed
+            messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
+            current_game.adv_current_msg = 0
+            current_game.adv_current_msg_list_size = len(messages)
+            #commit the messages to the database
+            db.session.commit()
 
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
+        
+        #adversary message editing
         elif (is_prev_submit or is_next_submit or is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
             if is_prev_submit: #if the prev button is clicked
                 if current_game.adv_current_msg == 0: #if the adversary tries to go backwards at the first message
@@ -295,6 +250,7 @@ def messages():
                     db.session.commit()
 
             #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
+
             elif is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
 
                 #capture the list of players from the checkboxes and make it into a string delimited by commas
@@ -312,15 +268,6 @@ def messages():
                 checkbox_output_str_new_senders = ''.join(map(str, checkbox_output_list_new_senders))
                 new_recipients = checkbox_output_str_new_recipients[:len(checkbox_output_str_new_recipients)-2]
                 new_senders = checkbox_output_str_new_senders[:len(checkbox_output_str_new_senders)-2]
-
-                """ old stuff for capturing new recipients and new senders
-                users_recipients=[] #make a list to put usernames in for the recipient
-                users_senders=[] #make a list to put usernames in for the sender
-                #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
-                #then maps the list of usernames into a string to pass into the db
-                new_recipients = ''.join(map(str, parse_for_username(''.join(map(str, adv_msg_edit_form.new_recipient.data)), users_recipients)))
-                new_senders = ''.join(map(str, parse_for_username(''.join(map(str, adv_msg_edit_form.new_sender.data)), users_senders)))
-                """
 
                 #setup the changes to be made to the current message
                 display_message.is_edited = True
@@ -363,7 +310,8 @@ def messages():
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
+        
+        #adversary advance round
         elif adv_next_round_form.advance_round.data: #if the adversary clicks the advance round button
             #check if there are any messages sent in the current round, this is to prevent the round being accidentally increased, or increased from multiple of the same post requests
             current_round_messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
@@ -471,34 +419,9 @@ def messages():
         if not checkbox_output_list:
             flash(f'Please select at least one recipient.', 'danger')
             return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+        
+        create_message(current_user, current_game, request.form, form)
 
-        checkbox_output_str = ''.join(map(str, checkbox_output_list))
-        recipients = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
-
-        """ old stuff for recipients
-        users=[] #make a list to put usernames in for the recipient
-        #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
-        #then maps the list of usernames into a string to pass into the db
-        recipients = ''.join(map(str, parse_for_username(''.join(map(str, form.recipient.data)), users)))
-        """
-
-        #if the message is a duplicate display an error and don't put the message in the db
-        if Message.query.filter_by(sender=current_user.username, recipient=recipients, content=form.content.data, round=current_game.current_round+1, game=current_game.id).first():
-            flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-        #prevent the user from creating more than one message per round, flash error message if they try
-        if Message.query.filter_by(sender=current_user.username, round=current_game.current_round+1, game=current_game.id).first():
-            flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-        #create the new message. grab the current_round for the round var, current user's username for the sender var,
-        #selected user's usernames for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round+1, game=current_game.id, sender=current_user.username, recipient=recipients,
-        content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
-        db.session.add(new_message) #stage the message
-        db.session.commit() #commit the message to the db
-        flash(f'Your message has been sent!', 'success') #success message to let user know it worked
     #give the template the vars it needs
     return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
@@ -526,30 +449,7 @@ def game_setup():
     for user in users:
         usernames.append(user.username)
 
-    #msg management
-    if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
-        targets = []
-        targets = parse_for_game(''.join(map(str, mng_form.games.data)), targets) #search for the games selected by name
-        #in theory, this should be able to end multiple games at once properly, but I haven't tested this
-        for target in strip_list_str(targets):
-            game = Game.query.filter_by(name=target).first() #find the selected game
-            game.is_running = False #change it to not running
-            adv = User.query.filter_by(username=game.adversary).first() #find the game's adversary
-            adv.game = None #remove the game from the user
-            db.session.commit() #commit
-            player_list = []
-            player_list = parse_for_players(game.players, player_list) #grab a list of players from the game
-            for player in player_list:
-                user = User.query.filter_by(username=player).first() #find each of the player objects
-                user.game = None #remove the game from the user
-                db.session.commit() #commit
-        flash(f'The game has been ended.', 'success') #show success message upon completion
-
-        #pull the forms again because their information has updated, might not need to do this
-        mng_form = GMManageGameForm()
-        setup_form = GMSetupGameForm()
-
-    #msg setup
+    #game setup
     if is_setup_submit and setup_form.validate(): #when the create game button is pressed and the form is valid
         #capture the list of players from the checkboxes and make it into a string delimited by commas
         checkbox_output_list = request.form.getlist('players')
@@ -560,6 +460,7 @@ def game_setup():
         player_list = []
         players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list))) #make a string of players to put in the db
         """
+
 
         #"validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
         #doing it this way is kinda janky, the error messages don't look the same as other validation, but it works
@@ -579,12 +480,31 @@ def game_setup():
         adv.game = game.id #set their game to this game
         db.session.commit()
         player_list = []
-        player_list = parse_for_players(players, player_list)
+        player_list = str_to_list(players, player_list)
         for player in strip_list_str(player_list): #for each player in the string of players
             user = User.query.filter_by(username=player).first() #grab their user object
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
+
+    #game management
+    if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
+        game = Game.query.filter_by(name=mng_form.game.data.name).first()
+        game.is_running = False
+        adv = User.query.filter_by(username=game.adversary).first() #find the game's adversary
+        adv.game = None #remove the game from the user
+        db.session.commit() #commit
+        player_list = []
+        player_list = str_to_list(game.players, player_list) #grab a list of players from the game
+        for player in player_list:
+            user = User.query.filter_by(username=player).first() #find each of the player objects
+            user.game = None #remove the game from the user
+            db.session.commit() #commit
+        flash(f'The game has been ended.', 'success') #show success message upon completion
+
+        #pull the forms again because their information has updated, might not need to do this
+        mng_form = GMManageGameForm()
+        setup_form = GMSetupGameForm()
 
     if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
         user = User.query.filter_by(username=usr_form.user.data.username).first() #grab the targeted user
@@ -596,6 +516,8 @@ def game_setup():
             user.role = 3 #update to adversary
         if usr_form.role.data == 'usr': #if the selected new role is user
             user.role = 4 #update to user
+        if usr_form.role.data == 'spec': #if the selected new role is spectator
+            user.role = 5 #update to spectator
         db.session.commit()
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
 
