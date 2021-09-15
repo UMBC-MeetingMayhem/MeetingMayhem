@@ -1,36 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@Shadowda 
-UMBC-MeetingMayhem
-/
-MeetingMayhem
-Public
-2
-1
-0
-Code
-Issues
-Pull requests
-1
-Actions
-Projects
-Wiki
-Security
-Insights
-MeetingMayhem/MeetingMayhem/routes.py /
-@KatieK80933
-KatieK80933 Fixing conflicts
-Latest commit 7e7884d 35 minutes ago
- History
- 3 contributors
-@Voitheia@KatieK80933@pcode12
-559 lines (472 sloc)  35.6 KB
-  
 """
 File: routes.py
 Author: Robert Shovan /Voitheia
@@ -574,7 +541,8 @@ def spectate_game():
         if game_selected and select_game_form.validate():
             game = select_game_form.running_games.data
             messages = Message.query.filter_by(game=game.id).all()
-            return render_template('spectator_messages.html', title='Spectated Game Info', game=game, message=messages, sg_form=select_game_form)
+
+            return render_template('spectator_messages.html', title='Spectating Game Info', game=game, message=messages, sg_form=select_game_form)
         else:
             # Send list of games to template
             return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
@@ -588,16 +556,3 @@ def spectate_game():
 def testing():
     return render_template('testing.html', title='Testing') #this tells the app what html template to use. Title isn't needed
 """
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
