@@ -25,7 +25,7 @@ from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
-from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list
+from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -35,7 +35,7 @@ from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list
 def home():
     if current_user.is_anonymous: #ask the user to login or register if they aren't logged in
         flash(f'Please register for an account or login to proceed.', 'info')
-    elif not current_user.game and current_user.role > 2: #if the user is logged in but isn't in a game, display below message
+    elif not current_user.game and (current_user.role == 3 or current_user.role == 4): #if the user is logged in but isn't in a game, display below message
         flash(f'You are not currently in a game. Please have your game master create a game to proceed.', 'info')
     return render_template('home.html', title='Home') #this line passes the template we want to use and any variables it needs to it
 
@@ -165,44 +165,15 @@ def messages():
 
         #adversary message creation
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
-
-            #if sender, recipient, or content are None, display an error
-            if not msg_form.content.data:
-                flash(f'There was an error in creating your message. Please try again.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
             
-            #capture the list of players from the checkboxes and make it into a string delimited by commas
-            checkbox_output_list_recipients = request.form.getlist('recipients')
-            checkbox_output_list_senders = request.form.getlist('senders')
+            create_message(current_user, current_game, request.form, msg_form)
 
-            #ensure the lists aren't empty
-            if not checkbox_output_list_recipients or not checkbox_output_list_senders:
-                flash(f'Please select at least one sender and one recipient.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-            checkbox_output_str_recipients = ''.join(map(str, checkbox_output_list_recipients))
-            checkbox_output_str_senders = ''.join(map(str, checkbox_output_list_senders))
-            recipients = checkbox_output_str_recipients[:len(checkbox_output_str_recipients)-2]
-            senders = checkbox_output_str_senders[:len(checkbox_output_str_senders)-2]
-            
-            #if the message is a duplicate display an error and don't put the message in the db
-            if Message.query.filter_by(sender=senders, recipient=recipients, content=msg_form.content.data, round=current_game.current_round+1, game=current_game.id).first():
-                flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-            #create the new message variable with the information from the form
-            new_message = Message(round=(current_game.current_round+1), game=current_game.id, sender=senders, recipient=recipients, content=msg_form.content.data,
-            is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True)
-
-            db.session.add(new_message) #stage the message
-            db.session.commit() #commit the message to the db
-            flash(f'Your message has been sent!', 'success') #success message to let user know it worked
+            #pull the messages again since the messages we want to display has changed
+            messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
+            current_game.adv_current_msg = 0
+            current_game.adv_current_msg_list_size = len(messages)
+            #commit the messages to the database
+            db.session.commit()
 
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
@@ -380,38 +351,8 @@ def messages():
     
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         
-        if not form.content.data:
-            flash(f'There was an error in creating your message. Please try again.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+        create_message(current_user, current_game, request.form, form)
 
-        #capture the list of players from the checkboxes and make it into a string delimited by commas
-        checkbox_output_list = request.form.getlist('recipients')
-
-        #ensure the list isn't empty
-        if not checkbox_output_list:
-            flash(f'Please select at least one recipient.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-        checkbox_output_str = ''.join(map(str, checkbox_output_list))
-        recipients = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
-
-        #if the message is a duplicate display an error and don't put the message in the db
-        if Message.query.filter_by(sender=current_user.username, recipient=recipients, content=form.content.data, round=current_game.current_round+1, game=current_game.id).first():
-            flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-        #prevent the user from creating more than one message per round, flash error message if they try
-        if Message.query.filter_by(sender=current_user.username, round=current_game.current_round+1, game=current_game.id).first():
-            flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-        #create the new message. grab the current_round for the round var, current user's username for the sender var,
-        #selected user's usernames for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round+1, game=current_game.id, sender=current_user.username, recipient=recipients,
-        content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False)
-        db.session.add(new_message) #stage the message
-        db.session.commit() #commit the message to the db
-        flash(f'Your message has been sent!', 'success') #success message to let user know it worked
     #give the template the vars it needs
     return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
