@@ -336,7 +336,7 @@ def messages():
             game_id = game.id
 
     current_game = Game.query.filter_by(id=game_id).first()
-
+    #TODO: list of previously sent messages
     form = MessageForm() #use the message form
     msgs = None
     if (current_game.current_round>1): 
