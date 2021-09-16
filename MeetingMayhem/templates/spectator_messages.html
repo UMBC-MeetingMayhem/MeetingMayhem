@@ -1,62 +1,179 @@
+<!--
+    File: spectator_messages.html
+    Authors: Piere Jackson, Kathleen Koerner
+    Date: 9/10/2021
+    Last Modified: 9/10/2021
+	E-mail: piercej1@umbc.edu
+    E-mail: im80933@umbc.edu
+    Description: html and jinja file for handling the spectator page
+-->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+	{% if game is none %}
+	<!-- Game Selection form, spectator_main.html -->
+		<h1>Game Selection</h1>
+		<div class="content-section">
+			<form method="POST" action="">
+				{{ sg_form.hidden_tag() }}
+				<fieldset class="form-group">
+					<legend class="border-bottom mb4">Choose a Game</legend>
+					<div class="form-group">
+						{{ sg_form.running_games.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
 
-<div class="content-section bg-dark" style="width:80%;display:flex;flex-direction:row;border-radius: 10px;padding:20px;">
+						{% if sg_form.running_games.errors %} <!-- if there are errors in the form... -->
+							{{ sg_form.running_games(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+								{% for errors in sg_form.running_games.errors %}
+									<span>{{ errors }}</span> <!-- display the errors -->
+								{% endfor %}
+							</div>
+						{% else %} <!-- if there aren't errors, just display normally -->
+							{{ sg_form.running_games(class="form-control form-control-lg") }}
+						{% endif %}
+					</div> <br/>
+				</fieldset>
+				<div class="form-group">
+					{{ sg_form.select_game(class="btn btn-outline-info") }}
+				</div>
+			</form>
+		</div>
+	{% else %}
+	<!-- Game Spectating, spectator_game.html -->
+		<h1>Spectating {{game.name}}</h1>
+		<div class="content-section">
+			<a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Return to Game Selection</a>
+		</div>
+		<div class="content-section">
+			<h2>Players</h1>
+			<p>{{game.players}}</p>
+			<h2>Adversary</h1>
+			<p>{{game.adversary}}</p>
+		</div>
+		
+		<!-- Add a legend article here or in the about page to explain game infomation to spectator -->
+		
+		<h1>Messages</h1>
+		<article class="media content-section bg-dark">
+			<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+				<div class="media-body" style="width:50%; text-align: center;" >
+					<h5> Players Actions: </h5>
+				</div>
+				<div class="media-body" style="width:50% ; text-align: center;" >
+					<h5> Adversary Actions: </h5>
+				</div>
+			</div>
+		</article>
+		
+		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
+		{% for message in message%} 
 
-    <div style="margin:auto;padding:10px;border-radius:10px;width:100%;background-color:rgb(74, 77, 78);display:flex; flex-direction:row;">
-
-        <div style="width:50%;">
-
-            <p style="font-size:20px;">Original:</p>
-
-            <div class="content-section bg-dark" style="margin:5px;margin-right:25px;">
-
-                <div style="display:flex; width:100%;">
-                    <div style="width:50%;">Sender</div>
-                    <div style="width:50%;">Recipient</div>
-                </div>
-
-                <div style="flex-direction:row;background-color:gray;color:black;border-radius:10px;height:200px;margin:10px;padding:10px;">Message</div>
-
-            </div>
-
-        </div>
-
-        <div style="width:50%;">
-
-            <p style="font-size:20px;">Modified:</p>
-
-            <div class="content-section bg-dark" style="margin:5px;margin-right:25px;">
-
-                <div style="display:flex; width:100%;">
-                    <div style="width:50%;">Sender</div>
-                    <div style="width:50%;">Recipient</div>
-                </div>
-
-                <div style="flex-direction:row;background-color:gray;color:black;border-radius:10px;height:200px;margin:10px;padding:10px;">Message</div>
-
-            </div>
-
-        </div>
-
-        
-    </div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
+			{% if message.adv_created %}
+				{% if not message.is_deleted %}
+				<!-- Adversary Created -->
+				<!-- Messages created then deleted by adversary are not shown -->
+				<!-- Messages created then edited by adversary only show edited message-->
+				<article class="media content-section">
+				<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+					<div class="media-body" style="width:50% ; text-align: center;" >
+						<h5> Adversary Created</h5>
+					</div>
+						<div class="media-body" style="width:50%;">
+						<div class="article-metadata">
+							{% if message.new_sender %}
+							<a>Sender: {{ message.new_sender }} | </a>
+							{% else %}
+							<a>Sender: {{ message.sender }} | </a>
+							{% endif %}
+							{% if message.new_recipient %}
+							<a>Recipient: {{ message.new_recipient }}</a>
+							{% else %}
+							<a>Recipient: {{ message.recipient }}</a>
+							{% endif %}
+							<small class="text-muted">Round:  {{message.round}} </small>
+						</div>
+						{% if message.edited_content %}
+						<p class="article-content"> {{message.edited_content}} </p>
+						{% else %}
+						<p class="article-content"> {{message.content}} </p>
+						{% endif %}
+					</div>
+				</div>
+				</article>
+				{% endif %}		
+			{% else %}
+				{% if message.is_edited %}
+					{% if message.is_deleted %}
+					<!-- Orignal message and deleted status -->
+					<article class="media content-section">
+					<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+						<div class="media-body" style="width:50%;">
+							<div class="article-metadata">
+							<a>Sender:  {{message.sender}} </a>
+							<a>Recipient:  {{message.recipient}} </a>
+							<small class="text-muted">Round:  {{message.round}} </small>
+							</div>
+							<p class="article-content"> {{message.content}} </p>
+						</div>
+						
+						<div class="media-body" style="width:50% ; text-align: center;" >
+							<h5> Deleted </h5>
+						</div>
+					</div>
+					</article>
+					{% else %}	
+					<!-- Original and modified message side by side -->
+					<article class="media content-section">
+						<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+							<div class="media-body" style="width:50%;">
+								<div class="article-metadata">
+								<h5> Original: </h5>
+								<a>Sender:  {{message.sender}} </a>
+								<a>Recipient:  {{message.recipient}} </a>
+								<small class="text-muted">Round:  {{message.round}} </small>
+								</div>
+								<p class="article-content"> {{message.content}} </p>
+							</div>
+							<div class="media-body" style="width:50%;">
+								<h5> Modified: </h5>
+								<div class="article-metadata">
+								{% if message.new_sender %}
+								<a>Sender: {{ message.new_sender }} | </a>
+								{% else %}
+								<a>Sender: {{ message.sender }} | </a>
+								{% endif %}
+								{% if message.new_recipient %}
+								<a>Recipient: {{ message.new_recipient }}</a>
+								{% else %}
+								<a>Recipient: {{ message.recipient }}</a>
+								{% endif %}
+								<small class="text-muted">Round:  {{message.round}} </small>
+								</div>
+								<p class="article-content"> {{message.edited_content}} </p>
+							</div>
+						</div>
+					</article>
+					{% endif %}
+				{% else %}
+				<!-- Just original message-->
+				<article class="media content-section">
+					<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+						<div class="media-body" style="width:50%;">
+							<div class="article-metadata">
+							<a>Sender:  {{message.sender}} </a>
+							<a>Recipient:  {{message.recipient}} </a>
+							<small class="text-muted">Round:  {{message.round}} </small>
+							</div>
+							<p class="article-content"> {{message.content}} </p>
+						</div>
+						<div class="media-body" style="width:50% ; text-align: center;" >
+							<h5> Unmodified </h5>
+						</div>
+					</div>
+				</article>
+				{% endif %}
+			{% endif %}
+		{% endfor %}	
+		{% endif %}
+	{% endif %}
 {% endblock content %}

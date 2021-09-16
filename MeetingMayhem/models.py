@@ -64,6 +64,9 @@ def getAdversary(columns=None):
 def getAdversaryFactory(columns=None):
     return partial(getAdversary, columns=columns)
 
+def getUserFactory(columns=None):
+    return partial(getUser, columns=columns)
+
 #queryfactory for all users and adversaries, use for gm to manage roles
 def getAllUserAdversary(columns=None):
     adv = User.query.filter(or_(User.role.__eq__(3),User.role.__eq__(4)))

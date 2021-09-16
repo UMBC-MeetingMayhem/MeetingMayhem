@@ -541,19 +541,18 @@ def spectate_game():
         if game_selected and select_game_form.validate():
             game = select_game_form.running_games.data
             messages = Message.query.filter_by(game=game.id).all()
-            return render_template('spectator_game.html', title='Spectate Game Info', game=game, message=messages, sg_form=select_game_form)
+
+            return render_template('spectator_messages.html', title='Spectating Game Info', game=game, message=messages, sg_form=select_game_form)
         else:
             # Send list of games to template
-            return render_template('spectator_main.html', title='Spectate A Game', sg_form=select_game_form)
+            return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
 
 """
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
-
 @app.route('/testing') #this decorator tells the website what to put after the http://<IP>
 #@app.route('/testing', methods=['GET', 'POST']) #this is needed if the user is doing to submit forms and things
 #@login_required #enforce that the user is logged in
 def testing():
     return render_template('testing.html', title='Testing') #this tells the app what html template to use. Title isn't needed
-
 """
