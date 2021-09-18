@@ -7,6 +7,9 @@ E-mail: rshovan1@umbc.edu
 Description: python file that contains helper functions for other python files.
 Docstring info: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 """
+from flask import flash
+from MeetingMayhem import db
+from MeetingMayhem.models import Message
 
 #recursivley parse the given string for usernames, return true if the given username is found
 def check_for_str(str, check):
@@ -82,3 +85,75 @@ def str_to_list(st, li):
         #raise an exception
         raise TypeError("Incorrect argument type or empty string passed to function.")
     return li #return the list filled with strings
+
+def create_message(user, game, request, form):
+    """Create a message. Used by both the adversary and the users.
+
+    Intention is to use this function with a switch statement so that different actions can
+    be taking depending on which code is returned.
+
+    Args:
+        user(User): the current_user object of the user creating a message.
+        game(Game): the current_game object from the instance that is calling this function.
+        request(request.form): the request form that contains checkbox stuff.
+        form(form/msg_form): the form from the website that contains msg content
+
+    Returns:
+        bool: whether or not the message sent successfully
+    """
+    if not form.content.data: #if there is no message content, display an error, return false
+        flash(f'There was an error in creating your message. Please try again.', 'danger')
+        return False
+    if user.role == 3: #if the user is an adversary
+        #get the list of the recipients and senders
+        checkbox_output_list_recipients = request.getlist('recipients')
+        checkbox_output_list_senders = request.getlist('senders')
+        #if one of those lists are empty, display an error, return false
+        if not checkbox_output_list_recipients or not checkbox_output_list_senders:
+            flash(f'Please select at least one sender and one recipient.', 'danger')
+            return False
+        #make the lists into strings
+        checkbox_output_str_recipients = ''.join(map(str, checkbox_output_list_recipients))
+        checkbox_output_str_senders = ''.join(map(str, checkbox_output_list_senders))
+        #remove the last ', ' off of the strings
+        recipients = checkbox_output_str_recipients[:len(checkbox_output_str_recipients)-2]
+        senders = checkbox_output_str_senders[:len(checkbox_output_str_senders)-2]
+        #check if the message is a duplicate, and if it is, display an error, return false
+        if Message.query.filter_by(sender=senders, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
+            flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
+            return False
+        #create the message and add it to the db
+        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True)
+        db.session.add(new_message)
+        db.session.commit()
+        #display success to user
+        flash(f'Your message has been sent!', 'success')
+        return True
+    elif user.role == 4: #if the user is a user
+        #get the list of recipients
+        checkbox_output_list = request.getlist('recipients')
+        #if that list is empty, display an error, return false
+        if not checkbox_output_list:
+            flash(f'There was an error in creating your message. Please try again.', 'danger')
+            return False
+        #make the list into a string
+        checkbox_output_str = ''.join(map(str, checkbox_output_list))
+        #remove the last ', ' off the string
+        recipients = checkbox_output_str[:len(checkbox_output_str)-2]
+        #check if the message is a duplicate, and if it is, display an error, return false
+        if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
+            flash(f'Please select at least one sender and one recipient.', 'danger')
+            return False
+        #check if the user has already sent a message this round, and if they have, display an error, return false
+        if Message.query.filter_by(sender=user.username, round=game.current_round+1, game=game.id).first():
+            flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
+            return False
+        #create the message and add it to the db
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False)
+        db.session.add(new_message)
+        db.session.commit()
+        #display success to user
+        flash(f'Your message has been sent!', 'success')
+        return True
+    else: #if someone who isn't a user or adversary manages to call this function, return false
+        return False

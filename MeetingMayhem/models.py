@@ -37,6 +37,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.Integer, nullable=False) #dictates what role the account is
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
+    
     """
     roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
     admin: is able to changes the roles of the users incase we need to do this
@@ -62,6 +63,9 @@ def getAdversary(columns=None):
 
 def getAdversaryFactory(columns=None):
     return partial(getAdversary, columns=columns)
+
+def getUserFactory(columns=None):
+    return partial(getUser, columns=columns)
 
 #queryfactory for all users and adversaries, use for gm to manage roles
 def getAllUserAdversary(columns=None):
@@ -91,6 +95,8 @@ class Message(db.Model):
     edited_content = db.Column(db.Text, nullable=True)
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
     adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
+    is_encrypted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is encrypted or not
+    is_signed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is signed or not
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}')\n"
