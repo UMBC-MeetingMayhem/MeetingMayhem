@@ -89,6 +89,42 @@
         </form>
     </div>
 
+	
+	<div class="tab">
+		<button class="tablinks content-section site-header" onclick="openCity(event, 'Received')" id="defaultOpen">Received</button>
+		<button class="tablinks content-section nav-item" onclick="openCity(event, 'Sent')">Sent</button>
+	</div>
+	
+	<div id="Received" class="tabcontent">
+		<h3>Received Messages</h3>
+		<p>London is the capital city of England.</p>
+	</div>
+
+	<div id="Sent" class="tabcontent">
+		<h3>Sent Messages</h3>
+		<p>Paris is the capital of France.</p> 
+	</div>
+	
+	<script>
+	function openCity(evt, cityName) {
+		var i, tabcontent, tablinks;
+		tabcontent = document.getElementsByClassName("tabcontent");
+		for (i = 0; i < tabcontent.length; i++) {
+			tabcontent[i].style.display = "none";
+		}
+		tablinks = document.getElementsByClassName("tablinks");
+		for (i = 0; i < tablinks.length; i++) {
+			tablinks[i].className = tablinks[i].className.replace(" active", "");
+		}
+		document.getElementById(cityName).style.display = "block";
+		evt.currentTarget.className += " active";
+	}
+
+	// Get the element with id="defaultOpen" and click on it
+	document.getElementById("defaultOpen").click();
+	</script>
+	
+	
     {% if prev_msg_flag %}
     <legend class="border-bottom mb4">Messages for previous rounds:</legend>
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
