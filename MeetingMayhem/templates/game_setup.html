@@ -16,7 +16,6 @@
             {{ setup_form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb4">Create a Game</legend>
-                <p>Use CTRL+Click or SHIFT+Click to select multiple.</p>
                 <div class="form-group">
                     {{ setup_form.name.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
@@ -45,22 +44,6 @@
                         {{ setup_form.adversary(class="form-control form-control-lg") }}
                     {% endif %}                    
                 </div> <br/>
-                {# this part can be deleted after validation works again
-                <div class="form-group">
-                    {{ setup_form.players.label(class="form-control-label") }}
-
-                    {% if setup_form.players.errors %} <!-- if there are errors in the form... -->
-                        {{ setup_form.players(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in setup_form.players.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ setup_form.players(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
-                #}
                 <div class="form-group">
                 <label class="form-control-label" for="name">Players</label> <br/>
                 {% for username in usernames %}
@@ -83,19 +66,18 @@
             {{ mng_form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb4">Manage a Game</legend>
-                <p>Use CTRL+Click or SHIFT+Click to select multiple.</p>
                 <div class="form-group">
-                    {{ mng_form.games.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    {{ mng_form.game.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
-                    {% if mng_form.games.errors %} <!-- if there are errors in the form... -->
-                        {{ mng_form.games(class="form-control form-control-lg is-invalid") }}
+                    {% if mng_form.game.errors %} <!-- if there are errors in the form... -->
+                        {{ mng_form.game(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for errors in mng_form.games.errors %}
+                            {% for errors in mng_form.game.errors %}
                                 <span>{{ errors }}</span> <!-- display the errors -->
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ mng_form.games(class="form-control form-control-lg") }}
+                        {{ mng_form.game(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> <br/>
             </fieldset>

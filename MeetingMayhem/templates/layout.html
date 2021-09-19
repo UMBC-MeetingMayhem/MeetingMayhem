@@ -160,6 +160,9 @@
                         {% if current_user.role == 2 %}
                         <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
                         {% endif %}
+                        {% if current_user.role == 5 %}
+                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                        {% endif %}
                         {% if current_user.game != None %}
                         <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
                         {% endif %}
