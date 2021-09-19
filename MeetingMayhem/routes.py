@@ -23,7 +23,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message
 
@@ -130,7 +130,7 @@ def messages():
         usernames = []
         for user in users:
             usernames.append(user.username)
-        
+
         if messages: #if messages has content, set the display message to the adversary's current message
             display_message = messages[current_game.adv_current_msg]
 
@@ -139,7 +139,7 @@ def messages():
 
         #set the adv_current_msg_list_size so that the edit message box "scrolling" works correctly
         current_game.adv_current_msg_list_size = len(messages)
-        
+
         #create variables for the edit message box buttons so that we only check their state once
         is_prev_submit = adv_buttons_form.prev_submit.data
         is_next_submit = adv_buttons_form.next_submit.data
@@ -322,9 +322,12 @@ def messages():
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
+        print(display_message)
         for message in display_message: #for each message
-            if check_for_str(message.new_recipient, current_user.username) or check_for_str(message.recipient, current_user.username):
+            if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
                 msgs.append(message)
+                print('flag')
+                print(message)
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
@@ -431,6 +434,7 @@ def game_setup():
         mng_form = GMManageGameForm()
         setup_form = GMSetupGameForm()
 
+    #user management
     if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
         user = User.query.filter_by(username=usr_form.user.data.username).first() #grab the targeted user
         if user.game: #if the user is in a game
@@ -449,7 +453,27 @@ def game_setup():
     #display webpage normally
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
+# Route for spectating
+@app.route('/spectate', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
+@login_required  # user must be logged in
+def spectate_game():
+    # If the user is not a spectator, flash a warning and send back to home
+    if current_user.role != 5:
+        flash(f'Your permissions are insufficient to access this page.', 'danger')
+        return render_template('home.html', title='Home')
+    else:
+        # Form for the selected game from running games list
+        select_game_form = SpectateGameSelectForm()
+        game_selected = select_game_form.select_game.data
 
+        # If the game is selected and the form is validated, move to spectator_game page
+        if game_selected and select_game_form.validate():
+            game = select_game_form.running_games.data
+            messages = Message.query.filter_by(game=game.id).all()
+            return render_template('spectator_messages.html', title='Spectating '+game.name, game=game, message=messages, sg_form=select_game_form)
+        else:
+            # Send list of games to template
+            return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
 
 
 """

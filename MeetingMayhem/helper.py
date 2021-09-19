@@ -123,7 +123,7 @@ def create_message(user, game, request, form):
             flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
             return False
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, is_encrypted=False, is_signed=False)
         db.session.add(new_message)
         db.session.commit()
         #display success to user
@@ -149,7 +149,7 @@ def create_message(user, game, request, form):
             flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
             return False
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=False, is_signed=False)
         db.session.add(new_message)
         db.session.commit()
         #display success to user

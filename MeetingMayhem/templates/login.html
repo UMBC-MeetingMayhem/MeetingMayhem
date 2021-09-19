@@ -59,15 +59,10 @@
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
-            <!-- forgot password link, doesn't do anything, can be deleted-->
-            <small class="text-muted ml-2">
-                <a href="#">Forgot Password?</a>
+            <!-- link at the bottom of the page if user doesn't have an account yet -->
+            <small class="text-muted">
+                Don't Have An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
             </small>
-            <br>
-                        <!-- link at the bottom of the page if user doesn't have an account yet -->
-                        <small class="text-muted">
-                            Don't Have An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
-                        </small>
         </form>
     </div>
     </div>
