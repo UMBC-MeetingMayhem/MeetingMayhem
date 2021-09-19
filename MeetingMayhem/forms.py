@@ -21,7 +21,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from MeetingMayhem.models import Game, User, getAdversaryFactory, getGameFactory, getAllUserAdversaryFactory, getNonGMUsersFactory
+from MeetingMayhem.models import Game, User, getAdversaryFactory, getGameFactory, getNonGMUsersFactory
 from MeetingMayhem.helper import str_to_list
 
 #this part handles the registraion form for new users

@@ -10,6 +10,7 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+
 	{% if not game %}
 	<!-- Game Selection form, spectator_main.html -->
 		<h1>Game Selection</h1>
@@ -64,7 +65,6 @@
 				</div>
 			</div>
 		</article>
-
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
@@ -115,7 +115,6 @@
 							</div>
 							<p class="article-content"> {{message.content}} </p>
 						</div>
-
 						<div class="media-body" style="width:50% ; text-align: center;" >
 							<h5> Deleted </h5>
 						</div>
