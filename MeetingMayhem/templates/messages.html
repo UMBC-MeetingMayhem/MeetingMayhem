@@ -145,30 +145,7 @@
 		<legend class="border-bottom mb4">Messages sent by you:</legend>
 		{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
 			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-			{% if sent_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
-			<article class="media content-section">
-				<div class="media-body">
-					<div class="article-metadata">
-					{% if sent_msg.new_sender %}
-					<a>Sender: {{ sent_msg.new_sender }} | </a>
-					{% else %}
-					<a>Sender: {{ sent_msg.sender }} | </a>
-					{% endif %}
-					{% if sent_msg.new_recipient %}
-					<a>Recipient: {{ sent_msg.new_recipient }} | </a>
-					{% else %}
-					<a>Recipient: {{ sent_msg.recipient }} | </a>
-					{% endif %}
-					<a>Round: {{ sent_msg.round }}</a>
-					</div>
-					{% if sent_msg.edited_content %}
-					<p class="article-content">{{ sent_msg.edited_content }}</p>
-					{% else %}
-					<p class="article-content">{{ sent_msg.content }}</p>
-					{% endif %}
-				</div>
-			</article>
-			{% else %} <!-- if the message hasn't been edited, display normally -->
+			<!-- if the message hasn't been edited, display normally -->
 			<article class="media content-section">
 				<div class="media-body">
 					<div class="article-metadata">
@@ -178,7 +155,6 @@
 					<p class="article-content">{{ sent_msg.content }}</p>
 				</div>
 			</article>
-			{% endif %}
 		{% endfor %}
 		{% else %}
 		<legend class="border-bottom mb4">No messages sent</legend>
