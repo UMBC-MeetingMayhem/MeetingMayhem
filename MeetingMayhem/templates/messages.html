@@ -12,7 +12,7 @@
     <h1>Messages</h1>
 
     {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-    <legend class="border-bottom mb4">Messages for round {{ game.current_round}}:</legend>
+    <legend class="border-bottom mb4">Recent messages — round {{ game.current_round}}:</legend>
     {% for message in msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
         {% if message.is_edited %} <!-- if the message has been edited, display the edited parts-->
@@ -90,21 +90,102 @@
     </div>
 
 	
-	<div class="tab">
-		<button class="tablinks content-section site-header" onclick="openCity(event, 'Received')" id="defaultOpen">Received</button>
-		<button class="tablinks content-section nav-item" onclick="openCity(event, 'Sent')">Sent</button>
+	<div class="tab" >
+		<button class="tablinks content-section" onclick="openCity(event, 'Received')" id="defaultOpen">Received Messages</button>
+		<button class="tablinks content-section" onclick="openCity(event, 'Sent')">Sent Messages</button>
 	</div>
 	
 	<div id="Received" class="tabcontent">
-		<h3>Received Messages</h3>
-		<p>London is the capital city of England.</p>
+		{% if prev_msg_flag %}
+		<legend class="border-bottom mb4">Messages received:</legend>
+		{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+			{% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
+			<article class="media content-section">
+				<div class="media-body">
+					<div class="article-metadata">
+					{% if prev_msg.new_sender %}
+					<a>Sender: {{ prev_msg.new_sender }} | </a>
+					{% else %}
+					<a>Sender: {{ prev_msg.sender }} | </a>
+					{% endif %}
+					{% if prev_msg.new_recipient %}
+					<a>Recipient: {{ prev_msg.new_recipient }} | </a>
+					{% else %}
+					<a>Recipient: {{ prev_msg.recipient }} | </a>
+					{% endif %}
+					<a>Round: {{ prev_msg.round }}</a>
+					</div>
+					{% if prev_msg.edited_content %}
+					<p class="article-content">{{ prev_msg.edited_content }}</p>
+					{% else %}
+					<p class="article-content">{{ prev_msg.content }}</p>
+					{% endif %}
+				</div>
+			</article>
+			{% else %} <!-- if the message hasn't been edited, display normally -->
+			<article class="media content-section">
+				<div class="media-body">
+					<div class="article-metadata">
+					<a>Sender: {{ prev_msg.sender }} | </a>
+					<a>Recipient: {{ prev_msg.recipient }}</a>
+					</div>
+					<p class="article-content">{{ prev_msg.content }}</p>
+				</div>
+			</article>
+			{% endif %}
+		{% endfor %}
+		{% else %}
+		<legend class="border-bottom mb4">No messages received</legend>
+		{% endif %}
 	</div>
 
 	<div id="Sent" class="tabcontent">
-		<h3>Sent Messages</h3>
-		<p>Paris is the capital of France.</p> 
+		{% if prev_msg_flag %}
+		<legend class="border-bottom mb4">Messages sent by you:</legend>
+		{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+			{% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
+			<article class="media content-section">
+				<div class="media-body">
+					<div class="article-metadata">
+					{% if prev_msg.new_sender %}
+					<a>Sender: {{ prev_msg.new_sender }} | </a>
+					{% else %}
+					<a>Sender: {{ prev_msg.sender }} | </a>
+					{% endif %}
+					{% if prev_msg.new_recipient %}
+					<a>Recipient: {{ prev_msg.new_recipient }} | </a>
+					{% else %}
+					<a>Recipient: {{ prev_msg.recipient }} | </a>
+					{% endif %}
+					<a>Round: {{ prev_msg.round }}</a>
+					</div>
+					{% if prev_msg.edited_content %}
+					<p class="article-content">{{ prev_msg.edited_content }}</p>
+					{% else %}
+					<p class="article-content">{{ prev_msg.content }}</p>
+					{% endif %}
+				</div>
+			</article>
+			{% else %} <!-- if the message hasn't been edited, display normally -->
+			<article class="media content-section">
+				<div class="media-body">
+					<div class="article-metadata">
+					<a>Sender: {{ prev_msg.sender }} | </a>
+					<a>Recipient: {{ prev_msg.recipient }}</a>
+					</div>
+					<p class="article-content">{{ prev_msg.content }}</p>
+				</div>
+			</article>
+			{% endif %}
+		{% endfor %}
+		{% else %}
+		<legend class="border-bottom mb4">No messages sent</legend>
+		{% endif %} 
 	</div>
 	
+	<!-- tab script -->
 	<script>
 	function openCity(evt, cityName) {
 		var i, tabcontent, tablinks;
@@ -123,46 +204,4 @@
 	// Get the element with id="defaultOpen" and click on it
 	document.getElementById("defaultOpen").click();
 	</script>
-	
-	
-    {% if prev_msg_flag %}
-    <legend class="border-bottom mb4">Messages for previous rounds:</legend>
-    {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-        <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-        {% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                {% if prev_msg.new_sender %}
-                <a>Sender: {{ prev_msg.new_sender }} | </a>
-                {% else %}
-                <a>Sender: {{ prev_msg.sender }} | </a>
-                {% endif %}
-                {% if prev_msg.new_recipient %}
-                <a>Recipient: {{ prev_msg.new_recipient }} | </a>
-                {% else %}
-                <a>Recipient: {{ prev_msg.recipient }} | </a>
-                {% endif %}
-                <a>Round: {{ prev_msg.round }}</a>
-                </div>
-                {% if prev_msg.edited_content %}
-                <p class="article-content">{{ prev_msg.edited_content }}</p>
-                {% else %}
-                <p class="article-content">{{ prev_msg.content }}</p>
-                {% endif %}
-            </div>
-        </article>
-        {% else %} <!-- if the message hasn't been edited, display normally -->
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                <a>Sender: {{ prev_msg.sender }} | </a>
-                <a>Recipient: {{ prev_msg.recipient }}</a>
-                </div>
-                <p class="article-content">{{ prev_msg.content }}</p>
-            </div>
-        </article>
-        {% endif %}
-    {% endfor %}
-    {% endif %}
 {% endblock content %}
