@@ -47,7 +47,7 @@ class User(db.Model, UserMixin):
     spectator: is able to see results for game, probably also messages for each round
     we might also want to make a role thats both an adversary and a user at some point
     """
-    
+
     def __repr__(self): #this is what gets printed out for the User when a basic query is run
         return f"User(ID='{self.id}', Username='{self.username}', Email='{self.email}', Pwd Hash='{self.password}', Role='{self.role}', Game='{self.game}')\n"
 
@@ -64,9 +64,6 @@ def getAdversary(columns=None):
 def getAdversaryFactory(columns=None):
     return partial(getAdversary, columns=columns)
 
-def getUserFactory(columns=None):
-    return partial(getUser, columns=columns)
-
 #queryfactory for all users and adversaries, use for gm to manage roles
 def getAllUserAdversary(columns=None):
     adv = User.query.filter(or_(User.role.__eq__(3),User.role.__eq__(4)))
@@ -76,6 +73,16 @@ def getAllUserAdversary(columns=None):
 
 def getAllUserAdversaryFactory(columns=None):
     return partial(getAllUserAdversary, columns=columns)
+
+#queryfactory for all non gm users, use for gm to manage roles
+def getNonGMUsers(columns=None):
+    adv = User.query.filter(User.role.__gt__(2))
+    if columns:
+        adv = adv.options(orm.load_only(*columns))
+    return adv
+
+def getNonGMUsersFactory(columns=None):
+    return partial(getNonGMUsers, columns=columns)
 
 #message table
 #contains the messages that users send to each other and the adversary
@@ -96,7 +103,9 @@ class Message(db.Model):
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
     adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
     is_encrypted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is encrypted or not
+    encryption_key = db.Column(db.String, nullable=True) #contains the encryption key used, format <username>.<pub/priv> | if multilpe: <username>.<pub/priv>,<username>.<pub/priv>
     is_signed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is signed or not
+    signature_key = db.Column(db.String, nullable=True) #contains the signature key used, format <username>.<pub/priv> | if multilpe: <username>.<pub/priv>,<username>.<pub/priv>
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}')\n"
@@ -198,9 +207,21 @@ db.drop_all()
 db.session.commit()
 db.create_all()
 
-Create game: (don't really need anymore since GM can do this now)
-game = Game(name='game', is_running=True, adversary='adversary', players='test', current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
-db.session.add(game)
+user creation:
+gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
+user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+spc = User(username='spc', email='spc@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=5)
+db.session.add(gm)
+db.session.add(adv)
+db.session.add(user1)
+db.session.add(user2)
+db.session.add(user3)
+db.session.add(user4)
+db.session.add(spc)
 db.session.commit()
 
 Create gm:
@@ -224,4 +245,8 @@ db.session.add(user3)
 db.session.add(user4)
 db.session.commit()
 
+Create spectator user:
+spc = User(username='spc', email='spc@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=5)
+db.session.add(spc)
+db.session.commit()
 """

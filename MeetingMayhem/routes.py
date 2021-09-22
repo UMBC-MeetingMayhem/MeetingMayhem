@@ -372,9 +372,12 @@ def messages():
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
+        print(display_message)
         for message in display_message: #for each message
-            if check_for_str(message.new_recipient, current_user.username) or check_for_str(message.recipient, current_user.username):
+            if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
                 msgs.append(message)
+                print('flag')
+                print(message)
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
@@ -506,6 +509,7 @@ def game_setup():
         mng_form = GMManageGameForm()
         setup_form = GMSetupGameForm()
 
+    #user management
     if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
         user = User.query.filter_by(username=usr_form.user.data.username).first() #grab the targeted user
         if user.game: #if the user is in a game
@@ -541,11 +545,11 @@ def spectate_game():
         if game_selected and select_game_form.validate():
             game = select_game_form.running_games.data
             messages = Message.query.filter_by(game=game.id).all()
-
-            return render_template('spectator_messages.html', title='Spectating Game Info', game=game, message=messages, sg_form=select_game_form)
+            return render_template('spectator_messages.html', title='Spectating '+game.name, game=game, message=messages, sg_form=select_game_form)
         else:
             # Send list of games to template
             return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
+
 
 """
 #sample route for testing pages

@@ -21,7 +21,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from MeetingMayhem.models import Game, User, getAdversaryFactory, getGameFactory, getAllUserAdversaryFactory
+from MeetingMayhem.models import Game, User, getAdversaryFactory, getGameFactory, getNonGMUsersFactory
 from MeetingMayhem.helper import str_to_list
 
 #this part handles the registraion form for new users
@@ -81,7 +81,6 @@ class GMSetupGameForm(FlaskForm):
     create_game = SubmitField('Create Game')
 
     def validate_name(self, name):
-        # A comment 
         game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
         if game: #if there is, throw an error
             raise ValidationError('That name is already in use. Please choose a different one.')
@@ -115,10 +114,10 @@ class GMManageGameForm(FlaskForm):
 
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
-    user = QuerySelectField(u'User', query_factory=getAllUserAdversaryFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-    role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User')], validators=[DataRequired()])
+    user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+    role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator')], validators=[DataRequired()])
     update = SubmitField('Update User')
-	
+
 # Form for a user to spectate a game
 class SpectateGameSelectForm(FlaskForm):
     running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
