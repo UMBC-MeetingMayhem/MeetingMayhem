@@ -141,30 +141,30 @@
 	</div>
 
 	<div id="Sent" class="tabcontent">
-		{% if prev_msg_flag %}
+		{% if sent_msg_flag %}
 		<legend class="border-bottom mb4">Messages sent by you:</legend>
-		{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+		{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
 			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-			{% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
+			{% if sent_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
 			<article class="media content-section">
 				<div class="media-body">
 					<div class="article-metadata">
-					{% if prev_msg.new_sender %}
-					<a>Sender: {{ prev_msg.new_sender }} | </a>
+					{% if sent_msg.new_sender %}
+					<a>Sender: {{ sent_msg.new_sender }} | </a>
 					{% else %}
-					<a>Sender: {{ prev_msg.sender }} | </a>
+					<a>Sender: {{ sent_msg.sender }} | </a>
 					{% endif %}
-					{% if prev_msg.new_recipient %}
-					<a>Recipient: {{ prev_msg.new_recipient }} | </a>
+					{% if sent_msg.new_recipient %}
+					<a>Recipient: {{ sent_msg.new_recipient }} | </a>
 					{% else %}
-					<a>Recipient: {{ prev_msg.recipient }} | </a>
+					<a>Recipient: {{ sent_msg.recipient }} | </a>
 					{% endif %}
-					<a>Round: {{ prev_msg.round }}</a>
+					<a>Round: {{ sent_msg.round }}</a>
 					</div>
-					{% if prev_msg.edited_content %}
-					<p class="article-content">{{ prev_msg.edited_content }}</p>
+					{% if sent_msg.edited_content %}
+					<p class="article-content">{{ sent_msg.edited_content }}</p>
 					{% else %}
-					<p class="article-content">{{ prev_msg.content }}</p>
+					<p class="article-content">{{ sent_msg.content }}</p>
 					{% endif %}
 				</div>
 			</article>
@@ -172,10 +172,10 @@
 			<article class="media content-section">
 				<div class="media-body">
 					<div class="article-metadata">
-					<a>Sender: {{ prev_msg.sender }} | </a>
-					<a>Recipient: {{ prev_msg.recipient }}</a>
+					<a>Sender: {{ sent_msg.sender }} | </a>
+					<a>Recipient: {{ sent_msg.recipient }}</a>
 					</div>
-					<p class="article-content">{{ prev_msg.content }}</p>
+					<p class="article-content">{{ sent_msg.content }}</p>
 				</div>
 			</article>
 			{% endif %}
