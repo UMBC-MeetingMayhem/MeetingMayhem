@@ -20,35 +20,26 @@
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
                 <legend class="border-bottom mb4">Send a Message</legend>
-                <p>Use CTRL+Click or SHIFT+Click to select multiple.</p>
                 <div class="form-group">
-                    {{ msg_form.sender.label(class="form-control-label") }}
-
-                    {% if msg_form.sender.errors %} <!-- if there are errors in the form... -->
-                        {{ msg_form.sender(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in msg_form.sender.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ msg_form.sender(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
+                <label class="form-control-label" for="name">Senders</label> <br/>
+                {% for username in usernames %}
+                    <div class="form-check form-check-inline">
+                        <!-- below line needs the ', ' in value to make processing usernames easier -->
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="senders" value="{{ username }}, ">
+                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+                    </div>
+                {% endfor %}
+                </div> <br/>
                 <div class="form-group">
-                    {{ msg_form.recipient.label(class="form-control-label") }}
-
-                    {% if msg_form.recipient.errors %} <!-- if there are errors in the form... -->
-                        {{ msg_form.recipient(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in msg_form.recipient.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ msg_form.recipient(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
+                <label class="form-control-label" for="name">Recipients</label> <br/>
+                {% for username in usernames %}
+                    <div class="form-check form-check-inline">
+                        <!-- below line needs the ', ' in value to make processing usernames easier -->
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
+                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+                    </div>
+                {% endfor %}
+                </div> <br/>
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
@@ -74,28 +65,53 @@
     {% if message %} <!-- if there is a message passed, display it and the edit message stuff -->
     <h2>Round {{ game.current_round }} Message {{ current_msg }}/{{ msg_list_size }}</h2>
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-        {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
+        {% if message.is_edited %} <!-- if the message has been edited, display the edited parts-->
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                <a>Sender: {{ message.new_sender }}</a>
-                <a>Recipient: {{ message.new_recipient }}</a>
-                <!-- Removing this since the round is indicated above
-                <small class="text-muted">Round: {{ message.round }}</small>
-                -->
+                {% if message.new_sender %}
+                <a>New Sender: {{ message.new_sender }} | </a>
+                {% else %}
+                <a>Sender: {{ message.sender }} | </a>
+                {% endif %}
+                {% if message.new_recipient %}
+                <a>New Recipient: {{ message.new_recipient }}</a>
+                {% else %}
+                <a>Recipient: {{ message.recipient }}</a>
+                {% endif %}
+                {% if message.adv_created %}
+                <a> | This message was created by the adversary.</a>
+                {% endif %}
+                {% if message.is_deleted %}
+                <a> | This message has been deleted.</a>
+                {% else %}
+                <a> | This message has been edited.</a>
+                {% endif %}
                 </div>
+                {% if message.edited_content %}
                 <p class="article-content">{{ message.edited_content }}</p>
+                {% else %}
+                <p class="article-content">{{ message.content }}</p>
+                {% endif %}
+            </div>
+        </article>
+        {% elif message.adv_created %} <!-- if the adversary created the message -->
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ message.sender }} | </a>
+                <a>Recipient: {{ message.recipient }}</a>
+                <a> | This message was created by the adversary.</a>
+                </div>
+                <p class="article-content">{{ message.content }}</p>
             </div>
         </article>
         {% else %} <!-- if the message hasn't been edited, display normally -->
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                <a>Sender: {{ message.sender }}</a>
+                <a>Sender: {{ message.sender }} | </a>
                 <a>Recipient: {{ message.recipient }}</a>
-                <!-- Removing this since the round is indicated above
-                <small class="text-muted">Round: {{ message.round }}</small>
-                -->
                 </div>
                 <p class="article-content">{{ message.content }}</p>
             </div>
@@ -109,33 +125,25 @@
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
                 <legend class="border-bottom mb4">Edit a Message</legend>
                 <div class="form-group">
-                    {{ adv_msg_edit_form.new_sender.label(class="form-control-label") }}
-
-                    {% if adv_msg_edit_form.new_sender.errors %} <!-- if there are errors in the form... -->
-                        {{ adv_msg_edit_form.new_sender(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in adv_msg_edit_form.new_sender.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ adv_msg_edit_form.new_sender(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
+                <label class="form-control-label" for="name">New Senders</label> <br/>
+                {% for username in usernames %}
+                    <div class="form-check form-check-inline">
+                        <!-- below line needs the ', ' in value to make processing usernames easier -->
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="new_senders" value="{{ username }}, ">
+                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+                    </div>
+                {% endfor %}
+                </div> <br/>
                 <div class="form-group">
-                    {{ adv_msg_edit_form.new_recipient.label(class="form-control-label") }}
-
-                    {% if adv_msg_edit_form.new_recipient.errors %} <!-- if there are errors in the form... -->
-                        {{ adv_msg_edit_form.new_recipient(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in adv_msg_edit_form.new_recipient.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ adv_msg_edit_form.new_recipient(class="form-control form-control-lg") }}
-                    {% endif %}                    
-                </div>
+                <label class="form-control-label" for="name">New Recipients</label> <br/>
+                {% for username in usernames %}
+                    <div class="form-check form-check-inline">
+                        <!-- below line needs the ', ' in value to make processing usernames easier -->
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="new_recipients" value="{{ username }}, ">
+                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+                    </div>
+                {% endfor %}
+                </div> <br/>
                 <div class="form-group">
                     {{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
@@ -177,4 +185,63 @@
             </div>
         </form>
     </div>
+
+    {% if prev_msg_flag %}
+    <legend class="border-bottom mb4">Messages for previous rounds:</legend>
+    {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+        <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+        {% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                {% if prev_msg.new_sender %}
+                <a>New Sender: {{ prev_msg.new_sender }} | </a>
+                {% else %}
+                <a>Sender: {{ prev_msg.sender }} | </a>
+                {% endif %}
+                {% if prev_msg.new_recipient %}
+                <a>New Recipient: {{ prev_msg.new_recipient }}</a>
+                {% else %}
+                <a>Recipient: {{ prev_msg.recipient }}</a>
+                {% endif %}
+                {% if prev_msg.adv_created %}
+                <a> | This message was created by the adversary.</a>
+                {% endif %}
+                {% if prev_msg.is_deleted %}
+                <a> | This message has been deleted.</a>
+                {% else %}
+                <a> | This message has been edited.</a>
+                {% endif %}
+                </div>
+                {% if prev_msg.edited_content %}
+                <p class="article-content">{{ prev_msg.edited_content }}</p>
+                {% else %}
+                <p class="article-content">{{ prev_msg.content }}</p>
+                {% endif %}
+            </div>
+        </article>
+        {% elif prev_msg.adv_created %}} <!-- if the adversary created the message -->
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ prev_msg.sender }} | </a>
+                <a>Recipient: {{ prev_msg.recipient }}</a>
+                <a> | This message was created by the adversary.</a>
+                </div>
+                <p class="article-content">{{ prev_msg.content }}</p>
+            </div>
+        </article>
+        {% else %} <!-- if the message hasn't been edited, display normally -->
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                <a>Sender: {{ prev_msg.sender }} | </a>
+                <a>Recipient: {{ prev_msg.recipient }}</a>
+                </div>
+                <p class="article-content">{{ prev_msg.content }}</p>
+            </div>
+        </article>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
 {% endblock content %}
