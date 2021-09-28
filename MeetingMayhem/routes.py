@@ -336,9 +336,10 @@ def messages():
             game_id = game.id
 
     current_game = Game.query.filter_by(id=game_id).first()
-    #TODO: list of previously sent messages
+
     form = MessageForm() #use the message form
     msgs = None
+    prev_msgs = None
     if (current_game.current_round>1): 
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
@@ -349,6 +350,17 @@ def messages():
                 if check_for_str(message.recipient, current_user.username):
                     #check if one of the recipients is the same as the current user, and append it to the list
                     msgs.append(message)
+    
+    if (current_game.current_round >=0): # showing sent messages from any round
+        #pull messages from current_round where the message isn't deleted
+        display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
+        prev_msgs=[]
+        for message in display_message: # runs through each message
+            if message.sender:          # message must have sender (might be unecessary)
+                if (check_for_str(message.sender, current_user.username)):
+                    # if the name of the sender is the current user, add message
+                    prev_msgs.append(message)
+
         
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         users=[] #make a list to put usernames in for the recipient
