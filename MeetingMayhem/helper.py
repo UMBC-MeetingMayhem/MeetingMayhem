@@ -141,6 +141,10 @@ def create_message(user, game, request, form):
         #remove the last ', ' off the string
         recipients = checkbox_output_str[:len(checkbox_output_str)-2]
         #check if the message is a duplicate, and if it is, display an error, return false
+        encryption_output = request.get('encryption_and_signed_keys')
+        signed_keys = [] # list to keep track of digital signatures
+        encrypted_keys = [] # list to keep track of encryption keys
+        #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
             flash(f'Please select at least one sender and one recipient.', 'danger')
             return False
@@ -148,8 +152,17 @@ def create_message(user, game, request, form):
         if Message.query.filter_by(sender=user.username, round=game.current_round+1, game=game.id).first():
             flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
             return False
+        for element in encryption_output.split(','):
+            if element.split('(')[0] == 'Sign':
+                signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+            else:
+                encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+        signed_keys_string = ','.join(map(str, signed_keys))
+        encrypted_keys_string = ','.join(map(str, encrypted_keys))
+        
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=False, is_signed=False)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=(len(encrypted_keys)> 0), encryption_details = encrypted_keys_string, is_signed = (len(signed_keys) > 0), signed_details = signed_keys_string)
+        
         db.session.add(new_message)
         db.session.commit()
         #display success to user

@@ -53,7 +53,21 @@
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {{ msg_form.content(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
+                </div> <br>
+                <div class="form-group">
+                    {{ msg_form.encryption_and_signed_keys.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if msg_form.encryption_and_signed_keys.errors %} <!-- if there are errors in the form... -->
+                        {{ msg_form.encryption_and_signed_keys(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in msg_form.encryption_and_signed_keys.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ msg_form.encryption_and_signed_keys(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div> <br/>
             </fieldset>
             <div class="form-group" style="margin:10px 0px;">
                 {{ msg_form.submit(class="btn btn-outline-info") }}
