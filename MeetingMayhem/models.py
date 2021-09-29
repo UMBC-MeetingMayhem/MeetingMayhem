@@ -37,7 +37,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.Integer, nullable=False) #dictates what role the account is
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
-    
     """
     roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
     admin: is able to changes the roles of the users incase we need to do this
@@ -47,7 +46,7 @@ class User(db.Model, UserMixin):
     spectator: is able to see results for game, probably also messages for each round
     we might also want to make a role thats both an adversary and a user at some point
     """
-
+    
     def __repr__(self): #this is what gets printed out for the User when a basic query is run
         return f"User(ID='{self.id}', Username='{self.username}', Email='{self.email}', Pwd Hash='{self.password}', Role='{self.role}', Game='{self.game}')\n"
 
@@ -108,7 +107,7 @@ class Message(db.Model):
     signature_key = db.Column(db.String, nullable=True) #contains the signature key used, format <username>.<pub/priv> | if multilpe: <username>.<pub/priv>,<username>.<pub/priv>
     
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}')\n"
+        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_key}', Signed='{self.is_signed}', Signature='{self.signature_key}',)\n"
 
 #game table
 #include information about the game in here so it can by dynamically pulled
