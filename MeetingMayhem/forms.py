@@ -58,11 +58,7 @@ class MessageForm(FlaskForm):
     content = StringField('Message', validators=[DataRequired()])
     encryption_and_signed_keys = StringField('Key(s)')
     submit = SubmitField('Send Message')
-    #recipients = []
     #round, sender should get automatically pulled in the route and send to db item when it is created in the route
-    
-    #def __init__(self, recipients):
-      #  pass
 
     def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
         keys = (encryption_and_signed_keys.data).split(',')
