@@ -322,12 +322,9 @@ def messages():
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
-        print(display_message)
         for message in display_message: #for each message
             if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
                 msgs.append(message)
-                print('flag')
-                print(message)
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
