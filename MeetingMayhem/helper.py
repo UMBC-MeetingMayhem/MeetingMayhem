@@ -144,13 +144,13 @@ def create_message(user, game, request, form):
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
         #check if the message is a duplicate, and if it is, display an error, return false
-        # if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
-        #     flash(f'Please select at least one sender and one recipient.', 'danger')
-        #     return False
-        # #check if the user has already sent a message this round, and if they have, display an error, return false
-        # if Message.query.filter_by(sender=user.username, round=game.current_round+1, game=game.id).first():
-        #     flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
-        #     return False
+        if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
+            flash(f'Please select at least one sender and one recipient.', 'danger')
+            return False
+        #check if the user has already sent a message this round, and if they have, display an error, return false
+        if Message.query.filter_by(sender=user.username, round=game.current_round+1, game=game.id).first():
+            flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
+            return False
         for element in encryption_output.split(','):
             if element.split('(')[0] == 'Sign':
                 signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
