@@ -96,8 +96,10 @@ class Message(db.Model):
     is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
     adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
     is_encrypted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is encrypted or not
+    recipient_encryption_details = db.Column(db.String, nullable=False, default="Null") #keeps track of username of recipient(s) and which key was used to encrypt
     is_signed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is signed or not
-    
+    sender_encryption_details = db.Column(db.String, nullable=False, default="Null") #keeps track of username of sender and which key was used to sign
+
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}')\n"
 
