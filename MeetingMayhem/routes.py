@@ -340,7 +340,7 @@ def messages():
         while msg_round>=2:
             for message in prev_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
                 if message.round == msg_round: #if the target message matches the round we are parsing this loop
-                    if check_for_str(message.new_recipient, current_user.username) or check_for_str(message.recipient, current_user.username):
+                    if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
                         prev_msgs.append(message)
             msg_round -= 1 #decrement iterator
 
