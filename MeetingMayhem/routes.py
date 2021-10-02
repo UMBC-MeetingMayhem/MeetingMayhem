@@ -357,36 +357,6 @@ def messages():
 
     if form.validate_on_submit(): #when the user submits the message form and it is valid
 
-        """
-        #if recipient or content are None display an error and don't put the message in the db
-        #unsure if this is needed, but will need to put it back in if we end up having issues with empty messages
-        if not form.recipient.data or not form.content.data:
-            flash(f'There was an error in creating your message. Please try again.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-        """
-        if not form.content.data:
-            flash(f'There was an error in creating your message. Please try again.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-        #capture the list of players from the checkboxes and make it into a string delimited by commas
-        checkbox_output_list = request.form.getlist('recipients')
-        encryption_output = request.form.get('encryption_and_signed_keys')
-        dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
-        
-        for element in checkbox_output_list: #populates dict with recipients chosen
-            dict_of_recipients[element] = 0
-
-        #ensure the list isn't empty
-        if not checkbox_output_list:
-            flash(f'Please select at least one recipient.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-        
-        #ensure keys entered are keys of actual recipients chosen
-        for element in encryption_output.split(','):
-            if element.split('.')[0].split('(')[1] not in dict_of_recipients and element.split('.')[0].split('(')[1] != current_user.username:
-                flash(f'Invalid recipient key detected, make sure to enter keys of chosen recipients or a valid sender', 'danger')
-                return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-        
         create_message(current_user, current_game, request.form, form)
 
     #give the template the vars it needs
@@ -422,11 +392,6 @@ def game_setup():
         checkbox_output_list = request.form.getlist('players')
         checkbox_output_str = ''.join(map(str, checkbox_output_list))
         players = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
-
-        """ old players capturing, leaving for now
-        player_list = []
-        players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list))) #make a string of players to put in the db
-        """
 
 
         #"validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
