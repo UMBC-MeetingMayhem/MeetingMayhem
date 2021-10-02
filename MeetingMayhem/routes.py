@@ -394,7 +394,7 @@ def game_setup():
         players = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
 
 
-        #"validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
+        #validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
         #doing it this way is kinda janky, the error messages don't look the same as other validation, but it works
         try:
             GMSetupGameForm.validate_players_checkbox(players)
