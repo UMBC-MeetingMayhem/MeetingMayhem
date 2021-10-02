@@ -166,53 +166,6 @@ def messages():
         #adversary message creation
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
-            #if sender, recipient, or content are None, display an error
-            if not msg_form.content.data:
-                flash(f'There was an error in creating your message. Please try again.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-            #capture the list of players from the checkboxes and make it into a string delimited by commas
-            checkbox_output_list_recipients = request.form.getlist('recipients')
-            checkbox_output_list_senders = request.form.getlist('senders')
-
-            #ensure the lists aren't empty
-            if not checkbox_output_list_recipients or not checkbox_output_list_senders:
-                flash(f'Please select at least one sender and one recipient.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-            checkbox_output_str_recipients = ''.join(map(str, checkbox_output_list_recipients))
-            checkbox_output_str_senders = ''.join(map(str, checkbox_output_list_senders))
-            recipients = checkbox_output_str_recipients[:len(checkbox_output_str_recipients)-2]
-            senders = checkbox_output_str_senders[:len(checkbox_output_str_senders)-2]
-
-            """ old stuff for gathering senders and recipients for sending a message for adv
-            users_recipients=[] #make a list to put usernames in for the recipient
-            users_senders=[] #make a list to put usernames in for the sender
-            #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
-            #then maps the list of usernames into a string to pass into the db
-            recipients = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.recipient.data)), users_recipients)))
-            senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
-            """
-
-            #if the message is a duplicate display an error and don't put the message in the db
-            if Message.query.filter_by(sender=senders, recipient=recipients, content=msg_form.content.data, round=current_game.current_round+1, game=current_game.id).first():
-                flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
-
-            #create the new message variable with the information from the form
-            new_message = Message(round=(current_game.current_round+1), game=current_game.id, sender=senders, recipient=recipients, content=msg_form.content.data,
-            is_edited=True, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
-
-            db.session.add(new_message) #stage the message
-            db.session.commit() #commit the message to the db
-            flash(f'Your message has been sent!', 'success') #success message to let user know it worked
-            
             create_message(current_user, current_game, request.form, msg_form)
 
             #pull the messages again since the messages we want to display has changed
