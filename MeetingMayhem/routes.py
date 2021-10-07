@@ -166,7 +166,7 @@ def messages():
         #adversary message creation
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
-            create_message(current_user, current_game, request.form, msg_form)
+            create_message(current_user, current_game, request.form, msg_form, current_user.username)
 
             #pull the messages again since the messages we want to display has changed
             messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
@@ -354,7 +354,32 @@ def messages():
 
     if form.validate_on_submit(): #when the user submits the message form and it is valid
 
-        create_message(current_user, current_game, request.form, form)
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        checkbox_output_list = request.form.getlist('recipients')
+        encryption_output = request.form.get('encryption_and_signed_keys')
+        dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
+        
+        # Code to remove wierd commas from get request 
+        for i in range(len(checkbox_output_list)):
+            checkbox_output_list[i] = checkbox_output_list[i].split(',')[0]
+
+        for element in checkbox_output_list: #populates dict with recipients chosen
+            dict_of_recipients[element] = 0
+
+        #ensure the list isn't empty
+        if not checkbox_output_list:
+            flash(f'Please select at least one recipient.', 'danger')
+            return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+        
+        #ensure keys entered are keys of actual recipients chosen
+        if encryption_output:
+
+            for element in encryption_output.split(','):
+                if (element.split('.')[0].split('(')[1] != current_user.username and element.split('.')[0].split('(')[1] not in dict_of_recipients):
+                    flash(f'Invalid key detected, make sure to enter your key or the recipients key(s)', 'danger')
+                    return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+
+        create_message(current_user, current_game, request.form, form, current_user.username)
 
     #give the template the vars it needs
     return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
