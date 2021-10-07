@@ -82,13 +82,26 @@
                         {{ form.content(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> <br/>
+                <div class="form-group">
+                    {{ form.encryption_and_signed_keys.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if form.encryption_and_signed_keys.errors %} <!-- if there are errors in the form... -->
+                        {{ form.encryption_and_signed_keys(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in form.encryption_and_signed_keys.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ form.encryption_and_signed_keys(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div> <br/>
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
-
     <div class="tab" >
 		<button class="tablinks content-section" onclick="openCity(event, 'Received')" id="defaultOpen">Received Messages</button>
 		<button class="tablinks content-section" onclick="openCity(event, 'Sent')">Sent Messages</button>
