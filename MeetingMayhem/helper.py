@@ -164,19 +164,21 @@ def create_message(user, game, request, form, username):
             flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
             return False
 
-            # if (element.split('.')[0].split('(')[1] != current_user.username and element.split('.')[0].split('(')[1] not in dict_of_recipients):
-            
         for element in encryption_output.split(','):
-            if element.split('(')[0] == 'Sign' and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
-                signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-            else:
-                if element.split('(')[0] == 'Sign':
+            if element.split('(')[0] == 'Sign':
+                if element.split('.')[1] == 'pub)' and element.split('.')[0].split('(')[1] in dict_of_recipients:
+                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                elif element.split('(')[1] == f"{username}.priv)":
+                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0] == 'Encrypt' and element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
-                encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-            else:
-                if element.split('(')[0] == 'Encrypt':
-                    encrypted_keys.append('invalid encrypted key')
+            if element.split('(')[0] == 'Encrypt':
+                if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                     encrypted_keys.append('invalid encrypted key')
+
+
         signed_keys_string = ','.join(map(str, signed_keys))
         encrypted_keys_string = ','.join(map(str, encrypted_keys))
         
