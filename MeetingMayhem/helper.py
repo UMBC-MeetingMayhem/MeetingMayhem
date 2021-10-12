@@ -164,6 +164,7 @@ def create_message(user, game, request, form, username):
             flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
             return False
 
+        # Code for determining whether entered keys are valid or not 
         for element in encryption_output.split(','):
             if element.split('(')[0] == 'Sign':
                 if element.split('.')[1] == 'pub)' and element.split('.')[0].split('(')[1] in dict_of_recipients:
