@@ -328,7 +328,7 @@ def messages():
         msgs_tuple = []
         for message in display_message: #for each message
             if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-                msgs_tuple.append((message, can_decrypt(user, message.encryption_details, message.is_encrypted)))
+                msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
@@ -347,7 +347,7 @@ def messages():
                 if message.round == msg_round: #if the target message matches the round we are parsing this loop
                     #adds message and whether it can be read by the user to the list of tuples (prev_msgs_tuple)
                     if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-                        prev_msgs_tuple.append((message, can_decrypt(user, message.encryption_details, message.is_encrypted)))
+                        prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
             msg_round -= 1 #decrement iterator
 
     #setup previous message flag to tell template if it should display previous messages or not
