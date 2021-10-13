@@ -86,7 +86,7 @@ def str_to_list(st, li):
         raise TypeError("Incorrect argument type or empty string passed to function.")
     return li #return the list filled with strings
 
-def create_message(user, game, request, form):
+def create_message(user, game, request, form, username):
     """Create a message. Used by both the adversary and the users.
 
     Intention is to use this function with a switch statement so that different actions can
@@ -141,9 +141,20 @@ def create_message(user, game, request, form):
         #remove the last ', ' off the string
         recipients = checkbox_output_str[:len(checkbox_output_str)-2]
         #check if the message is a duplicate, and if it is, display an error, return false
+        checkbox_output_list = request.getlist('recipients')
         encryption_output = request.get('encryption_and_signed_keys')
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
+
+        dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
+        
+        # Code to remove wierd commas from get request 
+        for i in range(len(checkbox_output_list)):
+            checkbox_output_list[i] = checkbox_output_list[i].split(',')[0]
+
+        for element in checkbox_output_list: #populates dict with recipients chosen
+            dict_of_recipients[element] = 0
+
         #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
             flash(f'Please select at least one sender and one recipient.', 'danger')
@@ -152,11 +163,23 @@ def create_message(user, game, request, form):
         if Message.query.filter_by(sender=user.username, round=game.current_round+1, game=game.id).first():
             flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
             return False
+
+        # Code for determining whether entered keys are valid or not 
         for element in encryption_output.split(','):
             if element.split('(')[0] == 'Sign':
-                signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-            else:
-                encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                if element.split('.')[1] == 'pub)' and element.split('.')[0].split('(')[1] in dict_of_recipients:
+                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                elif element.split('(')[1] == f"{username}.priv)":
+                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    signed_keys.append('invalid sign key')
+            if element.split('(')[0] == 'Encrypt':
+                if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                     encrypted_keys.append('invalid encrypted key')
+
+
         signed_keys_string = ','.join(map(str, signed_keys))
         encrypted_keys_string = ','.join(map(str, encrypted_keys))
         
