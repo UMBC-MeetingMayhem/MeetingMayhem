@@ -15,25 +15,25 @@
     <legend class="border-bottom mb4">Recent messages for round {{ game.current_round}}:</legend>
     {% for message in msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-        {% if message.is_edited %} <!-- if the message has been edited, display the edited parts-->
+        {% if message[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                {% if message.new_sender %}
-                <a>Sender: {{ message.new_sender }} | </a>
+                {% if message[0].new_sender %}
+                <a>Sender: {{ message[0].new_sender }} | </a>
                 {% else %}
-                <a>Sender: {{ message.sender }} | </a>
+                <a>Sender: {{ message[0].sender }} | </a>
                 {% endif %}
-                {% if message.new_recipient %}
-                <a>Recipient: {{ message.new_recipient }}</a>
+                {% if message[0].new_recipient %}
+                <a>Recipient: {{ message[0].new_recipient }}</a>
                 {% else %}
-                <a>Recipient: {{ message.recipient }}</a>
+                <a>Recipient: {{ message[0].recipient }}</a>
                 {% endif %}
                 </div>
-                {% if message.edited_content %}
-                <p class="article-content">{{ message.edited_content }}</p>
+                {% if message[0].edited_content %}
+                <p class="article-content">{{ message[0].edited_content }}</p>
                 {% else %}
-                <p class="article-content">{{ message.content }}</p>
+                <p class="article-content">{{ (message[0]).content }}</p>
                 {% endif %}
             </div>
         </article>
@@ -41,10 +41,14 @@
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                <a>Sender: {{ message.sender }} | </a>
-                <a>Recipient: {{ message.recipient }}</a>
+                <a>Sender: {{ message[0].sender }} | </a>
+                <a>Recipient: {{ message[0].recipient }}</a>
                 </div>
-                <p class="article-content">{{ message.content }}</p>
+                {% if message[1] %}
+                <p class="article-content">{{ message[0].content }}</p>
+                {% else %}
+                <p class="article-content">Cannot Read</p>
+                {% endif %}
             </div>
         </article>
         {% endif %}
@@ -112,26 +116,26 @@
 		<legend class="border-bottom mb4">Messages received:</legend>
 		{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
 			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-			{% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
+			{% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
 			<article class="media content-section">
 				<div class="media-body">
 					<div class="article-metadata">
-					{% if prev_msg.new_sender %}
-					<a>Sender: {{ prev_msg.new_sender }} | </a>
+					{% if prev_msg[0].new_sender %}
+					<a>Sender: {{ prev_msg[0].new_sender }} | </a>
 					{% else %}
-					<a>Sender: {{ prev_msg.sender }} | </a>
+					<a>Sender: {{ prev_msg[0].sender }} | </a>
 					{% endif %}
-					{% if prev_msg.new_recipient %}
-					<a>Recipient: {{ prev_msg.new_recipient }} | </a>
+					{% if prev_msg[0].new_recipient %}
+					<a>Recipient: {{ prev_msg[0].new_recipient }} | </a>
 					{% else %}
-					<a>Recipient: {{ prev_msg.recipient }} | </a>
+					<a>Recipient: {{ prev_msg[0].recipient }} | </a>
 					{% endif %}
-					<a>Round: {{ prev_msg.round }}</a>
+					<a>Round: {{ prev_msg[0].round }}</a>
 					</div>
 					{% if prev_msg.edited_content %}
-					<p class="article-content">{{ prev_msg.edited_content }}</p>
+					<p class="article-content">{{ prev_msg[0].edited_content }}</p>
 					{% else %}
-					<p class="article-content">{{ prev_msg.content }}</p>
+					<p class="article-content">{{ prev_msg[0].content }}</p>
 					{% endif %}
 				</div>
 			</article>
@@ -139,10 +143,14 @@
 			<article class="media content-section">
 				<div class="media-body">
 					<div class="article-metadata">
-					<a>Sender: {{ prev_msg.sender }} | </a>
-					<a>Recipient: {{ prev_msg.recipient }}</a>
+					<a>Sender: {{ prev_msg[0].sender }} | </a>
+					<a>Recipient: {{ prev_msg[0].recipient }}</a>
 					</div>
-					<p class="article-content">{{ prev_msg.content }}</p>
+                    {% if prev_msg[1] %}
+                    <p class="article-content">{{ prev_msg[0].content }}</p>
+                    {% else %}
+                    <p class="article-content">Cannot Read</p>
+                    {% endif %}
 				</div>
 			</article>
 			{% endif %}
