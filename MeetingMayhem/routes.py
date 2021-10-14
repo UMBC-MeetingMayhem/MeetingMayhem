@@ -443,10 +443,22 @@ def game_setup():
             flash(f'Unable to change a user\'s role while they are in a game. Please end the game first.', 'danger')
             return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
         if usr_form.role.data == 'adv': #if the selected new role is adversary
+            if user.role == 3:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
             user.role = 3 #update to adversary
         if usr_form.role.data == 'usr': #if the selected new role is user
+            if user.role == 4:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
             user.role = 4 #update to user
         if usr_form.role.data == 'spec': #if the selected new role is spectator
+            if user.role == 5:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
             user.role = 5 #update to spectator
         db.session.commit()
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
