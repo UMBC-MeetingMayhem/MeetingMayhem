@@ -25,7 +25,7 @@ from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
 from MeetingMayhem.models import User, Message, Game
-from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message
+from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -166,7 +166,7 @@ def messages():
         #adversary message creation
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
-            create_message(current_user, current_game, request.form, msg_form)
+            create_message(current_user, current_game, request.form, msg_form, current_user.username)
 
             #pull the messages again since the messages we want to display has changed
             messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
@@ -325,13 +325,14 @@ def messages():
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
+        msgs_tuple = []
         for message in display_message: #for each message
             if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-                msgs.append(message)
+                msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
-    if not msgs: #if the list of messages is empty, set the flag to false
+    if not msgs_tuple: #if the list of messages is empty, set the flag to false
         msg_flag = False
 
     #grab the messages from previous rounds
@@ -340,24 +341,37 @@ def messages():
         prev_messages = Message.query.filter_by(is_deleted=False, game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
         msg_round = current_game.current_round-1 #create an "iterator" so messages are displayed in order of round
         prev_msgs = []
+        prev_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
         while msg_round>=2:
             for message in prev_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
                 if message.round == msg_round: #if the target message matches the round we are parsing this loop
+                    #adds message and whether it can be read by the user to the list of tuples (prev_msgs_tuple)
                     if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-                        prev_msgs.append(message)
+                        prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
             msg_round -= 1 #decrement iterator
 
     #setup previous message flag to tell template if it should display previous messages or not
     prev_msg_flag = True
-    if not prev_msgs: #if the list of previous messages is empty, set the flag to false
+    if not prev_msgs_tuple: #if the list of previous messages is empty, set the flag to false
         prev_msg_flag = False
 
     if form.validate_on_submit(): #when the user submits the message form and it is valid
 
-        create_message(current_user, current_game, request.form, form)
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        checkbox_output_list = request.form.getlist('recipients')
+        
+
+        #ensure the list isn't empty
+        if not checkbox_output_list:
+            flash(f'Please select at least one recipient.', 'danger')
+            return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
+        
+        #ensure keys entered are keys of actual recipients chosen
+    
+        create_message(current_user, current_game, request.form, form, current_user.username)
 
     #give the template the vars it needs
-    return render_template('messages.html', title='Messages', form=form, msgs=msgs, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+    return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
 # game setup route for the game master
 @app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
