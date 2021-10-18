@@ -1,0 +1,58 @@
+{% macro print_msgs(msgs) -%}	
+{% for msg in msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+	<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+	
+	{% if msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
+	<article class="media content-section">
+		<div class="media-body">
+			<div class="article-metadata">
+			{% if msg[0].new_sender %}
+			<a>Sender: {{ msg[0].new_sender }} | </a>
+			{% else %}
+			<a>Sender: {{ msg[0].sender }} | </a>
+			{% endif %}
+			{% if msg[0].new_recipient %}
+			<a>Recipient: {{ msg[0].new_recipient }} | </a>
+			{% else %}
+			<a>Recipient: {{ msg[0].recipient }} | </a>
+			{% endif %}
+			<a>Round: {{ msg[0].round }}</a>
+			</div>
+			{% if msg.edited_content %}
+			<p class="article-content">{{ msg[0].edited_content }}</p>
+			{% else %}
+			<p class="article-content">{{ msg[0].content }}</p>
+			{% endif %}
+		</div>
+	</article>
+	{% else %} <!-- if the message hasn't been edited, display normally -->
+	<article class="media content-section">
+		<div class="media-body">
+			<div class="article-metadata">
+				<a>Sender: {{ msg[0].sender }} | </a>
+				<a>Recipient: {{ msg[0].recipient }}</a>
+			</div>
+			<!-- check encyption --> 
+            {% if msg[1] %}
+            <p class="article-content">{{ msg[0].content }}</p>
+            {% else %}
+            <p class="article-content">--UNABLE TO DECRYPT--</p>
+            {% endif %}
+		</div>
+		{% if msg[0].is_encrypted %}
+		<div class="m-1 row ">
+			<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
+			<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].sender }}</div>
+			</div>
+		</div>
+		{% endif %}
+		{% if msg[0].is_signed %}
+		<div class="m-1 row">
+			<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+			<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}</div>
+		</div>
+		{% endif %}
+	</article>
+	{% endif %}
+{% endfor %}
+{%- endmacro -%}

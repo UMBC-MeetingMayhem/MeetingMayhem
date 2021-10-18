@@ -7,53 +7,18 @@
     Description: html and jinja file for handling the messages page
 -->
 
+{% import 'messages.j2' as messages -%}
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <h1>Messages</h1>
 
+    <h1>Messages</h1>
+	
     {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
     <legend class="border-bottom mb4">Recent messages for round {{ game.current_round}}:</legend>
-    {% for message in msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-        <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-        {% if message[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                {% if message[0].new_sender %}
-                <a>Sender: {{ message[0].new_sender }} | </a>
-                {% else %}
-                <a>Sender: {{ message[0].sender }} | </a>
-                {% endif %}
-                {% if message[0].new_recipient %}
-                <a>Recipient: {{ message[0].new_recipient }}</a>
-                {% else %}
-                <a>Recipient: {{ message[0].recipient }}</a>
-                {% endif %}
-                </div>
-                {% if message[0].edited_content %}
-                <p class="article-content">{{ message[0].edited_content }}</p>
-                {% else %}
-                <p class="article-content">{{ (message[0]).content }}</p>
-                {% endif %}
-            </div>
-        </article>
-        {% else %} <!-- if the message hasn't been edited, display normally -->
-        <article class="media content-section">
-            <div class="media-body">
-                <div class="article-metadata">
-                <a>Sender: {{ message[0].sender }} | </a>
-                <a>Recipient: {{ message[0].recipient }}</a>
-                </div>
-                {% if message[1] %}
-                <p class="article-content">{{ message[0].content }}</p>
-                {% else %}
-                <p class="article-content">Cannot Read</p>
-                {% endif %}
-            </div>
-        </article>
-        {% endif %}
-    {% endfor %}
+    
+	{{ messages.print_msgs(msgs) }}
+
     {% else %}
     <legend class="border-bottom mb4">No messages for round {{ game.current_round}}.</legend>
     {% endif %}
@@ -115,47 +80,7 @@
 	<div id="Received" class="tabcontent">
 		{% if prev_msg_flag %}
 		<legend class="border-bottom mb4">Messages received:</legend>
-		{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-			{% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
-			<article class="media content-section">
-				<div class="media-body">
-					<div class="article-metadata">
-					{% if prev_msg[0].new_sender %}
-					<a>Sender: {{ prev_msg[0].new_sender }} | </a>
-					{% else %}
-					<a>Sender: {{ prev_msg[0].sender }} | </a>
-					{% endif %}
-					{% if prev_msg[0].new_recipient %}
-					<a>Recipient: {{ prev_msg[0].new_recipient }} | </a>
-					{% else %}
-					<a>Recipient: {{ prev_msg[0].recipient }} | </a>
-					{% endif %}
-					<a>Round: {{ prev_msg[0].round }}</a>
-					</div>
-					{% if prev_msg.edited_content %}
-					<p class="article-content">{{ prev_msg[0].edited_content }}</p>
-					{% else %}
-					<p class="article-content">{{ prev_msg[0].content }}</p>
-					{% endif %}
-				</div>
-			</article>
-			{% else %} <!-- if the message hasn't been edited, display normally -->
-			<article class="media content-section">
-				<div class="media-body">
-					<div class="article-metadata">
-					<a>Sender: {{ prev_msg[0].sender }} | </a>
-					<a>Recipient: {{ prev_msg[0].recipient }}</a>
-					</div>
-                    {% if prev_msg[1] %}
-                    <p class="article-content">{{ prev_msg[0].content }}</p>
-                    {% else %}
-                    <p class="article-content">Cannot Read</p>
-                    {% endif %}
-				</div>
-			</article>
-			{% endif %}
-		{% endfor %}
+		{{ messages.print_msgs(prev_msgs) }}
 		{% else %}
 		<legend class="border-bottom mb4">No messages received</legend>
 		{% endif %}
@@ -164,19 +89,7 @@
 	<div id="Sent" class="tabcontent">
 		{% if sent_msg_flag %}
 		<legend class="border-bottom mb4">Messages sent by you:</legend>
-		{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-			<!-- if the message hasn't been edited, display normally -->
-			<article class="media content-section">
-				<div class="media-body">
-					<div class="article-metadata">
-					<a>Sender: {{ sent_msg.sender }} | </a>
-					<a>Recipient: {{ sent_msg.recipient }}</a>
-					</div>
-					<p class="article-content">{{ sent_msg.content }}</p>
-				</div>
-			</article>
-		{% endfor %}
+		{{ messages.print_msgs(sent_msgs) }}		
 		{% else %}
 		<legend class="border-bottom mb4">No messages sent</legend>
 		{% endif %} 
