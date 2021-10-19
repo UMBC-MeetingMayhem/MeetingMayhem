@@ -7,7 +7,7 @@
     Description: html and jinja file for handling the messages page
 -->
 
-{% import 'messages.j2' as messages -%}
+{% import 'messages.j2' as messages %}
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
@@ -72,7 +72,8 @@
             </div>
         </form>
     </div>
-    <div class="tab" >
+    
+	<div class="tab" >
 		<button class="tablinks content-section" onclick="openCity(event, 'Received')" id="defaultOpen">Received Messages</button>
 		<button class="tablinks content-section" onclick="openCity(event, 'Sent')">Sent Messages</button>
 	</div>
@@ -89,7 +90,19 @@
 	<div id="Sent" class="tabcontent">
 		{% if sent_msg_flag %}
 		<legend class="border-bottom mb4">Messages sent by you:</legend>
-		{{ messages.print_msgs(sent_msgs) }}		
+		{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+			<!-- if the message hasn't been edited, display normally -->
+			<article class="media content-section">
+				<div class="media-body">
+					<div class="article-metadata">
+					<a>Sender: {{ sent_msg.sender }} | </a>
+					<a>Recipient: {{ sent_msg.recipient }}</a>
+					</div>
+					<p class="article-content">{{ sent_msg.content }}</p>
+				</div>
+			</article>
+		{% endfor %}
 		{% else %}
 		<legend class="border-bottom mb4">No messages sent</legend>
 		{% endif %} 
