@@ -65,7 +65,7 @@ class MessageForm(FlaskForm):
         if encryption_and_signed_keys.data == '':
             return
         for element in keys:
-            if (not(bool(re.match("Sign+[(]+[a-zA-Z0-9]+.[priv|pub]+[)]$", element))) and not(bool(re.match("Encrypt+[(]+[a-zA-Z0-9]+.[priv|pub]+[)]$", element)))):
+            if (not(bool(re.match("Sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("Encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
                 raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
 
 
