@@ -23,74 +23,7 @@ from flask import render_template, url_for, flash, redirect, request
 from MeetingMayhem import app, db, bcrypt
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, AdversaryMessageSendForm, GMManageGameForm, GMSetupGameForm
 from MeetingMayhem.models import User, Message, Game
-from flask_login import login_user, logout_user, login_required, current_user
-
-#recursivley parse the given string for usernames, return a list of usernames delimited by commas
-def parse_for_username(str, users):
-    str1=str.partition("Username='")[2] #grabs all the stuff in the string after the text "Username='"
-    str2=str1.partition("', ") #separates the remaining string into the username, the "', ", and the rest of the string
-    if str2[2]: #if there is content in the rest of the string
-        if (str2[2].find('Username') != -1): #if we can find the text 'Username' in the rest of the string
-            user = str2[0] + ', ' #put a comma and space after the username
-            users.append(user) #append it to the list
-            parse_for_username(str2[2], users) #call this method again
-        else: #if not
-            users.append(str2[0]) #just append the username as it is the last one
-    return users #return the list of usernames
-
-def parse_for_game(str, games):
-    str1=str.partition("Name='")[2]
-    str2=str1.partition("', ")
-    if str2[2]:
-        if (str2[2].find('Name') != -1):
-            game = str2[0] + ', '
-            games.append(game)
-            parse_for_game(str2[2], games)
-        else:
-            games.append(str2[0])
-    return games
-
-#recursivley parse the given string for usernames, return true if the given username is found
-def check_for_str(str, check):
-    str1=str.partition(', ') #split the string into the username, the "', ", and the rest of the string
-    if (str1[0] == check): #if the first part of str is the username we are looking for
-        return True
-    if (not str1[2]): #if there is nothing in the rest of str, it means there are no more usernames to look for
-        return False
-    else:
-        return check_for_str(str1[2], check) #call this method again if there is more string to look through
-
-def strip_list_str(str_list):
-    new_str_list = []
-    for str in str_list:
-        new_str = str.partition(",")[0]
-        new_str_list.append(new_str)
-    return new_str_list
-
-"""
-def username_str_to_list(usernames):
-    username_list = []
-    username_list.append(usernames.partition(',')[0])
-    new_usernames = usernames.partition(',')[2]
-    if new_usernames:
-        username_to_str_list_rec(new_usernames, username_list)
-    return username_list
-"""
-"""
-def username_to_str_list(usernames, username_list):
-    print('start')
-    print(usernames)
-    print(username_list)
-    username_list.append(usernames.partition(',')[0])
-    new_usernames = usernames.partition(',')[2]
-    print(new_usernames)
-    print(username_list)
-    if new_usernames:
-        username_list = username_to_str_list(new_usernames, username_list)
-        print(username_list)
-        print('if')
-    return username_list
-"""
+from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -217,20 +150,14 @@ def messages():
 
         if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
-            users_recipients=[] #make a list to put usernames in for the recipient
-            users_senders=[] #make a list to put usernames in for the sender
-            #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
-            #then maps the list of usernames into a string to pass into the db
-            recipients = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.recipient.data)), users_recipients)))
-            senders = ''.join(map(str, parse_for_username(''.join(map(str, msg_form.sender.data)), users_senders)))
+            create_message(current_user, current_game, request.form, msg_form, current_user.username)
 
-            #create the new message variable with the information from the form
-            new_message = Message(round=(current_game.current_round+1), sender=senders, recipient=recipients, content=msg_form.content.data,
-            is_edited=True, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
-
-            db.session.add(new_message) #stage the message
-            db.session.commit() #commit the message to the db
-            flash(f'Your message has been sent!', 'success') #success message to let user know it worked
+            #pull the messages again since the messages we want to display has changed
+            messages = Message.query.filter_by(round=current_game.current_round+1, game=current_game.id).all()
+            current_game.adv_current_msg = 0
+            current_game.adv_current_msg_list_size = len(messages)
+            #commit the messages to the database
+            db.session.commit()
 
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
@@ -342,41 +269,56 @@ def messages():
     prev_msgs = None
     if (current_game.current_round>1): 
         #pull messages from current_round where the message isn't deleted
-        display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
-
-        msgs=[] #create a list to store the messages to dispay to pass to the template
+        display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
+        msgs = [] #create a list to store the messages to dispay to pass to the template
+        msgs_tuple = []
         for message in display_message: #for each message
-            if message.recipient: #if the message has a recipient
-                if check_for_str(message.recipient, current_user.username):
-                    #check if one of the recipients is the same as the current user, and append it to the list
-                    msgs.append(message)
-    
-    if (current_game.current_round >=0): # showing sent messages from any round
-        #pull messages from current_round where the message isn't deleted
-        display_message = Message.query.filter_by(round=current_game.current_round,is_deleted=False).all()
-        prev_msgs=[]
-        for message in display_message: # runs through each message
-            if message.sender:          # message must have sender (might be unecessary)
-                if (check_for_str(message.sender, current_user.username)):
-                    # if the name of the sender is the current user, add message
-                    prev_msgs.append(message)
+            if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
+                msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
+
+    #setup message flag to tell template if it should display messages or not
+    msg_flag = True
+    if not msgs_tuple: #if the list of messages is empty, set the flag to false
+        msg_flag = False
+
+    #grab the messages from previous rounds
+    prev_msgs = None
+    if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
+        prev_messages = Message.query.filter_by(is_deleted=False, game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
+        msg_round = current_game.current_round-1 #create an "iterator" so messages are displayed in order of round
+        prev_msgs = []
+        prev_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
+        while msg_round>=2:
+            for message in prev_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
+                if message.round == msg_round: #if the target message matches the round we are parsing this loop
+                    #adds message and whether it can be read by the user to the list of tuples (prev_msgs_tuple)
+                    if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
+                        prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
+            msg_round -= 1 #decrement iterator
+
+    #setup previous message flag to tell template if it should display previous messages or not
+    prev_msg_flag = True
+    if not prev_msgs_tuple: #if the list of previous messages is empty, set the flag to false
+        prev_msg_flag = False
 
         
     if form.validate_on_submit(): #when the user submits the message form and it is valid
-        users=[] #make a list to put usernames in for the recipient
-        #this creates a string of user objects, maps the whole thing to a string, parses that string for only the usernames,
-        #then maps the list of usernames into a string to pass into the db
-        recipients = ''.join(map(str, parse_for_username(''.join(map(str, form.recipient.data)), users)))
+
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        checkbox_output_list = request.form.getlist('recipients')
         
-        #create the new message. grab the current_round for the round var, current user's username for the sender var,
-        #selected user's usernames for the recipient var, and the message content
-        new_message = Message(round=current_game.current_round+1, sender=current_user.username, recipient=recipients,
-        content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False)
-        db.session.add(new_message) #stage the message
-        db.session.commit() #commit the message to the db
-        flash(f'Your message has been sent!', 'success') #success message to let user know it worked
+
+        #ensure the list isn't empty
+        if not checkbox_output_list:
+            flash(f'Please select at least one recipient.', 'danger')
+            return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
+        
+        #ensure keys entered are keys of actual recipients chosen
+    
+        create_message(current_user, current_game, request.form, form, current_user.username)
+
     #give the template the vars it needs
-    return render_template('messages.html', title='Messages', form=form, message=msgs)
+    return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
 # game setup route for the game master
 @app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
@@ -414,11 +356,17 @@ def game_setup():
         mng_form = GMManageGameForm()
         setup_form = GMSetupGameForm()
 
-    #msg setup
-    #TODO: need validation to ensure players are selected and a name is chosen
-    if is_setup_submit and setup_form.validate():
-        player_list = []
-        players = ''.join(map(str, parse_for_username(''.join(map(str, setup_form.players.data)), player_list)))
+
+        #validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
+        #doing it this way is kinda janky, the error messages don't look the same as other validation, but it works
+        try:
+            GMSetupGameForm.validate_players_checkbox(players)
+        except ValidationError:
+            #if validation for players fails, display an error and refresh the page so the game doesn't get created
+            flash(f'One of the selected users is already in a game.', 'danger')
+            return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
+
+        #create the game with info from the form
         new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
         db.session.add(new_game)
         db.session.commit()

@@ -57,7 +57,17 @@ class LoginForm(FlaskForm):
 class MessageForm(FlaskForm):
     content = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Send Message')
+    encryption_and_signed_keys = StringField('Key(s)')
     #round, sender should get automatically pulled in the route and send to db item when it is created in the route
+
+    def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
+        keys = (encryption_and_signed_keys.data).split(',')
+        if encryption_and_signed_keys.data == '':
+            return
+        for element in keys:
+            if (not(bool(re.match("Sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("Encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
+                raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
+
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
