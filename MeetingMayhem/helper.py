@@ -166,19 +166,15 @@ def create_message(user, game, request, form, username):
 
 
         # Code for determining whether entered keys are valid or not
-        is_encrypted = False
-        is_signed = False 
         for element in encryption_output.split(','):
             if element.split('(')[0] == 'Sign':
                 if element.split('(')[1] == f"{username}.priv)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-                    is_signed = True
                 else:
                     signed_keys.append('invalid sign key')
             if element.split('(')[0] == 'Encrypt':
                 if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-                    is_encrypted = True
                 else:
                      encrypted_keys.append('invalid encrypted key')
 
@@ -187,7 +183,7 @@ def create_message(user, game, request, form, username):
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=is_encrypted, encryption_details = encrypted_keys_string, is_signed = is_signed, signed_details = signed_keys_string)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string)
         
         db.session.add(new_message)
         db.session.commit()
