@@ -321,14 +321,14 @@ def messages():
 
     form = MessageForm() #use the standard message form
     msgs = None
+    msgs_tuple = []
     if (current_game.current_round>1):
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
         msgs = [] #create a list to store the messages to dispay to pass to the template
-        msgs_tuple = []
         for message in display_message: #for each message
             if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-                msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
+                msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = True
@@ -337,17 +337,17 @@ def messages():
 
     #grab the messages from previous rounds
     prev_msgs = None
+    prev_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
     if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
         prev_messages = Message.query.filter_by(is_deleted=False, game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
         msg_round = current_game.current_round-1 #create an "iterator" so messages are displayed in order of round
         prev_msgs = []
-        prev_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
         while msg_round>=2:
             for message in prev_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
                 if message.round == msg_round: #if the target message matches the round we are parsing this loop
                     #adds message and whether it can be read by the user to the list of tuples (prev_msgs_tuple)
                     if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-                        prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
+                        prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
             msg_round -= 1 #decrement iterator
 
     #setup previous message flag to tell template if it should display previous messages or not
