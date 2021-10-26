@@ -164,12 +164,11 @@ def create_message(user, game, request, form, username):
             flash(f'Users may only send one message per round. Please wait until the next round to send another message.', 'danger')
             return False
 
-        # Code for determining whether entered keys are valid or not 
+
+        # Code for determining whether entered keys are valid or not
         for element in encryption_output.split(','):
             if element.split('(')[0] == 'Sign':
-                if element.split('.')[1] == 'pub)' and element.split('.')[0].split('(')[1] in dict_of_recipients:
-                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-                elif element.split('(')[1] == f"{username}.priv)":
+                if element.split('(')[1] == f"{username}.priv)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
@@ -184,7 +183,7 @@ def create_message(user, game, request, form, username):
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=(len(encrypted_keys)> 0), encryption_details = encrypted_keys_string, is_signed = (len(signed_keys) > 0), signed_details = signed_keys_string)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string)
         
         db.session.add(new_message)
         db.session.commit()
@@ -194,7 +193,7 @@ def create_message(user, game, request, form, username):
     else: #if someone who isn't a user or adversary manages to call this function, return false
         return False
     
-def can_decrypt(user, encryption_keys, is_encrypted):
+def can_decrypt(user, encryption_keys, is_encrypted, sender):
     """Decides who can or cannot read an encrypted message.
 
     Args:
@@ -205,13 +204,14 @@ def can_decrypt(user, encryption_keys, is_encrypted):
     Returns:
         bool: whether or not the user can decrypt message
     """
+    if sender == user.username:
+        return True 
     if is_encrypted == False:
         return True 
-    else:
-        list_of_keys = str_to_list(encryption_keys, [])
-        for element in list_of_keys:
-            if user.username in element:
-                return True 
+    list_of_keys = str_to_list(encryption_keys, [])
+    for element in list_of_keys:
+        if user.username in element:
+            return True 
     return False 
 
 

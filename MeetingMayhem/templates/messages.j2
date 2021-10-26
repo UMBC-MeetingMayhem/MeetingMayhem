@@ -41,7 +41,11 @@
 				{% if msg[1] %}
 				<p class="article-content">{{ msg[0].content }}</p>
 				{% else %}
-				<p class="article-content">--UNABLE TO DECRYPT--</p>
+					{% if not msg[0].is_encrypted%}
+					<p class="article-content">{{ msg[0].content }}</p>
+					{% else %}
+					<p class="article-content">--UNABLE TO DECRYPT--</p>
+					{% endif %}
 				{% endif %}
 			</div>
 			{% if msg[0].is_encrypted %}
