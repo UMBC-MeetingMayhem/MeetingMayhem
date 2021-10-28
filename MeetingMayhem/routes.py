@@ -22,7 +22,7 @@ flask_login - different utilities used for loggin the user in, seeing which user
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
-from MeetingMayhem import app, db, bcrypt
+from MeetingMayhem import app, db, bcrypt, socketio
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
@@ -321,6 +321,8 @@ def messages():
 
     form = MessageForm() #use the standard message form
     msgs = None
+    msgs_tuple = []
+	
     if (current_game.current_round>1):
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
@@ -331,12 +333,14 @@ def messages():
                 msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted)))
 
     #setup message flag to tell template if it should display messages or not
+	
     msg_flag = True
     if not msgs_tuple: #if the list of messages is empty, set the flag to false
         msg_flag = False
 
     #grab the messages from previous rounds
     prev_msgs = None
+    prev_msgs_tuple = []
     if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
         prev_messages = Message.query.filter_by(is_deleted=False, game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
         msg_round = current_game.current_round-1 #create an "iterator" so messages are displayed in order of round
@@ -491,12 +495,15 @@ def spectate_game():
             return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
 
 
-"""
+
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
-@app.route('/testing') #this decorator tells the website what to put after the http://<IP>
+#@app.route('/testing') #this decorator tells the website what to put after the http://<IP>
 #@app.route('/testing', methods=['GET', 'POST']) #this is needed if the user is doing to submit forms and things
 #@login_required #enforce that the user is logged in
-def testing():
-    return render_template('testing.html', title='Testing') #this tells the app what html template to use. Title isn't needed
-"""
+#def testing():
+#    return render_template('testing.html', title='Testing') #this tells the app what html template to use. #Title isn't needed
+
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))
