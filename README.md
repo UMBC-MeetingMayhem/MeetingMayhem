@@ -1,1 +1,1 @@
-# Meeting-Mayhem
+# MeetingMayhem
