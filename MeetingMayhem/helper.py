@@ -167,12 +167,12 @@ def create_message(user, game, request, form, username):
 
         # Code for determining whether entered keys are valid or not
         for element in encryption_output.split(','):
-            if element.split('(')[0] == 'Sign':
+            if element.split('(')[0] == 'sign':
                 if element.split('(')[1] == f"{username}.priv)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0] == 'Encrypt':
+            if element.split('(')[0] == 'encrypt':
                 if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
@@ -204,6 +204,18 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
     Returns:
         bool: whether or not the user can decrypt message
     """
+    #flash(list_of_keys)
+    
+    # determines if adversary can read a message
+    if user.role == 3:
+        if is_encrypted == False:
+            return True 
+        list_of_keys = str_to_list(encryption_keys, [])
+        if "invalid encrypted key" in list_of_keys:
+            return True 
+        return False
+    
+    # determines if a user can read a message
     if sender == user.username:
         return True 
     if is_encrypted == False:

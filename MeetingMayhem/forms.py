@@ -61,11 +61,11 @@ class MessageForm(FlaskForm):
     #round, sender should get automatically pulled in the route and send to db item when it is created in the route
 
     def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
-        keys = (encryption_and_signed_keys.data).split(',')
+        keys = (encryption_and_signed_keys.data).lower().split(',')
         if encryption_and_signed_keys.data == '':
             return
         for element in keys:
-            if (not(bool(re.match("Sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("Encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
+            if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
                 raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
 
 

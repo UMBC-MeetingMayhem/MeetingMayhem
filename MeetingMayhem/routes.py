@@ -137,6 +137,10 @@ def messages():
         else: #if there are no messages, set display message to none
             display_message = None
 
+        if display_message != None:
+            can_decrypt_curr_message = can_decrypt(current_user, display_message.encryption_details, display_message.is_encrypted, display_message.sender)
+        else:
+            can_decrypt_curr_message = 1
         #set the adv_current_msg_list_size so that the edit message box "scrolling" works correctly
         current_game.adv_current_msg_list_size = len(messages)
 
@@ -148,6 +152,7 @@ def messages():
 
         #grab the messages from previous rounds, this is done here because the previous messages shouldn't change
         prev_msgs = None
+        prev_msgs_tuple = []
         if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
             prev_messages = Message.query.filter_by(game=current_game.id).all() #grab all the previous messages for this game
             msg_round = current_game.current_round #create an "iterator" so messages are displayed in order of round
@@ -155,12 +160,14 @@ def messages():
             while msg_round>=2: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
                 for message in prev_messages:
                     if message.round == msg_round: #if the target message matches the round we are parsing this loop
-                        prev_msgs.append(message) #append it to the list
+                        if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
+                            prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted))) # append it to the tuple 
+                 #append it to the list
                 msg_round -= 1 #decrement iterator
 
         #make a flag that the template uses to determine if it should display previous messages or not
         prev_msg_flag = True
-        if not prev_msgs: #if the list of previous messages is empty, set the flag to false
+        if not prev_msgs_tuple: #if the list of previous messages is empty, set the flag to false
             prev_msg_flag = False
 
         #adversary message creation
@@ -177,8 +184,8 @@ def messages():
 
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
         
         #adversary message editing
@@ -191,6 +198,13 @@ def messages():
                 else: #decrement the current message normally and update the value
                     current_game.adv_current_msg -= 1
                     db.session.commit()
+                
+                display_message = messages[current_game.adv_current_msg]
+                
+                if display_message != None:
+                    can_decrypt_curr_message = can_decrypt(current_user, display_message.encryption_details, display_message.is_encrypted, display_message.sender)
+                else:
+                    can_decrypt_curr_message = 1
 
             elif is_next_submit: #if the next button is clicked
                 #if the adversary tries to go forwards on the last message
@@ -202,8 +216,14 @@ def messages():
                     current_game.adv_current_msg += 1
                     db.session.commit()
 
-            #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
+                display_message = messages[current_game.adv_current_msg]
+                
+                if display_message != None:
+                    can_decrypt_curr_message = can_decrypt(current_user, display_message.encryption_details, display_message.is_encrypted, display_message.sender)
+                else:
+                    can_decrypt_curr_message = 1
 
+            #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
             elif is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
 
                 #capture the list of players from the checkboxes and make it into a string delimited by commas
@@ -214,8 +234,8 @@ def messages():
                 if not checkbox_output_list_new_recipients or not checkbox_output_list_new_senders:
                     flash(f'Please select at least one sender and one recipient.', 'danger')
                     return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                    adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                    current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+                    adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                    current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
                 checkbox_output_str_new_recipients = ''.join(map(str, checkbox_output_list_new_recipients))
                 checkbox_output_str_new_senders = ''.join(map(str, checkbox_output_list_new_senders))
@@ -223,6 +243,8 @@ def messages():
                 new_senders = checkbox_output_str_new_senders[:len(checkbox_output_str_new_senders)-2]
 
                 #setup the changes to be made to the current message
+                display_message.is_signed = False
+                display_message.is_encrypted = False 
                 display_message.is_edited = True
                 display_message.new_sender = new_senders
                 display_message.new_recipient = new_recipients
@@ -261,8 +283,8 @@ def messages():
 
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
         
         #adversary advance round
         elif adv_next_round_form.advance_round.data: #if the adversary clicks the advance round button
@@ -271,8 +293,8 @@ def messages():
             if not current_round_messages:
                 flash(f'The round cannot be advanced when no messages have been sent.', 'danger')
                 return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+                adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
             #increment the current_round and reset the current message and current message list size, then commit changes
             current_game.current_round += 1
@@ -293,13 +315,13 @@ def messages():
 
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
-            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
         else:
             # display normally
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, game=current_game,
+            adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
             current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
     #for regular users
@@ -523,7 +545,6 @@ def game_info():
         else:
             # Send list of games to template
             return render_template('game_info.html', title='Game Info', sg_form=select_game_form)
-
 
 """
 #sample route for testing pages

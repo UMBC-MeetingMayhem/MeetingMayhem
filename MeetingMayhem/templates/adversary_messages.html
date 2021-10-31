@@ -55,20 +55,6 @@
                         {{ msg_form.content(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> <br>
-                <div class="form-group">
-                    {{ msg_form.encryption_and_signed_keys.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    
-                    {% if msg_form.encryption_and_signed_keys.errors %} <!-- if there are errors in the form... -->
-                        {{ msg_form.encryption_and_signed_keys(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in msg_form.encryption_and_signed_keys.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ msg_form.encryption_and_signed_keys(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div> <br/>
             </fieldset>
             <div class="form-group" style="margin:10px 0px;">
                 {{ msg_form.submit(class="btn btn-outline-info") }}
@@ -122,37 +108,31 @@
 			</div>
 		</article>
 		{% else %} <!-- if the message hasn't been edited, display normally -->
-			{% if message.is_encrypted %}
 			<article class="media content-section">
-				<p class="article-content h2">--UNABLE TO DECRYPT--</p>
-			</article>
-			{% else %}	
-				<article class="media content-section">
-				<div class="media-body">
-					<div class="article-metadata">
-					<a>Sender: {{ message.sender }} | </a>
-					<a>Recipient: {{ message.recipient }}</a>
-					</div>
-					{% if message.is_encrypted %}
-					<p class="article-content">--UNABLE TO DECRYPT--</p>
-					{% else %}
-					<p class="article-content">{{ message.content }}</p>
-					{% endif %}
+			<div class="media-body">
+				<div class="article-metadata">
+				<a>Sender: {{ message.sender }} | </a>
+				<a>Recipient: {{ message.recipient }}</a>
 				</div>
-					{% if message.is_encrypted %}
-					<div class="m-1 row ">
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.sender }}</div>
-					</div>
-					{% endif %}
-					{% if message.is_signed %}
-					<div class="m-1 row">
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.signed_details }}</div>
-					</div>
-					{% endif %}
-				</article>
-			{% endif %}	
+				{% if not can_decrypt %}
+				<p class="article-content">--CANNOT DECRYPT--</p>
+				{% else %}
+				<p class="article-content">{{ message.content }}</p>
+				{% endif %}
+			</div>
+				{% if message.is_encrypted %}
+				<div class="m-1 row ">
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.sender }}</div>
+				</div>
+				{% endif %}
+				{% if message.is_signed %}
+				<div class="m-1 row">
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.signed_details }}</div>
+				</div>
+				{% endif %}
+			</article>
 		{% endif %}	
     <div class="content-section">
         <form method="POST" action="">
@@ -194,7 +174,11 @@
                         {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
                         {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.edited_content) }}
                         {% else %} <!-- if the message hasn't been edited, display normally -->
-                        {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.content) }}
+                            {% if can_decrypt %}
+                            {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.content) }}
+                            {% else %}
+                            {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value='--CANNOT DECRYPT --') }}
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                 </div>
@@ -226,72 +210,67 @@
     <legend class="border-bottom mb4">Messages for previous rounds:</legend>
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-        {% if prev_msg.is_edited %} <!-- if the message has been edited, display the edited parts-->
+        {% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                {% if prev_msg.new_sender %}
-                <a>New Sender: {{ prev_msg.new_sender }} | </a>
+                {% if prev_msg[0].new_sender %}
+                <a>New Sender: {{ prev_msg[0].new_sender }} | </a>
                 {% else %}
-                <a>Sender: {{ prev_msg.sender }} | </a>
+                <a>Sender: {{ prev_msg[0].sender }} | </a>
                 {% endif %}
-                {% if prev_msg.new_recipient %}
+                {% if prev_msg[0].new_recipient %}
                 <a>New Recipient: {{ prev_msg.new_recipient }}</a>
                 {% else %}
-                <a>Recipient: {{ prev_msg.recipient }}</a>
+                <a>Recipient: {{ prev_msg[0].recipient }}</a>
                 {% endif %}
-                {% if prev_msg.adv_created %}
+                {% if prev_msg[0].adv_created %}
                 <a> | This message was created by the adversary.</a>
                 {% endif %}
-                {% if prev_msg.is_deleted %}
+                {% if prev_msg[0].is_deleted %}
                 <a> | This message has been deleted.</a>
                 {% else %}
                 <a> | This message has been edited.</a>
                 {% endif %}
                 </div>
-                {% if prev_msg.edited_content %}
-                <p class="article-content">{{ prev_msg.edited_content }}</p>
+                {% if prev_msg[0].edited_content %}
+                <p class="article-content">{{ prev_msg[0].edited_content }}</p>
                 {% else %}
-                <p class="article-content">{{ prev_msg.content }}</p>
+                <p class="article-content">{{ prev_msg[0].content }}</p>
                 {% endif %}
             </div>
         </article>
-        {% elif prev_msg.adv_created %} <!-- if the adversary created the message -->
+        {% elif prev_msg[0].adv_created %} <!-- if the adversary created the message -->
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                <a>Sender: {{ prev_msg.sender }} | </a>
-                <a>Recipient: {{ prev_msg.recipient }}</a>
+                <a>Sender: {{ prev_msg[0].sender }} | </a>
+                <a>Recipient: {{ prev_msg[0].recipient }}</a>
                 <a> | This message was created by the adversary.</a>
                 </div>
-                <p class="article-content">{{ prev_msg.content }}</p>
+                <p class="article-content">{{ prev_msg[0].content }}</p>
             </div>
         </article>
         {% else %} <!-- if the message hasn't been edited, display normally -->
-			{% if prev_msg.is_encrypted %}
-			<article class="media content-section">
-				<p class="article-content h2">--UNABLE TO DECRYPT--</p>
-			</article>
-			{% else %}		
 			<article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                <a>Sender: {{ prev_msg.sender }} | </a>
-                <a>Recipient: {{ prev_msg.recipient }}</a>
+                <a>Sender: {{ prev_msg[0].sender }} | </a>
+                <a>Recipient: {{ prev_msg[0].recipient }}</a>
                 </div>
-				{% if prev_msg.is_encrypted %}
-				<p class="article-content">--UNABLE TO DECRYPT--</p>
+				{% if not prev_msg[1] %}
+				<p class="article-content">--CANNOT DECRYPT--</p>
 				{% else %}
-				<p class="article-content">{{ prev_msg.content }}</p>
+				<p class="article-content">{{ prev_msg[0].content }}</p>
 				{% endif %}
             </div>
-			{% if prev_msg.is_encrypted %}
+			{% if prev_msg[0].is_encrypted %}
 			<div class="m-1 row ">
 				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
 				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg.sender }}</div>
 			</div>
 			{% endif %}
-			{% if prev_msg.is_signed %}
+			{% if prev_msg[0].is_signed %}
 			<div class="m-1 row">
 				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
 				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg.signed_details }}</div>
@@ -299,7 +278,6 @@
 			{% endif %}
         </article>
 			{% endif %}
-		{% endif %}
     {% endfor %}
     {% endif %}
 {% endblock content %}
