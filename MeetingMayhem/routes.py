@@ -23,7 +23,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt
-from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, GameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 
@@ -490,7 +490,7 @@ def spectate_game():
         return render_template('home.html', title='Home')
     else:
         # Form for the selected game from running games list
-        select_game_form = SpectateGameSelectForm()
+        select_game_form = GameSelectForm()
         game_selected = select_game_form.select_game.data
 
         # If the game is selected and the form is validated, move to spectator_game page
@@ -501,6 +501,28 @@ def spectate_game():
         else:
             # Send list of games to template
             return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
+
+# Route for gm game info
+@app.route('/game_info', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
+@login_required  # user must be logged in
+def game_info():
+    # If the user is not a game master, flash a warning and send back to home
+    if current_user.role != 2:
+        flash(f'Your permissions are insufficient to access this page.', 'danger')
+        return render_template('home.html', title='Home')
+    else:
+        # Form for the selected game from running games list
+        select_game_form = GameSelectForm()
+        game_selected = select_game_form.select_game.data
+
+        # If the game is selected and the form is validated, move to showing info
+        if game_selected and select_game_form.validate():
+            game = select_game_form.running_games.data
+            msg_count = len(Message.query.filter_by(game=game.id).all())
+            return render_template('game_info.html', title='Info For '+game.name, game=game, msg_count=msg_count, sg_form=select_game_form)
+        else:
+            # Send list of games to template
+            return render_template('game_info.html', title='Game Info', sg_form=select_game_form)
 
 
 """

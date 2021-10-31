@@ -1,0 +1,58 @@
+<!--
+    File: game_info.html
+    Authors: Kathleen Koerner
+    Date: 10/26/2021
+    Last Modified: 10/26/2021
+    E-mail: im80933@umbc.edu
+    Description: html and jinja file for handling the gm game info
+-->
+
+{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
+{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+	{% if not game %}
+	<!-- Game Selection form, game_info.html -->
+		<h1>Game Selection</h1>
+		<div class="content-section">
+			<form method="POST" action="">
+				{{ sg_form.hidden_tag() }}
+				<fieldset class="form-group">
+					<legend class="border-bottom mb4">Choose a Game</legend>
+					<div class="form-group">
+						{{ sg_form.running_games.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+
+						{% if sg_form.running_games.errors %} <!-- if there are errors in the form... -->
+							{{ sg_form.running_games(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+								{% for errors in sg_form.running_games.errors %}
+									<span>{{ errors }}</span> <!-- display the errors -->
+								{% endfor %}
+							</div>
+						{% else %} <!-- if there aren't errors, just display normally -->
+							{{ sg_form.running_games(class="form-control form-control-lg") }}
+						{% endif %}
+					</div> <br/>
+				</fieldset>
+				<div class="form-group">
+					{{ sg_form.select_game(class="btn btn-outline-info") }}
+				</div>
+			</form>
+		</div>
+	{% else %}
+	<!-- Game Info, game_info.html -->
+		<h1>Info For {{game.name}}</h1>
+		<div class="content-section">
+			<a class="nav-item nav-link" href="{{ url_for('game_info') }}">Return to Game Selection</a>
+		</div>
+		<div class="content-section">
+			<h2>Players</h1>
+			<p>{{game.players}}</p>
+			<h2>Adversary</h1>
+			<p>{{game.adversary}}</p>
+            <h2>Round</h1>
+			<p>{{game.current_round}}</p>
+            <h2>Total Messages Sent</h1>
+			<p>{{msg_count}}</p>
+		</div>
+
+    {%  endif %}
+{% endblock content %}

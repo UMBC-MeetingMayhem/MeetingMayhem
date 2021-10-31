@@ -178,6 +178,7 @@
                         <p class="nav-item nav-link">|</p>
                         {% if current_user.role == 2 %}
                         <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                        <a class="nav-item nav-link" href="{{ url_for('game_info') }}">Game Info</a>
                         {% endif %}
                         {% if current_user.role == 5 %}
                         <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>

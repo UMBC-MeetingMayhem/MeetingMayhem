@@ -128,7 +128,12 @@ class GMManageUserForm(FlaskForm):
     role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator')], validators=[DataRequired()])
     update = SubmitField('Update User')
 
-# Form for a user to spectate a game
-class SpectateGameSelectForm(FlaskForm):
+# Form for a user to select a game
+class GameSelectForm(FlaskForm):
     running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
     select_game = SubmitField('Select Game')
+
+# Form for game master to get game info
+#class GMSelectForm(FlaskForm):
+    #running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
+    #select_game = SubmitField('Select Game')
