@@ -281,6 +281,12 @@ def messages():
             is_submit_edits = False
             is_delete_msg = False
 
+            display_message = messages[current_game.adv_current_msg]
+                
+            if display_message != None:
+                can_decrypt_curr_message = can_decrypt(current_user, display_message.encryption_details, display_message.is_encrypted, display_message.sender)
+            else:
+                can_decrypt_curr_message = 1
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
