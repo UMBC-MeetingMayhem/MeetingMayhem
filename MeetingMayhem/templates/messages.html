@@ -14,7 +14,16 @@
 
     <h1>Messages</h1>
 	
-	<div id="load_messages"></div>
+	<div id="load_messages">
+		{% if msg_flag %} <!-- this checks if the passed message var has content in it -->
+		<legend class="border-bottom mb4">Recent messages for round {{ game.current_round}}:</legend>
+		
+		{{ messages.print_msgs(msgs) }}
+
+		{% else %}
+		<legend class="border-bottom mb4">No messages for round {{ game.current_round}}.</legend>
+		{% endif %}
+	</div>
 	
     <legend class="border-bottom mb4">Send a Message</legend>
     <div class="content-section">
@@ -128,6 +137,9 @@
         var socket = io();
 		socket.on('update', function() {
             console.log("hello");
+			$('#load_messages').load(document.URL + ' #load_messages');
+			$('#Received').load(document.URL + ' #Received');
+			$('#Sent').load(document.URL + ' #Sent');
         });
 	});
 	</script>

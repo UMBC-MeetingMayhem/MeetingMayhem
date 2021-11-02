@@ -19,12 +19,12 @@ forms - import the forms we created in the forms.py file so we can send them to 
 models - imports the models created in models.py so that we can create new db items, query the db, and update db items
 flask_login - different utilities used for loggin the user in, seeing which user is logged in, logging the user out, and requireing login for a page
 """
-from flask_socketio import send, emit
+from flask_socketio import send, emit, join_room, leave_room
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt, socketio
-from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, SpectateGameSelectForm
+from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryMessageButtonForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, GameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 
@@ -320,7 +320,9 @@ def messages():
 
             else: #if there are no messages, set display message to none
                 display_message = None
-
+				
+            socketio.emit('update',broadcast=True)
+			
             #render the webpage
             return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
             adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
@@ -352,10 +354,6 @@ def messages():
     form = MessageForm() #use the standard message form
     msgs = None
     msgs_tuple = []
-<<<<<<< HEAD
-	
-=======
->>>>>>> fb5e84f7246c40f54b8ef76aa798f1f3f132a3d5
     if (current_game.current_round>1):
         #pull messages from current_round where the message isn't deleted
         display_message = Message.query.filter_by(round=current_game.current_round, is_deleted=False, game=current_game.id).all()
@@ -404,7 +402,7 @@ def messages():
         #ensure keys entered are keys of actual recipients chosen
     
         create_message(current_user, current_game, request.form, form, current_user.username)
-    socketio.emit('update',broadcast=True)
+        socketio.emit('update',broadcast=True)
     #give the template the vars it needs
     return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
@@ -464,7 +462,8 @@ def game_setup():
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
-
+        socketio.emit('ingame',broadcast=True)
+		
     #game management
     if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
         game = Game.query.filter_by(name=mng_form.game.data.name).first()
@@ -569,8 +568,7 @@ def game_info():
 #    return render_template('testing.html', title='Testing') #this tells the app what html template to use. #Title isn't needed
 
 def update():
-	emit('update');
-
+	socketio.emit('update',broadcast=True)
 
 #@socketio.on('my event')
 #def handle_my_custom_event(json):
