@@ -132,9 +132,7 @@
 			color: #ffffff;
 			background-color: rgba(86,103,131,1);
 			transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
-		}
-		
-		
+		}		
 		.pillbox :first-child{
 			border-left: 50px 20px;
 			rounded-start;
@@ -181,6 +179,7 @@
                         <p class="nav-item nav-link">|</p>
                         {% if current_user.role == 2 %}
                         <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                        <a class="nav-item nav-link" href="{{ url_for('game_info') }}">Game Info</a>
                         {% endif %}
                         {% if current_user.role == 5 %}
                         <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>

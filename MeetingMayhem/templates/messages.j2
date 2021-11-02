@@ -1,12 +1,7 @@
 {% macro print_msgs(msgs) -%}	
 	{% for msg in msgs%} <!-- if message has content, display it and some information about it like sender and round -->
 		<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-		
-		{% if not msg[1] %}
-		<article class="media content-section">
-			<p class="article-content h2">--UNABLE TO DECRYPT--</p>
-		</article>
-		{% else %}		
+				
 		{% if msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
 		<article class="media content-section">
 			<div class="media-body">
@@ -23,7 +18,7 @@
 				{% endif %}
 				<a>Round: {{ msg[0].round }}</a>
 				</div>
-				{% if msg.edited_content %}
+				{% if msg[0].edited_content %}
 				<p class="article-content">{{ msg[0].edited_content }}</p>
 				{% else %}
 				<p class="article-content">{{ msg[0].content }}</p>
@@ -41,7 +36,11 @@
 				{% if msg[1] %}
 				<p class="article-content">{{ msg[0].content }}</p>
 				{% else %}
-				<p class="article-content">--UNABLE TO DECRYPT--</p>
+					{% if msg[1] %}
+					<p class="article-content">{{ msg[0].content }}</p>
+					{% else %}
+					<p class="article-content">--CANNOT DECRYPT--</p>
+					{% endif %}
 				{% endif %}
 			</div>
 			{% if msg[0].is_encrypted %}
@@ -57,7 +56,6 @@
 			</div>
 			{% endif %}
 		</article>
-		{% endif %}
 		{% endif %}
 	{% endfor %}
 {%- endmacro -%}
