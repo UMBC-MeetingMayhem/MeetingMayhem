@@ -14,15 +14,8 @@
 
     <h1>Messages</h1>
 	
-    {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-    <legend class="border-bottom mb4">Recent messages for round {{ game.current_round}}:</legend>
-    
-	{{ messages.print_msgs(msgs) }}
-
-    {% else %}
-    <legend class="border-bottom mb4">No messages for round {{ game.current_round}}.</legend>
-    {% endif %}
-
+	<div id="load_messages"></div>
+	
     <legend class="border-bottom mb4">Send a Message</legend>
     <div class="content-section">
         <form method="POST" action="">
@@ -126,5 +119,16 @@
 
 	// Get the element with id="defaultOpen" and click on it
 	document.getElementById("defaultOpen").click();
+	</script>
+	<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('update', function() {
+            console.log("hello");
+        });
+	});
 	</script>
 {% endblock content %}

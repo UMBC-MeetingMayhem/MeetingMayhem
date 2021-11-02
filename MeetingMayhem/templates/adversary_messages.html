@@ -76,6 +76,7 @@
         </form>
     </div>
 
+	<div id="current_round">
     {% if message %} <!-- if there is a message passed, display it and the edit message stuff -->
     <h2>Round {{ game.current_round }} Message {{ current_msg }}/{{ msg_list_size }}</h2>
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
@@ -212,7 +213,8 @@
     <h2>Round {{ game.current_round }} </h2>
     <h3>No messages for the current round.</h3>
     {% endif %}
-    
+    </div>
+	
     <!-- advance round button -->
     <div class="content-section">
         <form method="POST" action="">
@@ -302,4 +304,16 @@
 		{% endif %}
     {% endfor %}
     {% endif %}
+	
+	<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('update', function() {
+            $('#current_round').load(document.URL + ' #current_round');
+        });
+	});
+	</script>
 {% endblock content %}

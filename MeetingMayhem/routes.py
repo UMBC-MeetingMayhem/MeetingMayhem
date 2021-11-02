@@ -19,6 +19,7 @@ forms - import the forms we created in the forms.py file so we can send them to 
 models - imports the models created in models.py so that we can create new db items, query the db, and update db items
 flask_login - different utilities used for loggin the user in, seeing which user is logged in, logging the user out, and requireing login for a page
 """
+from flask_socketio import send, emit
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
@@ -150,6 +151,7 @@ def messages():
         prev_msgs = None
         if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
             prev_messages = Message.query.filter_by(game=current_game.id).all() #grab all the previous messages for this game
+            
             msg_round = current_game.current_round #create an "iterator" so messages are displayed in order of round
             prev_msgs = []
             while msg_round>=2: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
@@ -373,7 +375,7 @@ def messages():
         #ensure keys entered are keys of actual recipients chosen
     
         create_message(current_user, current_game, request.form, form, current_user.username)
-
+    socketio.emit('update',broadcast=True)
     #give the template the vars it needs
     return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames)
 
@@ -504,6 +506,11 @@ def spectate_game():
 #def testing():
 #    return render_template('testing.html', title='Testing') #this tells the app what html template to use. #Title isn't needed
 
-@socketio.on('my event')
-def handle_my_custom_event(json):
-    print('received json: ' + str(json))
+def update():
+	emit('update');
+
+
+#@socketio.on('my event')
+#def handle_my_custom_event(json):
+	#print('received json: ' + str(json))
+	#emit('update',broadcast=True);
