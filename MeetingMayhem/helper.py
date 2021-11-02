@@ -147,6 +147,7 @@ def create_message(user, game, request, form, username):
         encrypted_keys = [] # list to keep track of encryption keys
 
         dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
+
         
         # Code to remove wierd commas from get request 
         for i in range(len(checkbox_output_list)):
@@ -167,17 +168,16 @@ def create_message(user, game, request, form, username):
 
         # Code for determining whether entered keys are valid or not
         for element in encryption_output.split(','):
-            if element.split('(')[0] == 'sign':
+            if element.split('(')[0].lower() == 'sign':
                 if element.split('(')[1] == f"{username}.priv)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0] == 'encrypt':
+            if element.split('(')[0].lower() == 'encrypt':
                 if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                      encrypted_keys.append('invalid encrypted key')
-
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
