@@ -181,7 +181,7 @@ def messages():
 	sent_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
 	if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
 		sent_messages = Message.query.filter_by(game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
-		msg_round = current_game.current_round-1 #create an "iterator" so messages are displayed in order of round
+		msg_round = current_game.current_round #create an "iterator" so messages are displayed in order of round
 		sent_msgs = []
 		while msg_round>=2:
 			for message in sent_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
