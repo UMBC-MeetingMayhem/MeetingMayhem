@@ -98,11 +98,23 @@
 			<article class="media content-section">
 				<div class="media-body">
 					<div class="article-metadata">
-					<a>Sender: {{ sent_msg.sender }} | </a>
-					<a>Recipient: {{ sent_msg.recipient }}</a>
+					<a>Sender: {{ sent_msg[0].sender }} | </a>
+					<a>Recipient: {{ sent_msg[0].recipient }}</a>
 					</div>
-					<p class="article-content">{{ sent_msg.content }}</p>
+					<p class="article-content">{{ sent_msg[0].content }}</p>
 				</div>
+				{% if sent_msg[0].is_encrypted %}
+				<div class="m-1 row ">
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg[0].sender }}</div>
+				</div>
+				{% endif %}
+				{% if sent_msg[0].is_signed %}
+				<div class="m-1 row">
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg[0].signed_details }}</div>
+				</div>
+				{% endif %}
 			</article>
 		{% endfor %}
 		{% else %}

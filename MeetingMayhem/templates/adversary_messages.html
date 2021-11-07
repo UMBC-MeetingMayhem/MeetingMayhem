@@ -63,7 +63,7 @@
     </div>
 
 	<div id="Incoming_Messages">
-	<h2>Incoming Messages </h2>
+	<h2>Incoming Messages (round {{ game.current_round}})</h2>
 	{% if msgs %}
 	{% for msg in msgs%}
 		<article id="disp-msg-{{msg.id}}" class="option media content-section" onclick="select_msg(this, {{msg.id}})">
@@ -203,7 +203,7 @@
         </form>
     </div>
 
-    {% if prev_msg_flag %}
+    {% if prev_msgs %}
     <legend class="border-bottom mb4">Messages for previous rounds:</legend>
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
@@ -278,7 +278,6 @@
     {% endfor %}
 	{% else %}
 	<legend class="border-bottom mb4">No previous messages</legend>
-	
     {% endif %}
 	
 	<script type="text/javascript" charset="utf-8">
