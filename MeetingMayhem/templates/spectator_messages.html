@@ -69,17 +69,18 @@
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
+			<article class="media content-section">
+			<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
 			{% if message.adv_created %}
 				{% if not message.is_deleted %}
 				<!-- Adversary Created -->
 				<!-- Messages created then deleted by adversary are not shown -->
 				<!-- Messages created then edited by adversary only show edited message-->
-				<article class="media content-section">
-				<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+				
 					<div class="media-body" style="width:50% ; text-align: center;" >
 						<h5> Adversary Created</h5>
 					</div>
-						<div class="media-body" style="width:50%;">
+					<div class="media-body" style="width:50%;">
 						<div class="article-metadata">
 							{% if message.new_sender %}
 							<a>Sender: {{ message.new_sender }} | </a>
@@ -99,15 +100,13 @@
 						<p class="article-content"> {{message.content}} </p>
 						{% endif %}
 					</div>
-				</div>
-				</article>
+		
 				{% endif %}		
 			{% else %}
 				{% if message.is_edited %}
 					{% if message.is_deleted %}
 					<!-- Orignal message and deleted status -->
-					<article class="media content-section">
-					<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+					
 						<div class="media-body" style="width:50%;">
 							<div class="article-metadata">
 							<a>Sender:  {{message.sender}} </a>
@@ -116,16 +115,13 @@
 							</div>
 							<p class="article-content"> {{message.content}} </p>
 						</div>
-
 						<div class="media-body" style="width:50% ; text-align: center;" >
 							<h5> Deleted </h5>
 						</div>
-					</div>
-					</article>
+
 					{% else %}	
 					<!-- Original and modified message side by side -->
-					<article class="media content-section">
-						<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
+					
 							<div class="media-body" style="width:50%;">
 								<div class="article-metadata">
 								<h5> Original: </h5>
@@ -152,13 +148,10 @@
 								</div>
 								<p class="article-content"> {{message.edited_content}} </p>
 							</div>
-						</div>
-					</article>
+
 					{% endif %}
 				{% else %}
 				<!-- Just original message-->
-				<article class="media content-section">
-					<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
 						<div class="media-body" style="width:50%;">
 							<div class="article-metadata">
 							<a>Sender:  {{message.sender}} </a>
@@ -170,10 +163,23 @@
 						<div class="media-body" style="width:50% ; text-align: center;" >
 							<h5> Unmodified </h5>
 						</div>
-					</div>
-				</article>
 				{% endif %}
+				
 			{% endif %}
+			</div>
+			{% if message.is_encrypted %}
+			<div class="m-1 row ">
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.encryption_details }}</div>
+			</div>
+			{% endif %}
+			{% if message.is_signed %}
+			<div class="m-1 row">
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.signed_details }}</div>
+			</div>
+			{% endif %}
+			</article>
 		{% endfor %}	
 		{% endif %}
 		</div> 
