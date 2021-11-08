@@ -14,13 +14,10 @@ from MeetingMayhem.models import Message
 #recursivley parse the given string for usernames, return true if the given username is found
 def check_for_str(str, check):
     """Recursivley parse a string for usernames to find the username passed.
-
     This is used to detect when a user is a recipient of a message.
-
     Args:
         str (str): the string that contains usernames
         check (str): the username we are looking for
-
     Returns:
         bool: True if the username we are looking for is found.
     
@@ -41,9 +38,7 @@ def check_for_str(str, check):
 #used to strip commas and white spaces out of lists of strings
 def strip_list_str(str_list):
     """Parse a list of strings, and remove and commas or white spaces after the text we want.
-
     This is used by the game_seutp page to clean up lists of usernames and game names.
-
     Args:
         str_list (list): the list that we want to clean up
     
@@ -61,17 +56,14 @@ def strip_list_str(str_list):
 
 def str_to_list(st, li):
     """Recursivley parse a string delimited by ", " and put the separate strings into a list
-
     This is used in game validation when detecting players that are already in a game, and by
     the game_setup page for pulling usernames out of the players field of a game.
-
     Args:
         st (str): a string delimited by ", " which we want to make into a list.
         li (list): an empty list where we will put the list of strings.
     
     Returns:
         list: the same list that was passed as an argument, now filled with strings.
-
     Throws:
         TypeError: when incorrect argument type or empty string is passed to function.
     """
@@ -88,16 +80,13 @@ def str_to_list(st, li):
 
 def create_message(user, game, request, form, username):
     """Create a message. Used by both the adversary and the users.
-
     Intention is to use this function with a switch statement so that different actions can
     be taking depending on which code is returned.
-
     Args:
         user(User): the current_user object of the user creating a message.
         game(Game): the current_game object from the instance that is calling this function.
         request(request.form): the request form that contains checkbox stuff.
         form(form/msg_form): the form from the website that contains msg content
-
     Returns:
         bool: whether or not the message sent successfully
     """
@@ -195,12 +184,10 @@ def create_message(user, game, request, form, username):
     
 def can_decrypt(user, encryption_keys, is_encrypted, sender):
     """Decides who can or cannot read an encrypted message.
-
     Args:
         user(User): the current_user object of the user creating a message.
         encryption_keys(Message): the encryption keys associated with a message
         is_encrypted(Message): a boolean value that determines if message is encrypted or not.
-
     Returns:
         bool: whether or not the user can decrypt message
     """
@@ -225,6 +212,3 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
         if user.username in element:
             return True 
     return False 
-
-
-    

@@ -11,8 +11,17 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 
-
-
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('ingame', function() {
+            window.location.href = "{{ url_for('messages') }}";
+        });
+	});
+</script>
 
 
 

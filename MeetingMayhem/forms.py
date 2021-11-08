@@ -17,7 +17,7 @@ getUserFactory - used to pull the usernames for the recipient selection
 """
 import re
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -27,113 +27,115 @@ from MeetingMayhem.helper import str_to_list
 #this part handles the registraion form for new users
 #i feel like these fields and variables are pretty self-explanatory, the first string passed is the title of the field
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
-    
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
-        if user: #if there is, throw an error
-            raise ValidationError('That username is already in use. Please choose a different one.')
-        if re.compile("[A-Za-z0-9]+").fullmatch(username.data) is None: #check if the username only has letters and numbers, if not, throw an error
-            raise ValidationError('Please only use letters and numbers for your username.')
-    
-    def validate_email(self, email):
-        email = User.query.filter_by(email=email.data).first() #check if there is already a user with the passed email in the db
-        if email: #if there is, throw an error
-            raise ValidationError('That email is already in use. Please choose a different one.')
+	username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
+	email = StringField('Email', validators=[DataRequired(), Email()])
+	password = PasswordField('Password', validators=[DataRequired()])
+	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+	submit = SubmitField('Sign Up')
+	
+	def validate_username(self, username):
+		user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
+		if user: #if there is, throw an error
+			raise ValidationError('That username is already in use. Please choose a different one.')
+		if re.compile("[A-Za-z0-9]+").fullmatch(username.data) is None: #check if the username only has letters and numbers, if not, throw an error
+			raise ValidationError('Please only use letters and numbers for your username.')
+	
+	def validate_email(self, email):
+		email = User.query.filter_by(email=email.data).first() #check if there is already a user with the passed email in the db
+		if email: #if there is, throw an error
+			raise ValidationError('That email is already in use. Please choose a different one.')
 
 #this part handles the login form for existing users to log into the website
 #i feel like these fields and variables are pretty self-explanatory, the first string passed is the title of the field
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+	username = StringField('Username', validators=[DataRequired()])
+	password = PasswordField('Password', validators=[DataRequired()])
+	remember = BooleanField('Remember Me')
+	submit = SubmitField('Login')
 
 #Message form for users and adversary to construct messages with
 class MessageForm(FlaskForm):
-    content = StringField('Message', validators=[DataRequired()])
-    submit = SubmitField('Send Message')
-    encryption_and_signed_keys = StringField('Key(s)')
-    #round, sender should get automatically pulled in the route and send to db item when it is created in the route
+	content = StringField('Message', validators=[DataRequired()])
+	submit = SubmitField('Send Message')
+	encryption_and_signed_keys = StringField('Key(s)')
+	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
 
-    def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
-        keys = (encryption_and_signed_keys.data).lower().split(',')
-        if encryption_and_signed_keys.data == '':
-            return
-        for element in keys:
-            if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
-                raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
-
+	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
+		keys = (encryption_and_signed_keys.data).lower().split(',')
+		if encryption_and_signed_keys.data == '':
+			return
+		for element in keys:
+			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
+				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
-    edited_content = StringField('Edited Message')
-    submit_edits = SubmitField('Submit Edits')
-
+	edited_content = StringField('Edited Message')
+	msg_num = IntegerField()
+	submit_edits = SubmitField('Submit Edits')
+	send_msg = SubmitField('Send Message')
+	delete_msg = SubmitField('Delete Message')
+	
 #Form for the adversary to choose their message to edit or delete message
 class AdversaryMessageButtonForm(FlaskForm):
-    prev_submit = SubmitField('Previous Message')
-    next_submit = SubmitField('Next Message')
-    delete_msg = SubmitField('Delete Message')
+	prev_submit = SubmitField('Previous Message')
+	next_submit = SubmitField('Next Message')
+	delete_msg = SubmitField('Delete Message')
 
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):
-    advance_round = SubmitField('Advance Round')
+	advance_round = SubmitField('Advance Round')
 
 #Form for the game master to setup a game
 class GMSetupGameForm(FlaskForm):
-    name = StringField('Game Name', validators=[DataRequired()])
-    adversary = QuerySelectField(u'Adversary', query_factory=getAdversaryFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-    create_game = SubmitField('Create Game')
+	name = StringField('Game Name', validators=[DataRequired()])
+	adversary = QuerySelectField(u'Adversary', query_factory=getAdversaryFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+	create_game = SubmitField('Create Game')
 
-    def validate_name(self, name):
-        game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
-        if game: #if there is, throw an error
-            raise ValidationError('That name is already in use. Please choose a different one.')
-    
-    def validate_adversary(self, adversary): #check if the adversary is already in a game
-        game = Game.query.filter_by(adversary=adversary.data.username, is_running=True).first()
-        if game:
-            raise ValidationError('That adversary is already in a game. Please choose a different adversary.')
+	def validate_name(self, name):
+		game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
+		if game: #if there is, throw an error
+			raise ValidationError('That name is already in use. Please choose a different one.')
+	
+	def validate_adversary(self, adversary): #check if the adversary is already in a game
+		game = Game.query.filter_by(adversary=adversary.data.username, is_running=True).first()
+		if game:
+			raise ValidationError('That adversary is already in a game. Please choose a different adversary.')
 
-    #check if any of the selected players are already in a game
-    #this gets called by the routes.py for validation
-    def validate_players_checkbox(players):
-        user_list_self = [] #generate a list of players from above string
-        user_list_self = str_to_list(players, user_list_self)
-        if len(user_list_self) > 4:
-            raise ValidationError('Each game session can only have a maximum of 4 players.')
-        else:
-            games = Game.query.filter_by(is_running=True).all() #for all of the running games
-            for game in games:
-                user_list_game = [] #make a list of players in the running games
-                user_list_game = str_to_list(game.players, user_list_game)
-                for user_self in user_list_self:
-                    for user_game in user_list_game:
-                        if user_self == user_game: #compare each user in the new game to each user in the running games
-                            raise ValidationError('One of the selected users is already in a game.') #if there is a match, raise error
+	#check if any of the selected players are already in a game
+	#this gets called by the routes.py for validation
+	def validate_players_checkbox(players):
+		user_list_self = [] #generate a list of players from above string
+		user_list_self = str_to_list(players, user_list_self)
+		if len(user_list_self) > 4:
+			raise ValidationError('Each game session can only have a maximum of 4 players.')
+		else:
+			games = Game.query.filter_by(is_running=True).all() #for all of the running games
+			for game in games:
+				user_list_game = [] #make a list of players in the running games
+				user_list_game = str_to_list(game.players, user_list_game)
+				for user_self in user_list_self:
+					for user_game in user_list_game:
+						if user_self == user_game: #compare each user in the new game to each user in the running games
+							raise ValidationError('One of the selected users is already in a game.') #if there is a match, raise error
 
 #Form for the game master to end a game
 class GMManageGameForm(FlaskForm):
-    game = QuerySelectField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-    end_game = SubmitField('End Game')
+	game = QuerySelectField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
+	end_game = SubmitField('End Game')
 
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
-    user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-    role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator')], validators=[DataRequired()])
-    update = SubmitField('Update User')
+	user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
+	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator')], validators=[DataRequired()])
+	update = SubmitField('Update User')
 
 # Form for a user to select a game
 class GameSelectForm(FlaskForm):
-    running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-    select_game = SubmitField('Select Game')
+	running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
+	select_game = SubmitField('Select Game')
 
 # Form for game master to get game info
 #class GMSelectForm(FlaskForm):
-    #running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-    #select_game = SubmitField('Select Game')
+	#running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
+	#select_game = SubmitField('Select Game')

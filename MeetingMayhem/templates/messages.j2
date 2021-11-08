@@ -12,11 +12,10 @@
 				<a>Sender: {{ msg[0].sender }} | </a>
 				{% endif %}
 				{% if msg[0].new_recipient %}
-				<a>Recipient: {{ msg[0].new_recipient }} | </a>
+				<a>Recipient: {{ msg[0].new_recipient }} </a>
 				{% else %}
-				<a>Recipient: {{ msg[0].recipient }} | </a>
+				<a>Recipient: {{ msg[0].recipient }} </a>
 				{% endif %}
-				<a>Round: {{ msg[0].round }}</a>
 				</div>
 				{% if msg[0].edited_content %}
 				<p class="article-content">{{ msg[0].edited_content }}</p>
