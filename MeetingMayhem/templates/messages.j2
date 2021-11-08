@@ -1,7 +1,6 @@
 {% macro print_msgs(msgs) -%}	
 	{% for msg in msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-		<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-				
+		<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->	
 		{% if msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
 		<article class="media content-section">
 			<div class="media-body">
@@ -23,6 +22,18 @@
 				{% else %}
 				<p class="article-content">{{ msg[0].content }}</p>
 				{% endif %}
+				{% if msg[0].is_encrypted %}
+				<div class="m-1 row ">
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].sender }}</div>
+				</div>
+				{% endif %}
+				{% if msg[0].is_signed %}
+				<div class="m-1 row">
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}</div>
+				</div>
+			{% endif %}
 			</div>
 		</article>
 		{% else %} <!-- if the message hasn't been edited, display normally -->
