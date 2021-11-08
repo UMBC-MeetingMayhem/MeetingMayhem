@@ -20,7 +20,7 @@
             {{ msg_form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
-                <legend class="border-bottom mb4">Send a Message</legend>
+                <legend class="border-bottom mb4">Create a Message</legend>
                 <div class="form-group">
                 <label class="form-control-label" for="name">Senders</label> <br/>
                 {% for username in usernames %}
@@ -71,89 +71,96 @@
                 </div> <br>
             </fieldset>
             <div class="form-group" style="margin:10px 0px;">
-                {{ msg_form.submit(class="btn btn-outline-info") }}
+                {{ msg_form.submit(value="Create Message", class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
 
-    {% if message %} <!-- if there is a message passed, display it and the edit message stuff -->
-    <h2>Round {{ game.current_round }} Message {{ current_msg }}/{{ msg_list_size }}</h2>
-        <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-    	
-		{% if message.is_edited %} <!-- if the message has been edited, display the edited parts-->
-		<article class="media content-section">
+	<div id="Incoming_Messages">
+	<h2>Incoming Messages (round {{ game.current_round}})</h2>
+	{% if msgs %}
+	{% for msg in msgs%}
+		<article id="disp-msg-{{msg.id}}" class="option media content-section" onclick="select_msg(this, {{msg.id}})">
 			<div class="media-body">
 				<div class="article-metadata">
-				{% if message.new_sender %}
-				<a>New Sender: {{ message.new_sender }} | </a>
+				{% if msg.is_edited %}
+					{% if msg.new_sender %}
+					<a>New Sender: {{ msg.new_sender }} | </a>
+					{% else %}
+					<a>Sender: {{ msg.sender }} | </a>
+					{% endif %}
+					{% if msg.new_recipient %}
+					<a>New Recipient: {{ msg.new_recipient }}</a>
+					{% else %}
+					<a>Recipient: {{ msg.recipient }}</a>
+					{% endif %}
+					{% if msg.adv_created %}
+					<a> | This msg was created by the adversary.</a>
+					{% endif %}
+					{% if msg.is_deleted %}
+					<a> | This msg has been deleted.</a>
+					{% else %}
+					<a> | This msg has been edited.</a>
+					{% endif %}
 				{% else %}
-				<a>Sender: {{ message.sender }} | </a>
-				{% endif %}
-				{% if message.new_recipient %}
-				<a>New Recipient: {{ message.new_recipient }}</a>
-				{% else %}
-				<a>Recipient: {{ message.recipient }}</a>
-				{% endif %}
-				{% if message.adv_created %}
-				<a> | This message was created by the adversary.</a>
-				{% endif %}
-				{% if message.is_deleted %}
-				<a> | This message has been deleted.</a>
-				{% else %}
-				<a> | This message has been edited.</a>
-				{% endif %}
+					<a>Sender: {{ msg.sender }} | </a>
+					<a>Recipient: {{ msg.recipient }}</a>
+					{% if msg.adv_created %}
+					<a> | This message was created by the adversary.</a>
+					{% endif %}
+				{% endif %}	
 				</div>
-				{% if message.edited_content %}
-				<p class="article-content">{{ message.edited_content }}</p>
-				{% else %}
-				<p class="article-content">{{ message.content }}</p>
-				{% endif %}
-			</div>
-		</article>
-		{% elif message.adv_created %} <!-- if the adversary created the message -->
-		<article class="media content-section">
-			<div class="media-body">
-				<div class="article-metadata">
-				<a>Sender: {{ message.sender }} | </a>
-				<a>Recipient: {{ message.recipient }}</a>
-				<a> | This message was created by the adversary.</a>
-				</div>
-				<p class="article-content">{{ message.content }}</p>
-			</div>
-		</article>
-		{% else %} <!-- if the message hasn't been edited, display normally -->
-			<article class="media content-section">
-			<div class="media-body">
-				<div class="article-metadata">
-				<a>Sender: {{ message.sender }} | </a>
-				<a>Recipient: {{ message.recipient }}</a>
-				</div>
+				
 				{% if not can_decrypt %}
-				<p class="article-content">--CANNOT DECRYPT--</p>
+				<p id="msg-content-{{msg.id}}" class="article-content">--CANNOT DECRYPT--</p>
 				{% else %}
-				<p class="article-content">{{ message.content }}</p>
+					{% if msg.is_edited %}
+					<p id="msg-content-{{msg.id}}" class="article-content">{{ msg.edited_content }}</p>
+					{% else %}
+					<p id="msg-content-{{msg.id}}" class="article-content">{{ msg.content }}</p>
+					{% endif %}
 				{% endif %}
 			</div>
-				{% if message.is_encrypted %}
+				{% if msg.is_encrypted %}
 				<div class="m-1 row ">
 					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.sender }}</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg.sender }}</div>
 				</div>
 				{% endif %}
-				{% if message.is_signed %}
+				{% if msg.is_signed %}
 				<div class="m-1 row">
 					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.signed_details }}</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg.signed_details }}</div>
 				</div>
 				{% endif %}
 			</article>
-		{% endif %}	
+	{% endfor %}
+	{% else %}
+	<legend class="border-bottom mb4">No messages</legend><br/>
+	{% endif %}
+	<script>
+	function select_msg(ele, num) {
+		document.getElementById('current_round').scrollIntoView();
+		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
+		
+		id = "msg-content-" + num;
+		console.log(id)
+		text = document.getElementById(id).innerHTML;
+		console.log(text)
+		document.getElementById('adv_msg_edit_form').value = text; 
+		document.getElementById('msg_num').value = num; 
+	}
+	
+	</script>
+	</div>
+	
+	<div id="edit-form">
+	{% if msgs %}
+	<h2>Edit a Message</h2>
     <div class="content-section">
         <form method="POST" action="">
             {{ adv_msg_edit_form.hidden_tag() }}
             <fieldset class="form-group">
-                <!-- these form groups are basically the same thing, just for each field needed for the messages -->
-                <legend class="border-bottom mb4">Edit a Message</legend>
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Senders</label> <br/>
                 {% for username in usernames %}
@@ -213,18 +220,16 @@
             </fieldset>
             <div class="form-group" style="margin:10px 0px;">
                 <!-- previous, next, delete, and submit buttons for message editing -->
-                {{ adv_buttons_form.prev_submit(class="btn btn-outline-info") }}
-                {{ adv_buttons_form.next_submit(class="btn btn-outline-info") }}
-                {{ adv_buttons_form.delete_msg(class="btn btn-outline-info") }}
+                {{ adv_msg_edit_form.delete_msg(class="btn btn-outline-info") }}
                 {{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
+				{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
+				{{ adv_msg_edit_form.send_msg(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
-    {% else %} <!-- if no messages are passed, just display this -->
-    <h2>Round {{ game.current_round }} </h2>
-    <h3>No messages for the current round.</h3>
     {% endif %}
-    
+	</div> 
+	
     <!-- advance round button -->
     <div class="content-section">
         <form method="POST" action="">
@@ -234,7 +239,7 @@
         </form>
     </div>
 
-    {% if prev_msg_flag %}
+    {% if prev_msgs %}
     <legend class="border-bottom mb4">Messages for previous rounds:</legend>
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
@@ -307,5 +312,24 @@
         </article>
 			{% endif %}
     {% endfor %}
+	{% else %}
+	<legend class="border-bottom mb4">No previous messages</legend>
     {% endif %}
+	
+	<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('update', function() {
+			text = document.getElementById("edit-form").innerHTML;
+			
+			if (text = ''){
+				$('#edit-form').load(document.URL + ' #edit-form');
+			}
+            $('#Incoming_Messages').load(document.URL + ' #Incoming_Messages');
+        });
+	});
+	</script>
 {% endblock content %}
