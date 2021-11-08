@@ -327,7 +327,7 @@ def adv_messages_page():
 			display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
 
 			#TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
-			elif is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
+			if is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
 
 				#capture the list of players from the checkboxes and make it into a string delimited by commas
 				checkbox_output_list_new_recipients = request.form.getlist('new_recipients')
@@ -374,7 +374,7 @@ def adv_messages_page():
 							signed_keys.append('invalid sign key')
 					if element.split('(')[0].lower() == 'encrypt':
 						if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
-						encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+							encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
 						else:
 							encrypted_keys.append('invalid encrypted key')
 
@@ -455,7 +455,7 @@ def adv_messages_page():
 			# display normally
 			return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
 			adv_buttons_form=adv_buttons_form, adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-			current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs, prev_msg_flag=prev_msg_flag, usernames=usernames, msgs=messages)
+			current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=prev_msg_flag, usernames=usernames, msgs=messages)
 		
 # game setup route for the game master
 @app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
