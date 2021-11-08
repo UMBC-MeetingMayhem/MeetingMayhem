@@ -65,6 +65,7 @@
 			</div>
 		</article>
 
+		<div id="msg-list">
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
@@ -175,5 +176,17 @@
 			{% endif %}
 		{% endfor %}	
 		{% endif %}
+		</div> 
 	{% endif %}
+	<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('update', function() {
+			$('#msg-list').load(document.URL + ' #msg-list');
+        });
+	});
+	</script>
 {% endblock content %}

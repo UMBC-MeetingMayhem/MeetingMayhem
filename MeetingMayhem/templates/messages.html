@@ -151,7 +151,6 @@
         //     http[s]://<domain>:<port>[/<namespace>]
         var socket = io();
 		socket.on('update', function() {
-            console.log("hello");
 			$('#load_messages').load(document.URL + ' #load_messages');
 			$('#Received-div').load(document.URL + ' #Received');
 			$('#Sent-div').load(document.URL + ' #Sent');
