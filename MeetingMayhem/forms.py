@@ -75,6 +75,7 @@ class AdversaryMessageEditForm(FlaskForm):
 	submit_edits = SubmitField('Submit Edits')
 	send_msg = SubmitField('Send Message')
 	delete_msg = SubmitField('Delete Message')
+	encryption_and_signed_keys = StringField('Key(s)')
 	
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
@@ -83,12 +84,6 @@ class AdversaryMessageEditForm(FlaskForm):
 		for element in keys:
 			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
 				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
-
-#Form for the adversary to choose their message to edit or delete message
-class AdversaryMessageButtonForm(FlaskForm):
-	prev_submit = SubmitField('Previous Message')
-	next_submit = SubmitField('Next Message')
-	delete_msg = SubmitField('Delete Message')
 
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):
