@@ -108,8 +108,8 @@
 				</div>
 				{% if sent_msg[0].is_encrypted %}
 				<div class="m-1 row ">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg[0].sender }}</div>
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg[0].encryption_details }}</div>
 				</div>
 				{% endif %}
 				{% if sent_msg[0].is_signed %}

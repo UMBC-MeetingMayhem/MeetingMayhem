@@ -123,8 +123,8 @@
 			</div>
 				{% if msg.is_encrypted %}
 				<div class="m-1 row ">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg.sender }}</div>
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg.encryption_details }}</div>
 				</div>
 				{% endif %}
 				{% if msg.is_signed %}
@@ -140,7 +140,7 @@
 	{% endif %}
 	<script>
 	function select_msg(ele, num) {
-		document.getElementById('current_round').scrollIntoView();
+		document.getElementById('edit-form').scrollIntoView();
 		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
 		
 		id = "msg-content-" + num;
@@ -157,7 +157,7 @@
 	<div id="edit-form">
 	{% if msgs %}
 	<h2>Edit a Message</h2>
-    <div class="content-section">
+    <div is="" class="content-section">
         <form method="POST" action="">
             {{ adv_msg_edit_form.hidden_tag() }}
             <fieldset class="form-group">
@@ -185,7 +185,7 @@
                     {{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     
                     {% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
-                        {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg is-invalid") }}
+                        {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for errors in adv_msg_edit_form.edited_content.errors %}
                                 <span>{{ errors }}</span> <!-- display the errors -->
@@ -193,12 +193,12 @@
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
-                        {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.edited_content) }}
+                        {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
                         {% else %} <!-- if the message hasn't been edited, display normally -->
                             {% if can_decrypt or message.adv_created %}
-                            {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.content) }}
+                            {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
                             {% else %}
-                            {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value='--CANNOT DECRYPT --') }}
+                            {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='--CANNOT DECRYPT --') }}
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -299,8 +299,8 @@
             </div>
 			{% if prev_msg[0].is_encrypted %}
 			<div class="m-1 row ">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted by:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg.sender }}</div>
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg.encryption_details }}</div>
 			</div>
 			{% endif %}
 			{% if prev_msg[0].is_signed %}
