@@ -97,6 +97,7 @@ def create_message(user, game, request, form, username):
         #get the list of the recipients and senders
         checkbox_output_list_recipients = request.getlist('recipients')
         checkbox_output_list_senders = request.getlist('senders')
+        checkbox_output_list_keys = request.get('encryption_and_signed_keys')
         #if one of those lists are empty, display an error, return false
         if not checkbox_output_list_recipients or not checkbox_output_list_senders:
             flash(f'Please select at least one sender and one recipient.', 'danger')
@@ -107,12 +108,49 @@ def create_message(user, game, request, form, username):
         #remove the last ', ' off of the strings
         recipients = checkbox_output_str_recipients[:len(checkbox_output_str_recipients)-2]
         senders = checkbox_output_str_senders[:len(checkbox_output_str_senders)-2]
+
         #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=senders, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
             flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
             return False
+
+        signed_keys = [] # list to keep track of digital signatures
+        encrypted_keys = [] # list to keep track of encryption keys
+
+        dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
+        dict_of_senders = {} # Dictionary to allow for quick look up times when seeing if sender among encryption/sign keys
+        
+        # Code to remove wierd commas from get request 
+        for i in range(len(checkbox_output_list_recipients)):
+            checkbox_output_list_recipients[i] = checkbox_output_list_recipients[i].split(',')[0]
+        
+        for i in range(len(checkbox_output_list_senders)):
+            checkbox_output_list_senders[i] = checkbox_output_list_senders[i].split(',')[0]
+
+        for element in checkbox_output_list_recipients: #populates dict with recipients chosen
+            dict_of_recipients[element] = 0
+
+        for element in checkbox_output_list_senders: #populates dict with recipients chosen
+            dict_of_senders[element] = 0
+
+        # Code for determining whether entered keys are valid or not
+        for element in checkbox_output_list_keys.split(','):
+            if element.split('(')[0].lower() == 'sign':
+                if element.split('(')[1] == f"{username}.priv)":
+                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    signed_keys.append('invalid sign key')
+            if element.split('(')[0].lower() == 'encrypt':
+                if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                     encrypted_keys.append('invalid encrypted key')
+
+        signed_keys_string = ", ".join(map(str, signed_keys))
+        encrypted_keys_string = ", ".join(map(str, encrypted_keys))
+            
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, is_encrypted=False, is_signed=False)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string)
         db.session.add(new_message)
         db.session.commit()
         #display success to user
@@ -210,5 +248,10 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
     list_of_keys = str_to_list(encryption_keys, [])
     for element in list_of_keys:
         if user.username in element:
-            return True 
+            return True
+    if "invalid encrypted key" in list_of_keys:
+            return True  
     return False 
+
+
+    

@@ -55,6 +55,20 @@
                         {{ msg_form.content(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> <br>
+                <div class="form-group">
+                    {{ msg_form.encryption_and_signed_keys.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if msg_form.encryption_and_signed_keys.errors %} <!-- if there are errors in the form... -->
+                        {{ msg_form.encryption_and_signed_keys(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in msg_form.encryption_and_signed_keys.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ msg_form.encryption_and_signed_keys(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div> <br>
             </fieldset>
             <div class="form-group" style="margin:10px 0px;">
                 {{ msg_form.submit(value="Create Message", class="btn btn-outline-info") }}
@@ -178,7 +192,29 @@
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg")}}
+                        {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
+                        {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.edited_content) }}
+                        {% else %} <!-- if the message hasn't been edited, display normally -->
+                            {% if can_decrypt or message.adv_created %}
+                            {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value=message.content) }}
+                            {% else %}
+                            {{ adv_msg_edit_form.edited_content(class="form-control form-control-lg",value='--CANNOT DECRYPT --') }}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ adv_msg_edit_form.encryption_and_signed_keys.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if adv_msg_edit_form.encryption_and_signed_keys.errors %} <!-- if there are errors in the form... -->
+                        {{ adv_msg_edit_form.encryption_and_signed_keys(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in adv_msg_edit_form.encryption_and_signed_keys.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ adv_msg_edit_form.encryption_and_signed_keys(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
             </fieldset>
