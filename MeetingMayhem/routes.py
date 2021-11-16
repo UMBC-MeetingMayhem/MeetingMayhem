@@ -601,7 +601,8 @@ def game_info():
 		if game_selected and select_game_form.validate():
 			game = select_game_form.running_games.data
 			msg_count = len(Message.query.filter_by(game=game.id).all())
-			return render_template('game_info.html', title='Info For '+game.name, game=game, msg_count=msg_count, sg_form=select_game_form)
+			messages = Message.query.filter_by(game=game.id).all()
+			return render_template('game_info.html', title='Info For '+game.name, game=game, msg_count=msg_count, message=messages, sg_form=select_game_form)
 		else:
 			# Send list of games to template
 			return render_template('game_info.html', title='Game Info', sg_form=select_game_form)
