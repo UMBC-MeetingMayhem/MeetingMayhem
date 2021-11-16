@@ -154,7 +154,7 @@
 	</script>
 	</div>
 	
-	<div id="edit-form">
+	<div id="edit-form" class="inactive">
 	{% if msgs %}
 	<h2>Edit a Message</h2>
     <div is="" class="content-section">
@@ -227,7 +227,7 @@
             </div>
         </form>
     </div>
-    {% endif %}
+	{% endif %}
 	</div> 
 	
     <!-- advance round button -->
@@ -322,10 +322,14 @@
         // The connection URL has the following format, relative to the current page:
         //     http[s]://<domain>:<port>[/<namespace>]
         var socket = io();
+		
 		socket.on('update', function() {
 			text = document.getElementById("edit-form").innerHTML;
+			console.log(text);
+			console.log(text == '');
 			
-			if (text = ''){
+			if ( document.getElementById("edit-form").classList.contains('inactive') ){
+				document.getElementById("edit-form").classList.remove('inactive');
 				$('#edit-form').load(document.URL + ' #edit-form');
 			}
             $('#Incoming_Messages').load(document.URL + ' #Incoming_Messages');
