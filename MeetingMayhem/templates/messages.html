@@ -16,12 +16,12 @@
 	
 	<div id="load_messages">
 		{% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-		<legend class="border-bottom mb4">Recent messages for round {{ game.current_round}}:</legend>
+		<legend class="border-bottom mb4">Messages:</legend>
 		
 		{{ messages.print_msgs(msgs) }}
 
 		{% else %}
-		<legend class="border-bottom mb4">No messages for round {{ game.current_round}}.</legend>
+		<legend class="border-bottom mb4">No messages</legend>
 		{% endif %}
 	</div>
 	
