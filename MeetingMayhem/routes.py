@@ -136,67 +136,29 @@ def messages():
 		usernames.append(user.username)
 
 	form = MessageForm() #use the standard message form
-	msgs = None
+	#msgs = None
 	msgs_tuple = []
 	if (current_game.current_round>=1):
 		#pull messages from current_round where the message isn't deleted
 		display_message = Message.query.filter_by(adv_submitted=True, is_deleted=False, game=current_game.id).all()
-		msgs = [] #create a list to store the messages to dispay to pass to the template
+		#msgs = [] #create a list to store the messages to dispay to pass to the template
 		for message in display_message: #for each message
 			if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
 				msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
 
 	#setup message flag to tell template if it should display messages or not
-	
-	msg_flag = True
-	if not msgs_tuple: #if the list of messages is empty, set the flag to false
-		msg_flag = False
+	#msg_flag = True
+	#if not msgs_tuple: #if the list of messages is empty, set the flag to false
+	#	msg_flag = False
 
-	#grab the messages from previous rounds
-	"""""
-	prev_msgs = None
-	prev_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
-	if (current_game.current_round>2): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
-		prev_messages = Message.query.filter_by(is_deleted=False, game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
-		msg_round = current_game.current_round-1 #create an "iterator" so messages are displayed in order of round
-		prev_msgs = []
-		while msg_round>=2:
-			for message in prev_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
-				if message.round == msg_round: #if the target message matches the round we are parsing this loop
-					#adds message and whether it can be read by the user to the list of tuples (prev_msgs_tuple)
-					
-					if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-						prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
-			msg_round -= 1 #decrement iterator
-
-	#setup previous message flag to tell template if it should display previous messages or not
-	prev_msg_flag = True
-	if not prev_msgs_tuple: #if the list of previous messages is empty, set the flag to false
-		prev_msg_flag = False
-	"""""
-
-	#grab the messages from previous rounds
-	sent_msgs = None
-	sent_msgs_tuple = [] # list of tuples that have a message paired with a can_read bool dictating if the current_user can read the message or not
-	if (current_game.current_round>=1): #messages are created with current_round+1, so there shouldn't be a reason to display messages on rounds 1 or 2
-		sent_messages = Message.query.filter_by(game=current_game.id).all() #grab all the previous messages for this game that aren't deleted
-		msg_round = current_game.current_round #create an "iterator" so messages are displayed in order of round
-		sent_msgs = []
-		while msg_round>=1:
-			for message in sent_messages: #there won't be any messages from round 1 because messages are created with current_round+1, so stop at round 2
-				if message.round == msg_round: #if the target message matches the round we are parsing this loop
-					#adds message and whether it can be read by the user to the list of tuples (prev_msgs_tuple)
-					
-					if (not message.adv_created) and check_for_str(message.sender, current_user.username):
-						sent_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
-						
-			msg_round -= 1 #decrement iterator
-
-	#setup previous message flag to tell template if it should display previous messages or not
-	sent_msg_flag = True
-	if not sent_msgs_tuple: #if the list of previous messages is empty, set the flag to false
-		sent_msg_flag = False
-
+	msg_flag = False
+	if msgs_tuple:
+		msg_flag = True
+		msgs_tuple.reverse()
+		
+	#sent messages
+	sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
+	sent_msgs.reverse()
 	if form.validate_on_submit(): #when the user submits the message form and it is valid
 
 		#capture the list of players from the checkboxes and make it into a string delimited by commas
@@ -206,14 +168,15 @@ def messages():
 		#ensure the list isn't empty
 		if not checkbox_output_list:
 			flash(f'Please select at least one recipient.', 'danger')
-			return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=[], prev_msg_flag=0, sent_msgs=sent_msgs_tuple, sent_msg_flag=sent_msg_flag, usernames=usernames)
+			return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 		
 		#ensure keys entered are keys of actual recipients chosen
 	
 		create_message(current_user, current_game, request.form, form, current_user.username)
 		update()
+	
 	#give the template the vars it needs
-	return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, prev_msgs=[], prev_msg_flag=0, sent_msgs=sent_msgs_tuple, sent_msg_flag=sent_msg_flag, usernames=usernames)
+	return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 
 def adv_messages_page():
 		#setup the current_game so that we can pull information from it
