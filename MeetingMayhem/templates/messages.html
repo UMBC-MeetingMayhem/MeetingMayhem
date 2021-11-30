@@ -14,17 +14,6 @@
 
     <h1>Messages</h1>
 	
-	<div id="load_messages">
-		{% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-		<legend class="border-bottom mb4">Messages:</legend>
-		
-		{{ messages.print_msgs(msgs) }}
-
-		{% else %}
-		<legend class="border-bottom mb4">No messages</legend>
-		{% endif %}
-	</div>
-	
     <legend class="border-bottom mb4">Send a Message</legend>
     <div class="content-section">
         <form method="POST" action="">
@@ -75,75 +64,70 @@
         </form>
     </div>
     
-	<div class="tab" >
-		<button class="tablinks content-section" onclick="openTab(event, 'Received')" id="defaultOpen">Received Messages</button>
-		<button class="tablinks content-section" onclick="openTab(event, 'Sent')">Sent Messages</button>
-	</div>
+	<div class="row">
+		<div id="Received" class="col">
+			{% if msg_flag %} <!-- this checks if the passed message var has content in it -->
+			<legend class="border-bottom mb4">Recived messages:</legend>
+			
+			{{ messages.print_msgs(msgs) }}
 
-	<div id="Received-div">
-	<div id="Received" class="tabcontent">
-		{% if prev_msg_flag %}
-		<legend class="border-bottom mb4">Messages received:</legend>
-		{{ messages.print_msgs(prev_msgs) }}
-		{% else %}
-		<legend class="border-bottom mb4">No messages received</legend>
-		{% endif %}
-	</div>
+			{% else %}
+			<legend class="border-bottom mb4">No messages</legend>
+			{% endif %}
+		</div>
+		
+		<div id="Sent" class="col" >
+			{% if sent_msgs %}
+			<legend class="border-bottom mb4">Messages sent by you:</legend>
+			{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+				<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+				<!-- if the message hasn't been edited, display normally -->
+				<article class="media content-section">
+					<div class="media-body">
+						<div class="article-metadata">
+						<a>Sender: {{ sent_msg.sender }} | </a>
+						<a>Recipient: {{ sent_msg.recipient }}</a>
+						</div>
+						<p class="article-content">{{ sent_msg.content }}</p>
+					</div>
+					{% if sent_msg.is_encrypted %}
+					<div class="m-1 row ">
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.encryption_details }}</div>
+					</div>
+					{% endif %}
+					{% if sent_msg.is_signed %}
+					<div class="m-1 row">
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.signed_details }}</div>
+					</div>
+					{% endif %}
+				</article>
+			{% endfor %}
+			{% else %}
+			<legend class="border-bottom mb4">No messages sent</legend>
+			{% endif %} 
+		</div>
 	</div>
 	
-	<div id="Sent-div">
-	<div id="Sent" class="tabcontent">
-		{% if sent_msg_flag %}
-		<legend class="border-bottom mb4">Messages sent by you:</legend>
-		{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-			<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-			<!-- if the message hasn't been edited, display normally -->
-			<article class="media content-section">
-				<div class="media-body">
-					<div class="article-metadata">
-					<a>Sender: {{ sent_msg[0].sender }} | </a>
-					<a>Recipient: {{ sent_msg[0].recipient }}</a>
-					</div>
-					<p class="article-content">{{ sent_msg[0].content }}</p>
-				</div>
-				{% if sent_msg[0].is_encrypted %}
-				<div class="m-1 row ">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg[0].encryption_details }}</div>
-				</div>
-				{% endif %}
-				{% if sent_msg[0].is_signed %}
-				<div class="m-1 row">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg[0].signed_details }}</div>
-				</div>
-				{% endif %}
-			</article>
-		{% endfor %}
-		{% else %}
-		<legend class="border-bottom mb4">No messages sent</legend>
-		{% endif %} 
-	</div>
-	</div>
-	<!-- tab script -->
+	<a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
 	<script>
-	function openTab(evt, tabName) {
-		var i, tabcontent, tablinks;
-		tabcontent = document.getElementsByClassName("tabcontent");
-		for (i = 0; i < tabcontent.length; i++) {
-			tabcontent[i].style.display = "none";
+		$(document).ready(function() {
+		$(window).scroll(function() {
+		if ($(this).scrollTop() > 20) {
+		$('#toTopBtn').fadeIn();
+		} else {
+		$('#toTopBtn').fadeOut();
 		}
-		tablinks = document.getElementsByClassName("tablinks");
-		for (i = 0; i < tablinks.length; i++) {
-			tablinks[i].className = tablinks[i].className.replace(" active", "");
-		}
-		document.getElementById(tabName).style.display = "block";
-		evt.currentTarget.className += " active";
-	}
+		});
 
-	// Get the element with id="defaultOpen" and click on it
-	document.getElementById("defaultOpen").click();
+		$('#toTopBtn').click(function() {
+			document.body.scrollTop = 0; // For Safari
+			document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+		});
+		});
 	</script>
+
 	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
 		// Connect to the Socket.IO server.
@@ -151,9 +135,14 @@
         //     http[s]://<domain>:<port>[/<namespace>]
         var socket = io();
 		socket.on('update', function() {
-			$('#load_messages').load(document.URL + ' #load_messages');
-			$('#Received-div').load(document.URL + ' #Received');
-			$('#Sent-div').load(document.URL + ' #Sent');
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#Received');
+				 $('#Received').replaceWith(elem);
+			});
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#Sent');
+				 $('#Sent').replaceWith(elem);
+			});
         });
 	});
 	</script>
