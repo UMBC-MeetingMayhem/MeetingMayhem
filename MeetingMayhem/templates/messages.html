@@ -135,9 +135,14 @@
         //     http[s]://<domain>:<port>[/<namespace>]
         var socket = io();
 		socket.on('update', function() {
-			$('#Received').load(document.URL + ' #Received');
-			$('#Received').load(document.URL + ' #Received');
-			$('#Sent').load(document.URL + ' #Sent');
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#Received');
+				 $('#Received').replaceWith(elem);
+			});
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#Sent');
+				 $('#Sent').replaceWith(elem);
+			});
         });
 	});
 	</script>
