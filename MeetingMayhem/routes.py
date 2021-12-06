@@ -193,7 +193,7 @@ def adv_messages_page():
 		adv_next_round_form = AdversaryAdvanceRoundForm()
 
 		#setup variable to contain the messages that are in the current_round of this game
-		messages = Message.query.filter_by(adv_submitted=False, game=current_game.id).all()
+		messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 		msgs_tuple = []
 		for element in messages:
 			msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
@@ -245,7 +245,7 @@ def adv_messages_page():
 			create_message(current_user, current_game, request.form, msg_form, current_user.username)
 
 			#pull the messages again since the messages we want to display has changed
-			messages = Message.query.filter_by(adv_submitted=False,game=current_game.id).all()
+			messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 			msgs_tuple = []
 			for element in messages:
 				msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
@@ -342,7 +342,7 @@ def adv_messages_page():
 					display_message.encryption_details = encrypted_keys_string
 					
 				#pull the messages again since the messages we want to display has changed
-				messages = Message.query.filter_by(adv_submitted=False, game=current_game.id).all()
+				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
@@ -357,7 +357,7 @@ def adv_messages_page():
 				display_message.is_deleted = True
 				db.session.commit()
 				#pull the messages again since the messages we want to display has changed
-				messages = Message.query.filter_by(adv_submitted=False, game=current_game.id).all()
+				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
@@ -368,7 +368,7 @@ def adv_messages_page():
 
 			elif is_send_msg: #if the send message button is clicked
 				display_message.adv_submitted = True
-				messages = Message.query.filter_by(adv_submitted=False, game=current_game.id).all()
+				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
