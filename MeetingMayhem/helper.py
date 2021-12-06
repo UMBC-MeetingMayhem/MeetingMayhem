@@ -150,7 +150,7 @@ def create_message(user, game, request, form, username):
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
             
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string)
         db.session.add(new_message)
         db.session.commit()
         #display success to user

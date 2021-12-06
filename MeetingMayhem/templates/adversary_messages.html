@@ -240,7 +240,7 @@
     </div>-->
 
     {% if prev_msgs %}
-    <legend class="border-bottom mb4">Messages for previous rounds:</legend>
+    <legend class="border-bottom mb4">Sent Messages:</legend>
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
         {% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
