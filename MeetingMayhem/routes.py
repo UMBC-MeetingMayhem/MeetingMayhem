@@ -57,6 +57,9 @@ def register():
 		db.session.add(user) #stage the user for the db
 		db.session.commit() #commit new user to db
 		flash(f'Your account has been created! Please login.', 'success') #flash a success message to let the user know the account was made
+		
+		socketio.emit('new_player',broadcast=True)
+		
 		return redirect(url_for('login')) #redir the user to the login page
 	return render_template('register.html', title='Register', form=form)
 
@@ -562,7 +565,7 @@ def game_info():
 #	return render_template('testing.html', title='Testing') #this tells the app what html template to use. #Title isn't needed
 
 def update():
-	print("update")
+	#print("update")
 	socketio.emit('update',broadcast=True)
 
 #@socketio.on('my event')
