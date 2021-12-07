@@ -212,6 +212,8 @@ def adv_messages_page():
 		
 		for message in prev_messages:
 			prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted,message.sender))) # append it to the tuple 
+			
+			# the message.sender may cause a bug im not sure.
 		
 		prev_msgs_tuple.reverse()
 		
