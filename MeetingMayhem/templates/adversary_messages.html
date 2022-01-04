@@ -300,13 +300,13 @@
 			{% if prev_msg[0].is_encrypted %}
 			<div class="m-1 row ">
 				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg.encryption_details }}</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
 			</div>
 			{% endif %}
 			{% if prev_msg[0].is_signed %}
 			<div class="m-1 row">
 				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg.signed_details }}</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
 			</div>
 			{% endif %}
         </article>
