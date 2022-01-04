@@ -44,7 +44,7 @@
                         {{ setup_form.adversary(class="form-control form-control-lg") }}
                     {% endif %}                    
                 </div> <br/>
-                <div class="form-group">
+                <div id="players_game_form" class="form-group">
                 <label class="form-control-label" for="name">Players</label> <br/>
                 {% for username in usernames %}
                     <div class="form-check form-check-inline">
@@ -87,7 +87,7 @@
         </form>
     </div>
 
-    <div class="content-section">
+    <div id="manage_user_form" class="content-section">
         <form method="POST" action="">        
             {{ usr_form.hidden_tag() }}
             <fieldset class="form-group">
@@ -126,5 +126,23 @@
             </div>
         </form>
     </div>
-
+	<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		
+		socket.on('new_player', function() {
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#players_game_form');
+				 $('#players_game_form').replaceWith(elem);
+			});
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#manage_user_form');
+				 $('#manage_user_form').replaceWith(elem);
+			});
+        });
+	});
+	</script>
 {% endblock content %}

@@ -65,7 +65,7 @@
 			</div>
 		</article>
 
-		<div id="msg-list">
+		<div id="msg_list">
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
@@ -92,7 +92,6 @@
 							{% else %}
 							<a>Recipient: {{ message.recipient }}</a>
 							{% endif %}
-							<small class="text-muted">Round:  {{message.round}} </small>
 						</div>
 						{% if message.edited_content %}
 						<p class="article-content"> {{message.edited_content}} </p>
@@ -111,7 +110,6 @@
 							<div class="article-metadata">
 							<a>Sender:  {{message.sender}} </a>
 							<a>Recipient:  {{message.recipient}} </a>
-							<small class="text-muted">Round:  {{message.round}} </small>
 							</div>
 							<p class="article-content"> {{message.content}} </p>
 						</div>
@@ -127,7 +125,6 @@
 								<h5> Original: </h5>
 								<a>Sender:  {{message.sender}} </a>
 								<a>Recipient:  {{message.recipient}} </a>
-								<small class="text-muted">Round:  {{message.round}} </small>
 								</div>
 								<p class="article-content"> {{message.content}} </p>
 							</div>
@@ -156,7 +153,6 @@
 							<div class="article-metadata">
 							<a>Sender:  {{message.sender}} </a>
 							<a>Recipient:  {{message.recipient}} </a>
-							<small class="text-muted">Round:  {{message.round}} </small>
 							</div>
 							<p class="article-content"> {{message.content}} </p>
 						</div>
@@ -190,8 +186,12 @@
         // The connection URL has the following format, relative to the current page:
         //     http[s]://<domain>:<port>[/<namespace>]
         var socket = io();
+		
 		socket.on('update', function() {
-			$('#msg-list').load(document.URL + ' #msg-list');
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#msg_list');
+				 $('#msg_list').replaceWith(elem);
+			});
         });
 	});
 	</script>

@@ -43,13 +43,13 @@
 		<div class="content-section">
 			<a class="nav-item nav-link" href="{{ url_for('game_info') }}">Return to Game Selection</a>
 		</div>
+		
+		<div id="game_info">
 		<div class="content-section">
 			<h2>Players</h1>
 			<p>{{game.players}}</p>
 			<h2>Adversary</h1>
 			<p>{{game.adversary}}</p>
-            <h2>Round</h1>
-			<p>{{game.current_round}}</p>
             <h2>Total Messages Sent</h1>
 			<p>{{msg_count}}</p>
 		</div>
@@ -95,7 +95,6 @@
 							{% else %}
 							<a>Recipient: {{ message.recipient }}</a>
 							{% endif %}
-							<small class="text-muted">Round:  {{message.round}} </small>
 						</div>
 						{% if message.edited_content %}
 						<p class="article-content"> {{message.edited_content}} </p>
@@ -114,7 +113,6 @@
 							<div class="article-metadata">
 							<a>Sender:  {{message.sender}} </a>
 							<a>Recipient:  {{message.recipient}} </a>
-							<small class="text-muted">Round:  {{message.round}} </small>
 							</div>
 							<p class="article-content"> {{message.content}} </p>
 						</div>
@@ -130,7 +128,6 @@
 								<h5> Original: </h5>
 								<a>Sender:  {{message.sender}} </a>
 								<a>Recipient:  {{message.recipient}} </a>
-								<small class="text-muted">Round:  {{message.round}} </small>
 								</div>
 								<p class="article-content"> {{message.content}} </p>
 							</div>
@@ -147,7 +144,6 @@
 								{% else %}
 								<a>Recipient: {{ message.recipient }}</a>
 								{% endif %}
-								<small class="text-muted">Round:  {{message.round}} </small>
 								</div>
 								<p class="article-content"> {{message.edited_content}} </p>
 							</div>
@@ -159,7 +155,6 @@
 							<div class="article-metadata">
 							<a>Sender:  {{message.sender}} </a>
 							<a>Recipient:  {{message.recipient}} </a>
-							<small class="text-muted">Round:  {{message.round}} </small>
 							</div>
 							<p class="article-content"> {{message.content}} </p>
 						</div>
@@ -187,14 +182,19 @@
 		{% endif %}
 		</div> 
 	{% endif %}
+	<div>
 	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
 		// Connect to the Socket.IO server.
         // The connection URL has the following format, relative to the current page:
         //     http[s]://<domain>:<port>[/<namespace>]
         var socket = io();
+		
 		socket.on('update', function() {
-			$('#msg-list').load(document.URL + ' #msg-list');
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#msg_list');
+				 $('#msg_list').replaceWith(elem);
+			});
         });
 	});
 	</script>
