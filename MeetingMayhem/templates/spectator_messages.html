@@ -49,6 +49,9 @@
 			<p>{{game.players}}</p>
 			<h2>Adversary</h1>
 			<p>{{game.adversary}}</p>
+			<h2>Total Messages Sent</h1>
+			<p>{{msg_count}}</p>
+			
 		</div>
 
 		<!-- Add a legend article here or in the about page to explain game infomation to spectator -->
@@ -188,11 +191,13 @@
         var socket = io();
 		
 		socket.on('update', function() {
-			$.get(document.URL, function(data) {
+			url = document.URL + "?game_id=" + {{game.id}};
+			$.get(url, function(data) {
 				var elem = $(data).find('#msg_list');
 				 $('#msg_list').replaceWith(elem);
 			});
         });
 	});
+	
 	</script>
 {% endblock content %}

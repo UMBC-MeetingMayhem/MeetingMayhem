@@ -20,7 +20,7 @@ models - imports the models created in models.py so that we can create new db it
 flask_login - different utilities used for loggin the user in, seeing which user is logged in, logging the user out, and requireing login for a page
 """
 from flask_socketio import send, emit, join_room, leave_room
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt, socketio
@@ -514,47 +514,29 @@ def game_setup():
 @app.route('/spectate', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 @login_required  # user must be logged in
 def spectate_game():
+
+	game_id = request.args.get('game_id')
+	if game_id != None :
+		messages = Message.query.filter_by(game=game_id).all()
+		return render_template('spectator_messages.html', title='Spectating', game=True, message=messages, msg_count=0)
+
 	# If the user is not a spectator, flash a warning and send back to home
-	if current_user.role != 5:
+	if current_user.role != 5 and current_user.role != 2:
 		flash(f'Your permissions are insufficient to access this page.', 'danger')
 		return render_template('home.html', title='Home')
 	else:
 		# Form for the selected game from running games list
 		select_game_form = GameSelectForm()
 		game_selected = select_game_form.select_game.data
-
 		# If the game is selected and the form is validated, move to spectator_game page
-		if game_selected and select_game_form.validate():
-			game = select_game_form.running_games.data
-			messages = Message.query.filter_by(game=game.id).all()
-			return render_template('spectator_messages.html', title='Spectating '+game.name, game=game, message=messages, sg_form=select_game_form)
-		else:
-			# Send list of games to template
-			return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
-
-# Route for gm game info
-@app.route('/game_info', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
-@login_required  # user must be logged in
-def game_info():
-	# If the user is not a game master, flash a warning and send back to home
-	if current_user.role != 2:
-		flash(f'Your permissions are insufficient to access this page.', 'danger')
-		return render_template('home.html', title='Home')
-	else:
-		# Form for the selected game from running games list
-		select_game_form = GameSelectForm()
-		game_selected = select_game_form.select_game.data
-
-		# If the game is selected and the form is validated, move to showing info
 		if game_selected and select_game_form.validate():
 			game = select_game_form.running_games.data
 			msg_count = len(Message.query.filter_by(game=game.id).all())
 			messages = Message.query.filter_by(game=game.id).all()
-			return render_template('game_info.html', title='Info For '+game.name, game=game, msg_count=msg_count, message=messages, sg_form=select_game_form)
+			return render_template('spectator_messages.html', title='Spectating '+game.name, game=game, message=messages, sg_form=select_game_form, msg_count=msg_count)
 		else:
 			# Send list of games to template
-			return render_template('game_info.html', title='Game Info', sg_form=select_game_form)
-
+			return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
 
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
@@ -565,7 +547,7 @@ def game_info():
 #	return render_template('testing.html', title='Testing') #this tells the app what html template to use. #Title isn't needed
 
 def update():
-	#print("update")
+	print("update")
 	socketio.emit('update',broadcast=True)
 
 #@socketio.on('my event')
