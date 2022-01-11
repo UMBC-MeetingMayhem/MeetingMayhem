@@ -242,7 +242,6 @@ def adv_messages_page():
 		#create variables for the edit message box buttons so that we only check their state once
 		is_submit_edits = adv_msg_edit_form.submit_edits.data
 		is_delete_msg = adv_msg_edit_form.delete_msg.data
-		is_send_msg = adv_msg_edit_form.send_msg.data
 		
 		#adversary message creation
 		if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
@@ -268,7 +267,7 @@ def adv_messages_page():
 
 
 		#adversary message editing
-		elif (is_submit_edits or is_delete_msg or is_send_msg): #if any of the prev/next/submit buttons are clicked
+		elif (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
 			display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
 			
 			if display_message != None:
@@ -354,10 +353,16 @@ def adv_messages_page():
 				current_game.adv_current_msg = 0
 				current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
+				display_message.adv_submitted = True
+				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
+				msgs_tuple = []
+				for element in messages:
+					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
 				db.session.commit()
 
 			elif is_delete_msg: #if the delete message button is clicked
 				#flag the message as edited and deleted
+				display_message.adv_submitted = True 
 				display_message.is_edited = True
 				display_message.is_deleted = True
 				db.session.commit()
@@ -371,15 +376,6 @@ def adv_messages_page():
 				#commit the messages to the database
 				db.session.commit()
 
-			elif is_send_msg: #if the send message button is clicked
-				display_message.adv_submitted = True
-				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
-				msgs_tuple = []
-				for element in messages:
-					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				db.session.commit()
-
-			is_send_msg = False 
 			is_submit_edits = False
 			is_delete_msg = False
 
