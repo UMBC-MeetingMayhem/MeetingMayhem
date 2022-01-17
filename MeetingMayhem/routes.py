@@ -27,6 +27,9 @@ from MeetingMayhem import app, db, bcrypt, socketio
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, GameSelectForm
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
+from datetime import datetime 
+
+import pytz
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -147,7 +150,9 @@ def messages():
 		#msgs = [] #create a list to store the messages to dispay to pass to the template
 		for message in display_message: #for each message
 			if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
+				message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
 				msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
+				db.session.commit()
 
 	#setup message flag to tell template if it should display messages or not
 	#msg_flag = True
@@ -175,8 +180,8 @@ def messages():
 			return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 		
 		#ensure keys entered are keys of actual recipients chosen
-	
-		create_message(current_user, current_game, request.form, form, current_user.username)
+		curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+		create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
 		update()
 		
 	#sent messages
@@ -242,16 +247,19 @@ def adv_messages_page():
 		#create variables for the edit message box buttons so that we only check their state once
 		is_submit_edits = adv_msg_edit_form.submit_edits.data
 		is_delete_msg = adv_msg_edit_form.delete_msg.data
+		is_send_no_change = adv_msg_edit_form.send_no_change.data
 		
 		#adversary message creation
 		if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
 
-			create_message(current_user, current_game, request.form, msg_form, current_user.username)
+			curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+			create_message(current_user, current_game, request.form, msg_form, current_user.username, curr_time)
 
 			#pull the messages again since the messages we want to display has changed
 			messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 			msgs_tuple = []
 			for element in messages:
+				
 				msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
 		
 
@@ -267,7 +275,7 @@ def adv_messages_page():
 
 
 		#adversary message editing
-		elif (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
+		elif (is_submit_edits or is_delete_msg or is_send_no_change): #if any of the prev/next/submit buttons are clicked
 			display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
 			
 			if display_message != None:
@@ -376,8 +384,22 @@ def adv_messages_page():
 				#commit the messages to the database
 				db.session.commit()
 
+			elif is_send_no_change:
+				flash(display_message.content)
+				display_message.adv_submitted = True 
+				db.session.commit()
+				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
+				msgs_tuple = []
+				for element in messages:
+					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
+				current_game.adv_current_msg = 0
+				current_game.adv_current_msg_list_size = len(messages)
+				#commit the messages to the database
+				db.session.commit()
+
 			is_submit_edits = False
 			is_delete_msg = False
+			is_send_no_change = False 
 
 			prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True).all() #grab all the previous messages for this game
 		
