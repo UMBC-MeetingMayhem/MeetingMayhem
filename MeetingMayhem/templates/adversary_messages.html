@@ -94,6 +94,7 @@
 					{% else %}
 					<a>Recipient: {{ msg[0].recipient }}</a>
                     {% endif %}
+                    <a>Time Sent: {{ msg[0].time_sent }}</a>
 					{% if msg[0].adv_created %}
 					<a> | This msg was created by the adversary.</a>
 					{% endif %}
@@ -105,6 +106,7 @@
 				{% else %}
 					<a>Sender: {{ msg[0].sender }} | </a>
 					<a>Recipient: {{ msg[0].recipient }}</a>
+                    <a>Time Sent: {{ msg[0].time_sent }}</a>
 					{% if msg[0].adv_created %}
 					<a> | This message was created by the adversary.</a>
 					{% endif %}
@@ -222,6 +224,7 @@
                 <!-- previous, next, delete, and submit buttons for message editing -->
                 {{ adv_msg_edit_form.delete_msg(class="btn btn-outline-info") }}
                 {{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
+                {{ adv_msg_edit_form.send_no_change(class="btn btn-outline-info") }}
 				{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
             </div>
         </form>
@@ -259,6 +262,7 @@
                 {% if prev_msg[0].adv_created %}
                 <a> | This message was created by the adversary.</a>
                 {% endif %}
+                <a>Time Sent: {{ prev_msg[0].time_sent }} </a>
                 {% if prev_msg[0].is_deleted %}
                 <a> | This message has been deleted.</a>
                 {% else %}
@@ -278,6 +282,7 @@
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
                 <a>Recipient: {{ prev_msg[0].recipient }}</a>
+                <a>Time Sent: {{ prev_msg[0].time_sent }} </a>
                 <a> | This message was created by the adversary.</a>
                 </div>
                 <p class="article-content">{{ prev_msg[0].content }}</p>
@@ -289,6 +294,7 @@
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
                 <a>Recipient: {{ prev_msg[0].recipient }}</a>
+                <a>Time Sent: {{ prev_msg[0].time_sent }} </a>
                 </div>
 				{% if not prev_msg[1] %}
 				<p class="article-content">--CANNOT DECRYPT--</p>

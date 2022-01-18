@@ -73,6 +73,7 @@ class AdversaryMessageEditForm(FlaskForm):
 	edited_content = StringField('Edited Message')
 	msg_num = IntegerField()
 	submit_edits = SubmitField('Forward Message')
+	send_no_change = SubmitField('Forward Message (no changes)')
 	delete_msg = SubmitField('Delete Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	
