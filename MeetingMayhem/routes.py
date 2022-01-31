@@ -537,8 +537,11 @@ def spectate_game():
 
 	game_id = request.args.get('game_id')
 	if game_id != None :
+		game = Game.query.filter_by(id=game_id).first()
 		messages = Message.query.filter_by(game=game_id).all()
-		return render_template('spectator_messages.html', title='Spectating', game=True, message=messages, msg_count=0)
+		msg_count = len(Message.query.filter_by(game=game.id).all())
+		
+		return render_template('spectator_messages.html', title='Spectating', game=game, message=messages, msg_count=msg_count)
 
 	# If the user is not a spectator, flash a warning and send back to home
 	if current_user.role != 5 and current_user.role != 2:
@@ -557,7 +560,6 @@ def spectate_game():
 		else:
 			# Send list of games to template
 			return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
-
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
 #@app.route('/testing') #this decorator tells the website what to put after the http://<IP>

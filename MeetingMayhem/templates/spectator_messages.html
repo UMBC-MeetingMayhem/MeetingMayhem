@@ -41,9 +41,12 @@
 	{% else %}
 	<!-- Game Spectating, spectator_game.html -->
 		<h1>Spectating {{game.name}}</h1>
+		
 		<div class="content-section">
 			<a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Return to Game Selection</a>
 		</div>
+		
+		<div id="live_content">
 		<div class="content-section">
 			<h2>Players</h1>
 			<p>{{game.players}}</p>
@@ -68,7 +71,7 @@
 			</div>
 		</article>
 
-		<div id="msg_list">
+		<div>
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
@@ -182,6 +185,7 @@
 		{% endfor %}	
 		{% endif %}
 		</div> 
+		<div>
 	{% endif %}
 	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
@@ -191,11 +195,13 @@
         var socket = io();
 		
 		socket.on('update', function() {
+			{% if game %}
 			url = document.URL + "?game_id=" + {{game.id}};
 			$.get(url, function(data) {
-				var elem = $(data).find('#msg_list');
-				 $('#msg_list').replaceWith(elem);
+				var elem = $(data).find('#live_content');
+				 $('#live_content').replaceWith(elem);
 			});
+			{% endif %}
         });
 	});
 	
