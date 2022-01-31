@@ -12,7 +12,16 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 
-    <h1>Messages</h1>
+
+    <h1 class="float-start">Messages</h1>
+	
+	<button onclick="ReadyToggle()" style="box-shadow: none !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off"> Ready to Vote (WIP) </button>
+	<script>
+		function ReadyToggle() {
+			$( "#mydiv" ).hasClass( "foo" )
+		}		
+	</script>
+	
 	
     <legend class="border-bottom mb4">Send a Message</legend>
     <div class="content-section">
@@ -112,6 +121,7 @@
 	</div>
 	
 	<a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
+		
 	<script>
 		$(document).ready(function() {
 		$(window).scroll(function() {
@@ -127,6 +137,12 @@
 			document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 		});
 		});
+		
+		function endGame(){
+		
+		
+		}
+		
 	</script>
 
 	<script type="text/javascript" charset="utf-8">
