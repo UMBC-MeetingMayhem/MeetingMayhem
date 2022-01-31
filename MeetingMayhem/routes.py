@@ -340,7 +340,9 @@ def adv_messages_page():
 
 				#setup the changes to be made to the current message 
 				display_message.is_signed = False
+				display_message.signed_details = ""
 				display_message.is_encrypted = False 
+				display_message.encryption_details = ""
 				display_message.is_edited = True
 				display_message.new_sender = new_senders
 				display_message.new_recipient = new_recipients
@@ -535,9 +537,7 @@ def spectate_game():
 
 	game_id = request.args.get('game_id')
 	if game_id != None :
-		print(game_id)
 		game = Game.query.filter_by(id=game_id).first()
-		print(game)
 		messages = Message.query.filter_by(game=game_id).all()
 		msg_count = len(Message.query.filter_by(game=game.id).all())
 		

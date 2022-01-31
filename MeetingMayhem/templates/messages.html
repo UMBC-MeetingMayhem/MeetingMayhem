@@ -100,16 +100,16 @@
 						</div>
 						<p class="article-content">{{ sent_msg.content }}</p>
 					</div>
-					{% if sent_msg.is_encrypted %}
+					{% if sent_msg.initial_is_encrypted %}
 					<div class="m-1 row ">
 						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.encryption_details }}</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
 					</div>
 					{% endif %}
-					{% if sent_msg.is_signed %}
+					{% if sent_msg.initial_is_signed %}
 					<div class="m-1 row">
 						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.signed_details }}</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
 					</div>
 					{% endif %}
 				</article>
