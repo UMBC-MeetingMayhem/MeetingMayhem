@@ -129,6 +129,10 @@ class Game(db.Model):
     current_round = db.Column(db.Integer, nullable=False)
     adv_current_msg = db.Column(db.Integer, nullable=False)
     adv_current_msg_list_size = db.Column(db.Integer, nullable=False)
+    vote_ready = db.Column(db.String)
+    votes = db.Column(db.String)
+    adv_vote = db.Column(db.String)
+    end_result = db.Column(db.String)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
         return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Round='{self.current_round}', Current Msg='{self.adv_current_msg}', Msg List Size='{self.adv_current_msg_list_size}')\n"

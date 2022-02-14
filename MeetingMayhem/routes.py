@@ -28,6 +28,7 @@ from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, M
 from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 from datetime import datetime 
+from collections import Counter
 
 import pytz
 
@@ -560,6 +561,42 @@ def spectate_game():
 		else:
 			# Send list of games to template
 			return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
+
+@app.route('/character_select', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
+#@login_required  # user must be logged in
+def character_select():
+	#player_list = str_to_list(players, player_list)
+	#for player in strip_list_str(player_list): #for each player in the string of players
+
+	"""
+	db.drop_all()
+	db.session.commit()
+	db.create_all()
+
+	gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+	adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
+	user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+	user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+	user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+	user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+	spc = User(username='spc', email='spc@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=5)
+	db.session.add(gm)
+	db.session.add(adv)
+	db.session.add(user1)
+	db.session.add(user2)
+	db.session.add(user3)
+	db.session.add(user4)
+	db.session.add(spc)
+	db.session.commit()
+	"""
+	
+	return render_template('character_select.html', title='Select Your Character')
+		
+@app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
+#@login_required  # user must be logged in
+def end_of_game():
+	return render_template('character_select.html', title='Select Your Character')
+
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
 #@app.route('/testing') #this decorator tells the website what to put after the http://<IP>
@@ -572,7 +609,55 @@ def update():
 	print("update")
 	socketio.emit('update',broadcast=True)
 
-#@socketio.on('my event')
-#def handle_my_custom_event(json):
-	#print('received json: ' + str(json))
-	#emit('update',broadcast=True);
+@socketio.on('cast_vote')
+def cast_vote(json):
+	
+	game = Game.query.filter_by(id=json['game_id']).first()
+	
+	if (user.role == 3):
+		game.adv_vote = json['vote']
+	else:
+		votes_list = []
+		try: 
+			votes_list = str_to_list(game.votes, votes_list) 
+		except:
+			pass
+		
+		votes_list.append(json['vote'])
+		game.votes = ','.join(votes_list)
+		db.session.commit()
+		
+	if (len(votes_list) == len(player_list)):
+		c = Counter(votes_list)
+		game.end_result = c.most_common()[0];
+		db.session.commit()
+		socketio.emit('end_vote',broadcast=True)
+		
+	
+@socketio.on('ready_to_vote')
+def ready_to_vote(json):
+	#print(json)
+
+	game = Game.query.filter_by(id=json['game_id']).first()
+	
+	# try for the cases where no player has voted yet
+	voted_list = []
+	try: 
+		voted_list = str_to_list(game.vote_ready, voted_list) 
+	except:
+		pass
+	
+	if json['player'] not in voted_list:
+		voted_list.append(json['player'])
+		game.vote_ready = ','.join(voted_list)
+		db.session.commit()
+	
+	player_list = []
+	player_list = str_to_list(game.players, player_list)
+	
+	if (len(voted_list) / len(player_list) >= .5):
+		print("lets vote")
+		socketio.emit('start_vote',broadcast=True)
+	
+	
+	
