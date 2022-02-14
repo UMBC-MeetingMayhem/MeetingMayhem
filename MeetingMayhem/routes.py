@@ -599,9 +599,9 @@ def end_of_game():
 	games = Game.query.filter_by(is_running=True).all() #grab all the running games
 	for game in games:
 		if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
-			if(game_id.vote == game_id.adv_vote && user.role == 3){
+			if(game_id.vote == game_id.adv_vote and user.role == 3):
 				return render_template('end_of_game.html', title='Results', game=game, result="Winner")
-			}
+			
 			return render_template('end_of_game.html', title='Results', game=game, result="Loser")
 	return;
 
