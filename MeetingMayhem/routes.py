@@ -595,7 +595,15 @@ def character_select():
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
-	return render_template('character_select.html', title='Select Your Character')
+	game_id = None
+	games = Game.query.filter_by(is_running=True).all() #grab all the running games
+	for game in games:
+		if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
+			if(game_id.vote == game_id.adv_vote && user.role == 3){
+				return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+			}
+			return render_template('end_of_game.html', title='Results', game=game, result="Loser")
+	return;
 
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
@@ -606,7 +614,7 @@ def end_of_game():
 #	return render_template('testing.html', title='Testing') #this tells the app what html template to use. #Title isn't needed
 
 def update():
-	print("update")
+	#print("update")
 	socketio.emit('update',broadcast=True)
 
 @socketio.on('cast_vote')
