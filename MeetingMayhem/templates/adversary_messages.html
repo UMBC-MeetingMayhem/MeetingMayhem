@@ -322,7 +322,7 @@
     {% endif %}
 	
 	<!-- Modal -->
-	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 		<div class="modal-content">
 		  <div class="modal-header">
@@ -376,6 +376,8 @@
 		// Connect to the Socket.IO server.
         // The connection URL has the following format, relative to the current page:
         //     http[s]://<domain>:<port>[/<namespace>]
+		var advVoteModal = new bootstrap.Modal(document.getElementById("advVoteModal"), {});
+		
         var socket = io();
 		
 		socket.on('update', function() {			
@@ -393,7 +395,7 @@
         });
 		
 		socket.on('start_vote', function() {
-			myModal.show();
+			advVoteModal.show();
 		});
 		
 		socket.on('end_game', function() {
