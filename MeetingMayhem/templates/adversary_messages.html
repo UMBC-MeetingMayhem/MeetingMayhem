@@ -321,8 +321,58 @@
 	<legend class="border-bottom mb4">Sent messages log</legend>
     {% endif %}
 	
+	<!-- Modal -->
+	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please vote</h5>
+		  </div>
+		  <div class="modal-body">
+			<select id="places_select" class="form-select" aria-label="Default select example">
+			  <option selected>Select Location</option>
+			  <option value="1">One</option>
+			  <option value="2">Two</option>
+			  <option value="3">Three</option>
+			  <option value="4">Four</option>
+			</select>
+			
+			<div class="row">
+				<div class="col-sm-6">
+					<select id="time_s1" class="form-select" aria-label="Default select example">
+					  <option selected>Select Time</option>
+					  <option value="1">1:00</option>
+					  <option value="2">2:00</option>
+					  <option value="3">3:00</option>
+					  <option value="4">4:00</option>
+					  <option value="5">5:00</option>
+					  <option value="6">6:00</option>
+					  <option value="7">7:00</option>
+					  <option value="8">8:00</option>
+					  <option value="9">9:00</option>
+					  <option value="10">10:00</option>
+					  <option value="11">11:00</option>
+					  <option value="12">12:00</option>
+					</select>
+				</div>
+				<div class="col-sm-6">
+					<select id="time_s2" class="form-select" aria-label="Default select example">
+					<option value="1">PM</option>
+					<option value="2">AM</option>
+					</select>
+				</div>
+			</div>
+		  <div class="modal-footer">
+			<button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	
+	
 	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
+	
 		// Connect to the Socket.IO server.
         // The connection URL has the following format, relative to the current page:
         //     http[s]://<domain>:<port>[/<namespace>]
@@ -341,6 +391,37 @@
 				 $('#Incoming_Messages').replaceWith(elem);
 			});
         });
+		
+		socket.on('start_vote', function() {
+			myModal.show();
+		});
+		
+		socket.on('end_game', function() {
+            window.location.href = "{{ url_for('end_of_game') }}";
+        });
+		
 	});
+	
+	function submitVote(){
+	
+		place = $( "#places_select" ).text();
+		time = $( "#time_s1" ).text();
+		
+		if(place == "Select Location" || time == "Select Time"){
+			return;
+		}
+		$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
+		$("#submt_vote").prop("disabled",true);
+		
+		time = time + ' ' + $( "#time_s2" ).text();
+		
+		vote = place + ' ' + time;
+		
+		socket.emit('cast_vote', {
+		game_id: "{{game.id}}",
+		vote: vote
+		});
+
+	}
 	</script>
 {% endblock content %}

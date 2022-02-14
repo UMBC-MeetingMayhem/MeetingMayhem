@@ -18,6 +18,7 @@ body {
   background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgba(10,10,47,1) 15%, rgba(86,103,131,1) 67%, rgba(190,230,245,1) 100%);
     color: #444;
     margin-top: 5rem;
+	background-attachment: fixed;
   }
   
 .darkbkg {
