@@ -15,7 +15,7 @@
 
     <h1 class="float-start">Messages</h1>
 	
-	<button id="vote_bt" style="box-shadow: none !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off"> Ready to Vote (WIP) </button>
+	<button id="vote_bt" style="box-shadow: none !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 	<script>
 		$("#vote_bt").on("click", function() {
 			$(this).prop("disabled", true);
@@ -221,14 +221,16 @@
 		});
 		
 		socket.on('end_game', function() {
+			//console.log("end the game");
             window.location.href = "{{ url_for('end_of_game') }}";
         });
 	});
 	
 	function submitVote(){
-	
-		place = $( "#places_select" ).text();
-		time = $( "#time_s1" ).text();
+		var socket = io();
+		
+		place = $( "#places_select" ).find(':selected').text();
+		time = $( "#time_s1" ).find(':selected').text();
 		
 		if(place == "Select Location" || time == "Select Time"){
 			return;
@@ -236,7 +238,7 @@
 		$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
 		$("#submt_vote").prop("disabled",true);
 		
-		time = time + ' ' + $( "#time_s2" ).text();
+		time = time + ' ' + $( "#time_s2" ).find(':selected').text();
 		
 		vote = place + ' ' + time;
 		

@@ -567,7 +567,6 @@ def spectate_game():
 def character_select():
 	#player_list = str_to_list(players, player_list)
 	#for player in strip_list_str(player_list): #for each player in the string of players
-
 	"""
 	db.drop_all()
 	db.session.commit()
@@ -589,21 +588,26 @@ def character_select():
 	db.session.add(spc)
 	db.session.commit()
 	"""
-	
 	return render_template('character_select.html', title='Select Your Character')
 		
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
-	game_id = None
-	games = Game.query.filter_by(is_running=True).all() #grab all the running games
-	for game in games:
-		if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
-			if(game_id.vote == game_id.adv_vote and user.role == 3):
-				return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+	game = None;
+	
+	if (current_user.role == 3):
+		game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
+		if(game.end_result == game.adv_vote):
+			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+	else:
+		games = Game.query.filter_by(is_running=True).all() #grab all the running games
+		for g in games:
+			game = g
+			if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
+				if(game.end_result != game.adv_vote):
+					return render_template('end_of_game.html', title='Results', game=game, result="Winner")
 			
-			return render_template('end_of_game.html', title='Results', game=game, result="Loser")
-	return;
+	return render_template('end_of_game.html', title='Results', game=game, result="Loser")
 
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
@@ -619,27 +623,33 @@ def update():
 
 @socketio.on('cast_vote')
 def cast_vote(json):
+	print(json)
 	
 	game = Game.query.filter_by(id=json['game_id']).first()
 	
-	if (user.role == 3):
+	votes_list = []
+	try: 
+		votes_list = str_to_list(game.votes, votes_list) 
+	except:
+		pass
+	
+	if (current_user.role == 3):
 		game.adv_vote = json['vote']
+		db.session.commit()
+		print("adv vote")
 	else:
-		votes_list = []
-		try: 
-			votes_list = str_to_list(game.votes, votes_list) 
-		except:
-			pass
-		
 		votes_list.append(json['vote'])
 		game.votes = ','.join(votes_list)
 		db.session.commit()
 		
+	player_list = []
+	str_to_list(game.players, player_list) 
+		
 	if (len(votes_list) == len(player_list)):
 		c = Counter(votes_list)
-		game.end_result = c.most_common()[0];
+		game.end_result = c.most_common()[0][0];
 		db.session.commit()
-		socketio.emit('end_vote',broadcast=True)
+		socketio.emit('end_game',broadcast=True)
 		
 	
 @socketio.on('ready_to_vote')

@@ -405,9 +405,10 @@
 	});
 	
 	function submitVote(){
-	
-		place = $( "#places_select" ).text();
-		time = $( "#time_s1" ).text();
+		var socket = io();
+		
+		place = $( "#places_select" ).find(':selected').text();
+		time = $( "#time_s1" ).find(':selected').text();
 		
 		if(place == "Select Location" || time == "Select Time"){
 			return;
@@ -415,7 +416,7 @@
 		$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
 		$("#submt_vote").prop("disabled",true);
 		
-		time = time + ' ' + $( "#time_s2" ).text();
+		time = time + ' ' + $( "#time_s2" ).find(':selected').text();
 		
 		vote = place + ' ' + time;
 		
