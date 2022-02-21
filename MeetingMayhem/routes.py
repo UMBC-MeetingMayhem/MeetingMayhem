@@ -361,8 +361,8 @@ def adv_messages_page():
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				current_game.adv_current_msg = 0
-				current_game.adv_current_msg_list_size = len(messages)
+				#current_game.adv_current_msg = 0
+				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				display_message.adv_submitted = True
 				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
@@ -382,21 +382,21 @@ def adv_messages_page():
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				current_game.adv_current_msg = 0
-				current_game.adv_current_msg_list_size = len(messages)
+				#current_game.adv_current_msg = 0
+				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				db.session.commit()
 
 			elif is_send_no_change:
-				flash(display_message.content)
+				#flash(display_message.content)
 				display_message.adv_submitted = True 
 				db.session.commit()
 				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				current_game.adv_current_msg = 0
-				current_game.adv_current_msg_list_size = len(messages)
+				#current_game.adv_current_msg = 0
+				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				db.session.commit()
 
@@ -414,14 +414,12 @@ def adv_messages_page():
 
 			update()
 			return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-			current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0,usernames=usernames, msgs=msgs_tuple)
+			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0,usernames=usernames, msgs=msgs_tuple)
 		
 		else:
 			# display normally
 			return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-			current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
+			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
 		
 # game setup route for the game master
 @app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
@@ -645,9 +643,11 @@ def cast_vote(json):
 	player_list = []
 	str_to_list(game.players, player_list) 
 		
-	if (len(votes_list) == len(player_list)):
+	if (len(votes_list) == len(player_list) and game.adv_vote != None):
 		c = Counter(votes_list)
 		game.end_result = c.most_common()[0][0];
+		if(c.most_common()[0][1] == 1):
+			game.end_result = game.adv_vote;  
 		db.session.commit()
 		socketio.emit('end_game',broadcast=True)
 		
