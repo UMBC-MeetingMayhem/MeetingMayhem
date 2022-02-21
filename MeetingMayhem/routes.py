@@ -361,8 +361,8 @@ def adv_messages_page():
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				current_game.adv_current_msg = 0
-				current_game.adv_current_msg_list_size = len(messages)
+				#current_game.adv_current_msg = 0
+				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				display_message.adv_submitted = True
 				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
@@ -382,21 +382,21 @@ def adv_messages_page():
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				current_game.adv_current_msg = 0
-				current_game.adv_current_msg_list_size = len(messages)
+				#current_game.adv_current_msg = 0
+				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				db.session.commit()
 
 			elif is_send_no_change:
-				flash(display_message.content)
+				#flash(display_message.content)
 				display_message.adv_submitted = True 
 				db.session.commit()
 				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:
 					msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-				current_game.adv_current_msg = 0
-				current_game.adv_current_msg_list_size = len(messages)
+				#current_game.adv_current_msg = 0
+				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				db.session.commit()
 
@@ -414,14 +414,12 @@ def adv_messages_page():
 
 			update()
 			return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-			current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0,usernames=usernames, msgs=msgs_tuple)
+			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0,usernames=usernames, msgs=msgs_tuple)
 		
 		else:
 			# display normally
 			return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-			current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
+			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
 		
 # game setup route for the game master
 @app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
@@ -567,7 +565,6 @@ def spectate_game():
 def character_select():
 	#player_list = str_to_list(players, player_list)
 	#for player in strip_list_str(player_list): #for each player in the string of players
-
 	"""
 	db.drop_all()
 	db.session.commit()
@@ -589,21 +586,26 @@ def character_select():
 	db.session.add(spc)
 	db.session.commit()
 	"""
-	
 	return render_template('character_select.html', title='Select Your Character')
 		
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
-	game_id = None
-	games = Game.query.filter_by(is_running=True).all() #grab all the running games
-	for game in games:
-		if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
-			if(game_id.vote == game_id.adv_vote and user.role == 3):
-				return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+	game = None;
+	
+	if (current_user.role == 3):
+		game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
+		if(game.end_result == game.adv_vote):
+			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+	else:
+		games = Game.query.filter_by(is_running=True).all() #grab all the running games
+		for g in games:
+			game = g
+			if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
+				if(game.end_result != game.adv_vote):
+					return render_template('end_of_game.html', title='Results', game=game, result="Winner")
 			
-			return render_template('end_of_game.html', title='Results', game=game, result="Loser")
-	return;
+	return render_template('end_of_game.html', title='Results', game=game, result="Loser")
 
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
@@ -619,27 +621,35 @@ def update():
 
 @socketio.on('cast_vote')
 def cast_vote(json):
+	print(json)
 	
 	game = Game.query.filter_by(id=json['game_id']).first()
 	
-	if (user.role == 3):
+	votes_list = []
+	try: 
+		votes_list = str_to_list(game.votes, votes_list) 
+	except:
+		pass
+	
+	if (current_user.role == 3):
 		game.adv_vote = json['vote']
+		db.session.commit()
+		print("adv vote")
 	else:
-		votes_list = []
-		try: 
-			votes_list = str_to_list(game.votes, votes_list) 
-		except:
-			pass
-		
 		votes_list.append(json['vote'])
 		game.votes = ','.join(votes_list)
 		db.session.commit()
 		
-	if (len(votes_list) == len(player_list)):
+	player_list = []
+	str_to_list(game.players, player_list) 
+		
+	if (len(votes_list) == len(player_list) and game.adv_vote != None):
 		c = Counter(votes_list)
-		game.end_result = c.most_common()[0];
+		game.end_result = c.most_common()[0][0];
+		if(c.most_common()[0][1] == 1):
+			game.end_result = game.adv_vote;  
 		db.session.commit()
-		socketio.emit('end_vote',broadcast=True)
+		socketio.emit('end_game',broadcast=True)
 		
 	
 @socketio.on('ready_to_vote')
