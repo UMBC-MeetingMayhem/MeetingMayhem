@@ -1,1 +1,2 @@
 # MeetingMayhem
+MeetingMayhem is a web-based educational learning exercise that, through active learning, helps students develop adversarial thinking and introduces the idea of network protocols. In this exercise, players try to arrange a meeting time and place by sending and receiving messages through an insecure network that is under the control of a malicious adversary. The adversary can see, modify, block, replay, and inject messages.
