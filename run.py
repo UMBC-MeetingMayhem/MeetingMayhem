@@ -11,12 +11,13 @@ https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUx
 """
 
 #import the app from the package so that we can run it here
-from MeetingMayhem import app
+from MeetingMayhem import app, socketio
+#from flask_socketio import SocketIO
 
 """
 Runs the app. For now, the app is run in debug mode for ease of development. This allows us to see changes we make to
 the website without restarting the server. This will need to change in the future
 """
 if __name__ == '__main__':
-    app.run(debug=True) #use this one for local testing
-    #app.run(debug=True,host="0.0.0.0") #use this one to host for other computers
+    socketio.run(app, debug=True,) #use this one for local testing
+    #socketio.run(app, debug=True,host="0.0.0.0") #use this one to host for other computers

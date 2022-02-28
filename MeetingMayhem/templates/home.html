@@ -11,8 +11,43 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 
+<h1 style="text-align:center" >
+Scenario: 
+</h1>
 
+<p style="text-align:center; font-family:Lucida Console, Courier New, monospace;">
+You are an agent embedded in hostile territory.
+One of your fellow agents has been caught, and your mission is to aid them in their escape.
+You are attempting to arrange a meeting with other allied agents to exchange information critical to this mission.
+However, your only means of communication with your team has been compromised by a hostile Adversary.
+Can you successfully arrange a safe meeting with your team, or will the Adversary trick you into meeting somewhere unsafe?
+</p></br></br>
 
+<h1 style="text-align:center;">
+Directions: 
+</h1>
+
+<p style="text-align:center;">
+<ul>
+<li>Send messages to your allies to arrange a meeting time and place.</li>
+<li>Beware of the Adversary attempting to cause confusion or trick you.</li>
+<li>When available, use crypto primitives to your advantage.</li>
+<li>Encryption: Enc(<username>.pub) - ex: Enc(user1.pub)</li>
+<li>Signing: Sign(<username>.priv) - ex: Sign(user1.priv)</li>
+<li>When you are ready to choose your meeting time and place, click the "Ready to Vote" button.</li>
+</ul>
+</p>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('ingame', function() {
+            window.location.href = "{{ url_for('messages') }}";
+        });
+	});
+</script>
 
 
 

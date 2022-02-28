@@ -17,16 +17,16 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
-    <!-- bootstrap required stuff ends here -->
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-
+	
     <link rel="icon" href="{{ url_for('static', filename='MM_white.svg') }}">
 
-    <style>
+	<!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <!-- bootstrap required stuff ends here -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+	<style>
         @keyframes logbox {
             from {height:0;}
             to {height:350px;}
@@ -125,7 +125,69 @@
             background-color:#b0b4bd;
             border:none;
         }
+        .tablinks{
+			color: #cbd5db;
+		}
+		.tablinks:hover{
+			color: #ffffff;
+			background-color: rgba(86,103,131,1);
+			transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
+		}		
+		.pillbox :first-child{
+			border-left: 50px 20px;
+			rounded-start;
+			d-inline;
+		}
+		.pillbox :last-child{
+			rounded-end;
+			d-inline;
+		}
+		
+		#toTopBtn {
+			position: fixed;
+			bottom: 26px;
+			right: 39px;
+			z-index: 98;
+			padding: 21px;
+			background-color: hsla(5, 76%, 62%, .8)
+		}
+
+		.js .cd-top--fade-out {
+			opacity: .5
+		}
+
+		.js .cd-top--is-visible {
+			visibility: visible;
+			opacity: 1
+		}
+
+		.js .cd-top {
+			visibility: hidden;
+			opacity: 0;
+			transition: opacity .3s, visibility .3s, background-color .3s
+		}
+
+		.cd-top {
+			position: fixed;
+			bottom: 20px;
+			bottom: var(--cd-back-to-top-margin);
+			right: 20px;
+			right: var(--cd-back-to-top-margin);
+			display: inline-block;
+			height: 40px;
+			height: var(--cd-back-to-top-size);
+			width: 40px;
+			width: var(--cd-back-to-top-size);
+			box-shadow: 0 0 10px rgba(0, 0, 0, .05) !important;
+			background: url(https://res.cloudinary.com/dxfq3iotg/image/upload/v1571057658/cd-top-arrow.svg) no-repeat center 50%;
+			background-color: hsla(5, 76%, 62%, .8);
+			background-color: hsla(var(--cd-color-3-h), var(--cd-color-3-s), var(--cd-color-3-l), 0.8)
+		}
+		
     </style>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 
     <!-- we use an if else statement here to determine what the title of the page should be based on what is passed from the title variable from routes.py -->
     {% if title %}
@@ -159,6 +221,10 @@
                         <p class="nav-item nav-link">|</p>
                         {% if current_user.role == 2 %}
                         <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                        {% endif %}
+                        {% if current_user.role == 5 %}
+                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
                         {% endif %}
                         {% if current_user.game != None %}
                         <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
@@ -225,5 +291,13 @@
     <!-- bootstrap required stuff begins here -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
     <!-- bootstrap required stuff ends here -->
+	
+	<!-- socketio 
+	<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+	</script>-->
 </body>
 </html>

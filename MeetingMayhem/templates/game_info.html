@@ -1,17 +1,16 @@
 <!--
-    File: spectator_messages.html
-    Authors: Piere Jackson, Kathleen Koerner
-    Date: 9/10/2021
-    Last Modified: 9/10/2021
-	E-mail: piercej1@umbc.edu
+    File: game_info.html
+    Authors: Kathleen Koerner
+    Date: 10/26/2021
+    Last Modified: 10/26/2021
     E-mail: im80933@umbc.edu
-    Description: html and jinja file for handling the spectator page
+    Description: html and jinja file for handling the gm game info
 -->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 	{% if not game %}
-	<!-- Game Selection form, spectator_main.html -->
+	<!-- Game Selection form, game_info.html -->
 		<h1>Game Selection</h1>
 		<div class="content-section">
 			<form method="POST" action="">
@@ -39,25 +38,23 @@
 			</form>
 		</div>
 	{% else %}
-	<!-- Game Spectating, spectator_game.html -->
-		<h1>Spectating {{game.name}}</h1>
-		
+	<!-- Game Info, game_info.html -->
+		<h1>Info For {{game.name}}</h1>
 		<div class="content-section">
-			<a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Return to Game Selection</a>
+			<a class="nav-item nav-link" href="{{ url_for('game_info') }}">Return to Game Selection</a>
 		</div>
 		
-		<div id="live_content">
+		<div id="game_info">
 		<div class="content-section">
 			<h2>Players</h1>
 			<p>{{game.players}}</p>
 			<h2>Adversary</h1>
 			<p>{{game.adversary}}</p>
-			<h2>Total Messages Sent</h1>
+            <h2>Total Messages Sent</h1>
 			<p>{{msg_count}}</p>
-			
 		</div>
 
-		<!-- Add a legend article here or in the about page to explain game infomation to spectator -->
+<!-- Add a legend article here or in the about page to explain game infomation to spectator -->
 
 		<h1>Messages</h1>
 		<article class="media content-section bg-dark">
@@ -71,7 +68,7 @@
 			</div>
 		</article>
 
-		<div>
+		<div id="msg-list">
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
@@ -147,7 +144,6 @@
 								{% else %}
 								<a>Recipient: {{ message.recipient }}</a>
 								{% endif %}
-								<small class="text-muted">Round:  {{message.round}} </small>
 								</div>
 								<p class="article-content"> {{message.edited_content}} </p>
 							</div>
@@ -185,8 +181,8 @@
 		{% endfor %}	
 		{% endif %}
 		</div> 
-		<div>
 	{% endif %}
+	<div>
 	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
 		// Connect to the Socket.IO server.
@@ -195,15 +191,11 @@
         var socket = io();
 		
 		socket.on('update', function() {
-			{% if game %}
-			url = document.URL + "?game_id=" + {{game.id}};
-			$.get(url, function(data) {
-				var elem = $(data).find('#live_content');
-				 $('#live_content').replaceWith(elem);
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#msg_list');
+				 $('#msg_list').replaceWith(elem);
 			});
-			{% endif %}
         });
 	});
-	
 	</script>
 {% endblock content %}
