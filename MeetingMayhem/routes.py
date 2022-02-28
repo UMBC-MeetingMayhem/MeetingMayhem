@@ -268,7 +268,7 @@ def adv_messages_page():
 			current_game.adv_current_msg_list_size = len(messages)
 			#commit the messages to the database
 			db.session.commit()
-
+			update()
 			# #render the webpage
 			return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
 			adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
@@ -565,7 +565,7 @@ def spectate_game():
 def character_select():
 	#player_list = str_to_list(players, player_list)
 	#for player in strip_list_str(player_list): #for each player in the string of players
-	"""
+	
 	db.drop_all()
 	db.session.commit()
 	db.create_all()
@@ -585,7 +585,7 @@ def character_select():
 	db.session.add(user4)
 	db.session.add(spc)
 	db.session.commit()
-	"""
+	
 	return render_template('character_select.html', title='Select Your Character')
 		
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
@@ -634,22 +634,23 @@ def cast_vote(json):
 	if (current_user.role == 3):
 		game.adv_vote = json['vote']
 		db.session.commit()
-		print("adv vote")
 	else:
 		votes_list.append(json['vote'])
-		game.votes = ','.join(votes_list)
+		game.votes = ', '.join(votes_list)
 		db.session.commit()
 		
 	player_list = []
 	str_to_list(game.players, player_list) 
 		
-	if (len(votes_list) == len(player_list) and game.adv_vote != None):
+	if (len(votes_list) >= len(player_list) and game.adv_vote != None):
 		c = Counter(votes_list)
 		game.end_result = c.most_common()[0][0];
 		if(c.most_common()[0][1] == 1):
 			game.end_result = game.adv_vote;  
 		db.session.commit()
 		socketio.emit('end_game',broadcast=True)
+	
+	print(current_user, " ", game);
 		
 	
 @socketio.on('ready_to_vote')
@@ -667,7 +668,7 @@ def ready_to_vote(json):
 	
 	if json['player'] not in voted_list:
 		voted_list.append(json['player'])
-		game.vote_ready = ','.join(voted_list)
+		game.vote_ready = ', '.join(voted_list)
 		db.session.commit()
 	
 	player_list = []
@@ -676,6 +677,8 @@ def ready_to_vote(json):
 	if (len(voted_list) / len(player_list) >= .5):
 		print("lets vote")
 		socketio.emit('start_vote',broadcast=True)
+		
+	print(current_user, " ", game);
 	
 	
 	
