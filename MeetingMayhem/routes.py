@@ -625,16 +625,27 @@ def cast_vote(json):
 	
 	game = Game.query.filter_by(id=json['game_id']).first()
 	
+	if (current_user.role == 3):
+		game.adv_vote = json['vote']
+		db.session.commit()
+	
 	votes_list = []
 	try: 
 		votes_list = str_to_list(game.votes, votes_list) 
 	except:
 		pass
+			
+	who_voted = []
+	try: 
+		who_voted = str_to_list(game.who_voted, who_voted) 
+	except:
+		pass
 	
-	if (current_user.role == 3):
-		game.adv_vote = json['vote']
+	if (current_user.username not in who_voted) and current_user.role != 3:
+		who_voted.append(current_user.username)
+		game.who_voted = ', '.join(who_voted)
 		db.session.commit()
-	else:
+		
 		votes_list.append(json['vote'])
 		game.votes = ', '.join(votes_list)
 		db.session.commit()

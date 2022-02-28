@@ -131,11 +131,12 @@ class Game(db.Model):
     adv_current_msg_list_size = db.Column(db.Integer, nullable=False)
     vote_ready = db.Column(db.String)
     votes = db.Column(db.String)
+    who_voted = db.Column(db.String)
     adv_vote = db.Column(db.String)
     end_result = db.Column(db.String)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
-        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}, votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n"
+        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n"
 
 #queryfactory for games, used for gm to modify specific games
 def getGame(columns=None):
