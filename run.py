@@ -21,3 +21,5 @@ the website without restarting the server. This will need to change in the futur
 if __name__ == '__main__':
     socketio.run(app, debug=True,) #use this one for local testing
     #socketio.run(app, debug=True,host="0.0.0.0") #use this one to host for other computers
+
+# dANIEL wAS HERE
