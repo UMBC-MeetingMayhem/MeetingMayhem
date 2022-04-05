@@ -598,6 +598,7 @@ def end_of_game():
 		if(game.end_result == game.adv_vote):
 			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
 	else:
+	# change to say player winner vs what it curently does. 
 		games = Game.query.filter_by(is_running=True).all() #grab all the running games
 		for g in games:
 			game = g
