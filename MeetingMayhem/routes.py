@@ -170,7 +170,6 @@ def messages():
 	sent_msgs.reverse()
 	
 	if form.validate_on_submit(): #when the user submits the message form and it is valid
-
 		#capture the list of players from the checkboxes and make it into a string delimited by commas
 		checkbox_output_list = request.form.getlist('recipients')
 		

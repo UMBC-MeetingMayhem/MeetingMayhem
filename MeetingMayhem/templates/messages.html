@@ -78,8 +78,8 @@
             <div class="col-auto">
                <select id="cryptography_key_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
                   <option value= "-1" selected>Key Type</option>
-                  <option value="Public">Public</option>
-                  <option value="Private">Private</option>
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
                </select>
             </div>
          </div>
@@ -215,6 +215,7 @@
 
 <script type="text/javascript" charset="utf-8">
    $(document).ready(function() {
+	document.getElementById('encryption_and_signed_keys').value = ""; 
    	var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
    	// Connect to the Socket.IO server.
           // The connection URL has the following format, relative to the current page:
@@ -295,16 +296,22 @@
 			var listContainer = $( "#cryptography_tags_list" );
 			listContainer.append(listEl);
 			 
+			var submitString = "";
+			 
 			$('#cryptography_tags_list li').each(function() {
 				var option_all = $(this).children().map(function () {
 					return $(this).text();
 				}).get().join(',');
-				
+
 				var chars = option_all.split(',');
 				
-				console.log(chars);
+				submitString += chars[1] + "(" + chars[2] + "),"
 			}) 		
 		}
+		
+		submitString = submitString.slice(0, -1) 
+		console.log(submitString);
+		document.getElementById('encryption_and_signed_keys').value = submitString; 
    }
    
 </script>
