@@ -170,7 +170,6 @@ def messages():
 	sent_msgs.reverse()
 	
 	if form.validate_on_submit(): #when the user submits the message form and it is valid
-
 		#capture the list of players from the checkboxes and make it into a string delimited by commas
 		checkbox_output_list = request.form.getlist('recipients')
 		
@@ -598,6 +597,7 @@ def end_of_game():
 		if(game.end_result == game.adv_vote):
 			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
 	else:
+	# change to say player winner vs what it curently does. 
 		games = Game.query.filter_by(is_running=True).all() #grab all the running games
 		for g in games:
 			game = g
