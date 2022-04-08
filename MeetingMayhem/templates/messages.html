@@ -10,7 +10,7 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 <h1 class="float-start">Messages</h1>
-<button id="vote_bt" style="box-shadow: none !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
+<button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 <script>
    $("#vote_bt").on("click", function() {
    	$(this).prop("disabled", true);
@@ -21,6 +21,33 @@
    	});
    });	
 </script>
+
+<style>
+
+.modal-content{
+   background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgb(19, 19, 22) 10%, rgb(106, 108, 110) 64%, rgb(40, 42, 43) 100%);
+}
+
+.form-select{
+   background-color: #333333;
+   color: #0dcaf0;
+}
+
+.modal-footer{
+   border: transparent;
+}
+
+#vote_bt {
+   color: #0dcaf0; border-color:#0dcaf0; background-color: #272822;
+}
+
+#submt_vote{
+   color: #0dcaf0; border-color:#0dcaf0;
+   background: transparent;
+}
+
+</style>
+
 <legend class="border-bottom mb4">Send a Message</legend>
 <div class="content-section">
    <form method="POST" action="">
@@ -167,7 +194,7 @@
 <div class="modal-dialog">
    <div class="modal-content">
       <div class="modal-header">
-         <h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please vote</h5>
+         <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
       </div>
       <div class="modal-body">
          <select id="places_select" class="form-select" aria-label="Default select example">
@@ -180,6 +207,7 @@
             <option value="6">Bus stop</option>
             <option value="7">Subway station</option>
          </select>
+         <br>
          <div class="row">
             <div class="col-sm-6">
                <select id="time_s1" class="form-select" aria-label="Default select example">
