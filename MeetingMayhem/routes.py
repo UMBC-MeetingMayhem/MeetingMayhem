@@ -277,6 +277,13 @@ def adv_messages_page():
 		#adversary message editing
 		elif (is_submit_edits or is_delete_msg or is_send_no_change): #if any of the prev/next/submit buttons are clicked
 			display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
+			print(display_message)
+
+			if display_message == None:
+				flash(f'Please make sure to select a message for editing.', 'danger')
+				return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+				adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+				current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
 			
 			if display_message != None:
 				can_decrypt_curr_message = can_decrypt(current_user, display_message.encryption_details, display_message.is_encrypted, display_message.sender)
@@ -621,7 +628,7 @@ def update():
 
 @socketio.on('cast_vote')
 def cast_vote(json):
-	print(json)
+	#print(json)
 	
 	game = Game.query.filter_by(id=json['game_id']).first()
 	
@@ -661,7 +668,7 @@ def cast_vote(json):
 		db.session.commit()
 		socketio.emit('end_game',broadcast=True)
 	
-	print(current_user, " ", game);
+	#print(current_user, " ", game);
 		
 	
 @socketio.on('ready_to_vote')
@@ -686,10 +693,10 @@ def ready_to_vote(json):
 	player_list = str_to_list(game.players, player_list)
 	
 	if (len(voted_list) / len(player_list) >= .5):
-		print("lets vote")
+		#print("lets vote")
 		socketio.emit('start_vote',broadcast=True)
 		
-	print(current_user, " ", game);
+	#print(current_user, " ", game);
 	
 	
 	
