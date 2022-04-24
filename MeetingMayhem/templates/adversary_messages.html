@@ -397,14 +397,14 @@
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
                 {% endif %}
                 {% if prev_msg[0].new_recipient %}
-                <a>New Recipient: {{ prev_msg.new_recipient }}</a>
+                <a>New Recipient: {{ prev_msg[0].new_recipient }}</a>
                 {% else %}
                 <a>Recipient: {{ prev_msg[0].recipient }}</a>
                 {% endif %}
                 {% if prev_msg[0].adv_created %}
                 <a> | This message was created by the adversary.</a>
                 {% endif %}
-                <a>Time Sent: {{ prev_msg[0].time_sent }} </a>
+                <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
                 {% if prev_msg[0].is_deleted %}
                 <a> | This message has been deleted.</a>
                 {% else %}
@@ -424,7 +424,7 @@
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
                 <a>Recipient: {{ prev_msg[0].recipient }}</a>
-                <a>Time Sent: {{ prev_msg[0].time_sent }} </a>
+                <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
                 <a> | This message was created by the adversary.</a>
                 </div>
                 <p class="article-content">{{ prev_msg[0].content }}</p>
@@ -436,7 +436,7 @@
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
                 <a>Recipient: {{ prev_msg[0].recipient }}</a>
-                <a>Time Sent: {{ prev_msg[0].time_sent }} </a>
+                <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
                 </div>
 				{% if not prev_msg[1] %}
 				<p class="article-content">--CANNOT DECRYPT--</p>

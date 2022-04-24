@@ -412,6 +412,9 @@ def adv_messages_page():
 
 			prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True).all() #grab all the previous messages for this game
 		
+			#reset prev msgs tuple before filling it with new messages
+			prev_msgs_tuple = []
+
 			for message in prev_messages:
 				prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted,message.sender))) # append it to the tuple 
 
