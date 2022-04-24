@@ -531,6 +531,7 @@ def game_setup():
 			user.role = 5 #update to spectator
 		db.session.commit()
 		flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
+		update()
 
 	#display webpage normally
 	return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
@@ -597,11 +598,12 @@ def character_select():
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
-	game = None;
+	game = None
 	
 	if (current_user.role == 3):
 		game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
 		if(game.end_result == game.adv_vote):
+			
 			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
 	else:
 	# change to say player winner vs what it curently does. 
@@ -662,7 +664,7 @@ def cast_vote(json):
 		
 	if (len(votes_list) >= len(player_list) and game.adv_vote != None):
 		c = Counter(votes_list)
-		game.end_result = c.most_common()[0][0];
+		game.end_result = c.most_common()[0][0]
 		if(c.most_common()[0][1] == 1):
 			game.end_result = game.adv_vote;  
 		db.session.commit()

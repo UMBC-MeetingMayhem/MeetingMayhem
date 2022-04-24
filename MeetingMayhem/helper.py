@@ -188,7 +188,7 @@ def create_message(user, game, request, form, username, time_stamp):
 
         #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
-            flash(f'Please select at least one sender and one recipient.', 'danger')
+            flash(f'Duplicate message detected. Please create a new message.', 'danger')
             return False
         
 
