@@ -82,8 +82,8 @@ class AdversaryMessageEditForm(FlaskForm):
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
-				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):

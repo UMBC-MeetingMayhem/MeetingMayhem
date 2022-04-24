@@ -215,7 +215,7 @@
 					{% else %}
 					<a>Recipient: {{ msg[0].recipient }}</a>
                     {% endif %}
-                    <a>Time Sent: {{ msg[0].time_sent }}</a>
+                    <a> | Time Sent: {{ msg[0].time_sent }}</a>
 					{% if msg[0].adv_created %}
 					<a> | This msg was created by the adversary.</a>
 					{% endif %}
@@ -417,6 +417,18 @@
                 <p class="article-content">{{ prev_msg[0].content }}</p>
                 {% endif %}
             </div>
+			{% if prev_msg[0].is_encrypted %}
+			<div class="m-1 row ">
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
+			</div>
+			{% endif %}
+			{% if prev_msg[0].is_signed %}
+			<div class="m-1 row">
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
+			</div>
+			{% endif %}
         </article>
         {% elif prev_msg[0].adv_created %} <!-- if the adversary created the message -->
         <article class="media content-section">
@@ -429,6 +441,18 @@
                 </div>
                 <p class="article-content">{{ prev_msg[0].content }}</p>
             </div>
+			{% if prev_msg[0].is_encrypted %}
+			<div class="m-1 row ">
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
+			</div>
+			{% endif %}
+			{% if prev_msg[0].is_signed %}
+			<div class="m-1 row">
+				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
+			</div>
+			{% endif %}
         </article>
         {% else %} <!-- if the message hasn't been edited, display normally -->
 			<article class="media content-section">
