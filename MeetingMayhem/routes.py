@@ -331,13 +331,13 @@ def adv_messages_page():
 
 				# Code for determining whether entered keys are valid or not
 				for element in new_keys.split(','):
-					if element.split('(')[0].lower() == 'sign':
-						if element.split('(')[1] == f"{current_user.username}.priv)":
+					if element.split('(')[0].lower() == 'signed':
+						if element.split('(')[1] == f"{current_user.username}.private)":
 							signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
 						else:
 							signed_keys.append('invalid sign key')
-					if element.split('(')[0].lower() == 'encrypt':
-						if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{current_user.username}.priv)"):
+					if element.split('(')[0].lower() == 'encrypted':
+						if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{current_user.username}.private)"):
 							encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
 						else:
 							encrypted_keys.append('invalid encrypted key')
@@ -371,6 +371,7 @@ def adv_messages_page():
 				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				display_message.adv_submitted = True
+				print(display_message)
 				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:

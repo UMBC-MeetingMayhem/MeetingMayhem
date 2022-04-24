@@ -227,7 +227,7 @@
 				{% else %}
 					<a>Sender: {{ msg[0].sender }} | </a>
 					<a>Recipient: {{ msg[0].recipient }}</a>
-                    <a>Time Sent: {{ msg[0].time_sent }}</a>
+                    <a> | Time Sent: {{ msg[0].time_sent }}</a>
 					{% if msg[0].adv_created %}
 					<a> | This message was created by the adversary.</a>
 					{% endif %}
