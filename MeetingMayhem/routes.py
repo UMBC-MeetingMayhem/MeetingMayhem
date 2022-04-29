@@ -446,6 +446,7 @@ def game_setup():
 
 	#grab the state of the submit buttons so they only need to be pressed once
 	is_mng_submit = mng_form.end_game.data
+	is_end_game_page_submit = mng_form.end_game_page.data
 	is_setup_submit = setup_form.create_game.data
 	is_usr_form = usr_form.update.data
 
@@ -507,6 +508,14 @@ def game_setup():
 		#pull the forms again because their information has updated, might not need to do this
 		mng_form = GMManageGameForm()
 		setup_form = GMSetupGameForm()
+	
+	#bring the selected game to the end game screen, used for testing
+	if is_end_game_page_submit and mng_form.validate():
+		game = Game.query.filter_by(name=mng_form.game.data.name).first()
+		game.end_result = "testing"
+		db.session.commit()
+		socketio.emit('end_game',broadcast=True)
+		flash(f'The game has been brought to the end game page.', 'success')
 
 	#user management
 	if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
@@ -606,6 +615,8 @@ def end_of_game():
 	
 	if (current_user.role == 3):
 		game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
+		if(game.end_result == "testing"):
+			return render_template('end_of_game.html', title='Results', game=game, result="Testing")
 		if(game.end_result == game.adv_vote):
 			
 			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
@@ -615,6 +626,8 @@ def end_of_game():
 		for g in games:
 			game = g
 			if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
+				if(game.end_result == "testing"):
+					return render_template('end_of_game.html', title='Results', game=game, result="Testing")
 				if(game.end_result != game.adv_vote):
 					return render_template('end_of_game.html', title='Results', game=game, result="Winner")
 			

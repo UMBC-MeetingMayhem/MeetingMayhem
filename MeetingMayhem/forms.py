@@ -125,7 +125,8 @@ class GMSetupGameForm(FlaskForm):
 #Form for the game master to end a game
 class GMManageGameForm(FlaskForm):
 	game = QuerySelectField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-	end_game = SubmitField('End Game')
+	end_game = SubmitField('End Game') #ends the game completely
+	end_game_page = SubmitField('End Game Page') #brings the game to the end of game page, used for testing
 
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
