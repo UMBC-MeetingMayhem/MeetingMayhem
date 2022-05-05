@@ -76,9 +76,13 @@ def login():
 	if form.validate_on_submit():
 		user = User.query.filter_by(username=form.username.data).first() #check that the user exists, using username because that's what the user uses to log in
 		if user and bcrypt.check_password_hash(user.password, form.password.data): #if the user exists and the password is correct
-			login_user(user, remember=form.remember.data) #log the user in, and if the user checked the remeber box, remember the user (not sure if remember actually works)
-			next_page = request.args.get('next') #check if the next argument exists (i.e. user tried to go somewhere they needed to login to see)
-			flash(f'You are now logged in!', 'success') #notify the user they are logged in
+			if(user.role == 6): #If user's role is "inactive"
+				next_page = request.args.get('next')  # check if the next argument exists (i.e. user tried to go somewhere they needed to login to see)
+				flash(f'You cannot login because you have been removed from the game.','danger')  # Do not allow user to login
+			else:
+				login_user(user, remember=form.remember.data) #log the user in, and if the user checked the remeber box, remember the user (not sure if remember actually works)
+				next_page = request.args.get('next') #check if the next argument exists (i.e. user tried to go somewhere they needed to login to see)
+				flash(f'You are now logged in!', 'success') #notify the user they are logged in
 			return redirect(next_page) if next_page else redirect(url_for('home')) #redir the user to the next_page arg if it exists, if not send them to home page
 		else:
 			flash(f'Login Unsuccessful. Please check username and password.', 'danger') #display error message
@@ -542,6 +546,12 @@ def game_setup():
 				flash(f"You cannot change a user's role to what it already is!", 'danger')
 				return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
 			user.role = 5 #update to spectator
+		if usr_form.role.data == 'inac': #if the selected new role is inactive
+			if user.role == 6:
+				# show an error message. can't change a user's role to what they already are
+				flash(f"You cannot change a user's role to what it already is!", 'danger')
+				return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+			user.role = 6 #update to spectator
 		db.session.commit()
 		flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
 		update()

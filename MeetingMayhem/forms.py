@@ -131,7 +131,7 @@ class GMManageGameForm(FlaskForm):
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
 	user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator')], validators=[DataRequired()])
+	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator'), ('inac', 'Inactive')], validators=[DataRequired()])
 	update = SubmitField('Update User')
 
 # Form for a user to select a game
