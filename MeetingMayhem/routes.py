@@ -580,6 +580,7 @@ def spectate_game():
 			# Send list of games to template
 			return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
 
+"""
 @app.route('/character_select', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def character_select():
@@ -607,7 +608,8 @@ def character_select():
 	db.session.commit()
 	
 	return render_template('character_select.html', title='Select Your Character')
-		
+"""
+
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
@@ -618,8 +620,9 @@ def end_of_game():
 		if(game.end_result == "testing"):
 			return render_template('end_of_game.html', title='Results', game=game, result="Testing")
 		if(game.end_result == game.adv_vote):
-			
-			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+			return render_template('end_of_game.html', title='Results', game=game, result="AdvWin")
+		else:
+			return render_template('end_of_game.html', title='Results', game=game, result="AdvLose")
 	else:
 	# change to say player winner vs what it curently does. 
 		games = Game.query.filter_by(is_running=True).all() #grab all the running games
@@ -629,7 +632,9 @@ def end_of_game():
 				if(game.end_result == "testing"):
 					return render_template('end_of_game.html', title='Results', game=game, result="Testing")
 				if(game.end_result != game.adv_vote):
-					return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+					return render_template('end_of_game.html', title='Results', game=game, result="PlayerWin")
+				else:
+					return render_template('end_of_game.html', title='Results', game=game, result="PlayerLose")
 			
 	return render_template('end_of_game.html', title='Results', game=game, result="Loser")
 
