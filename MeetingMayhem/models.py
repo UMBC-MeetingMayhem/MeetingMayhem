@@ -137,7 +137,7 @@ class Game(db.Model):
     end_result = db.Column(db.String)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
-        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n"
+        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', Who_voted='{self.who_voted}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n" 
 
 #queryfactory for games, used for gm to modify specific games
 def getGame(columns=None):

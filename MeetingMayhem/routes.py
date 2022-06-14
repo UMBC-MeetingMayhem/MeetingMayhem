@@ -170,7 +170,6 @@ def messages():
 	sent_msgs.reverse()
 
 	if form.validate_on_submit(): #when the user submits the message form and it is valid
-
 		#capture the list of players from the checkboxes and make it into a string delimited by commas
 		checkbox_output_list = request.form.getlist('recipients')
 		
@@ -278,6 +277,13 @@ def adv_messages_page():
 		#adversary message editing
 		elif (is_submit_edits or is_delete_msg or is_send_no_change): #if any of the prev/next/submit buttons are clicked
 			display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
+			print(display_message)
+
+			if display_message == None:
+				flash(f'Please make sure to select a message for editing.', 'danger')
+				return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+				adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+				current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
 			
 			if display_message != None:
 				can_decrypt_curr_message = can_decrypt(current_user, display_message.encryption_details, display_message.is_encrypted, display_message.sender)
@@ -325,13 +331,13 @@ def adv_messages_page():
 
 				# Code for determining whether entered keys are valid or not
 				for element in new_keys.split(','):
-					if element.split('(')[0].lower() == 'sign':
-						if element.split('(')[1] == f"{current_user.username}.priv)":
+					if element.split('(')[0].lower() == 'signed':
+						if element.split('(')[1] == f"{current_user.username}.private)":
 							signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
 						else:
 							signed_keys.append('invalid sign key')
-					if element.split('(')[0].lower() == 'encrypt':
-						if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{current_user.username}.priv)"):
+					if element.split('(')[0].lower() == 'encrypted':
+						if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{current_user.username}.private)"):
 							encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
 						else:
 							encrypted_keys.append('invalid encrypted key')
@@ -365,6 +371,7 @@ def adv_messages_page():
 				#current_game.adv_current_msg_list_size = len(messages)
 				#commit the messages to the database
 				display_message.adv_submitted = True
+				print(display_message)
 				messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
 				msgs_tuple = []
 				for element in messages:
@@ -406,6 +413,9 @@ def adv_messages_page():
 
 			prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True).all() #grab all the previous messages for this game
 		
+			#reset prev msgs tuple before filling it with new messages
+			prev_msgs_tuple = []
+
 			for message in prev_messages:
 				prev_msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted,message.sender))) # append it to the tuple 
 
@@ -436,6 +446,7 @@ def game_setup():
 
 	#grab the state of the submit buttons so they only need to be pressed once
 	is_mng_submit = mng_form.end_game.data
+	is_end_game_page_submit = mng_form.end_game_page.data
 	is_setup_submit = setup_form.create_game.data
 	is_usr_form = usr_form.update.data
 
@@ -497,6 +508,14 @@ def game_setup():
 		#pull the forms again because their information has updated, might not need to do this
 		mng_form = GMManageGameForm()
 		setup_form = GMSetupGameForm()
+	
+	#bring the selected game to the end game screen, used for testing
+	if is_end_game_page_submit and mng_form.validate():
+		game = Game.query.filter_by(name=mng_form.game.data.name).first()
+		game.end_result = "testing"
+		db.session.commit()
+		socketio.emit('end_game',broadcast=True)
+		flash(f'The game has been brought to the end game page.', 'success')
 
 	#user management
 	if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
@@ -525,6 +544,7 @@ def game_setup():
 			user.role = 5 #update to spectator
 		db.session.commit()
 		flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
+		update()
 
 	#display webpage normally
 	return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
@@ -560,6 +580,7 @@ def spectate_game():
 			# Send list of games to template
 			return render_template('spectator_messages.html', title='Spectate A Game', sg_form=select_game_form)
 
+"""
 @app.route('/character_select', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def character_select():
@@ -587,23 +608,33 @@ def character_select():
 	db.session.commit()
 	
 	return render_template('character_select.html', title='Select Your Character')
-		
+"""
+
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
-	game = None;
+	game = None
 	
 	if (current_user.role == 3):
 		game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
+		if(game.end_result == "testing"):
+			return render_template('end_of_game.html', title='Results', game=game, result="Testing")
 		if(game.end_result == game.adv_vote):
-			return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+			return render_template('end_of_game.html', title='Results', game=game, result="AdvWin")
+		else:
+			return render_template('end_of_game.html', title='Results', game=game, result="AdvLose")
 	else:
+	# change to say player winner vs what it curently does. 
 		games = Game.query.filter_by(is_running=True).all() #grab all the running games
 		for g in games:
 			game = g
 			if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
+				if(game.end_result == "testing"):
+					return render_template('end_of_game.html', title='Results', game=game, result="Testing")
 				if(game.end_result != game.adv_vote):
-					return render_template('end_of_game.html', title='Results', game=game, result="Winner")
+					return render_template('end_of_game.html', title='Results', game=game, result="PlayerWin")
+				else:
+					return render_template('end_of_game.html', title='Results', game=game, result="PlayerLose")
 			
 	return render_template('end_of_game.html', title='Results', game=game, result="Loser")
 
@@ -621,7 +652,7 @@ def update():
 
 @socketio.on('cast_vote')
 def cast_vote(json):
-	print(json)
+	#print(json)
 	
 	game = Game.query.filter_by(id=json['game_id']).first()
 	
@@ -655,13 +686,13 @@ def cast_vote(json):
 		
 	if (len(votes_list) >= len(player_list) and game.adv_vote != None):
 		c = Counter(votes_list)
-		game.end_result = c.most_common()[0][0];
+		game.end_result = c.most_common()[0][0]
 		if(c.most_common()[0][1] == 1):
 			game.end_result = game.adv_vote;  
 		db.session.commit()
 		socketio.emit('end_game',broadcast=True)
 	
-	print(current_user, " ", game);
+	#print(current_user, " ", game);
 		
 	
 @socketio.on('ready_to_vote')
@@ -686,10 +717,10 @@ def ready_to_vote(json):
 	player_list = str_to_list(game.players, player_list)
 	
 	if (len(voted_list) / len(player_list) >= .5):
-		print("lets vote")
+		#print("lets vote")
 		socketio.emit('start_vote',broadcast=True)
 		
-	print(current_user, " ", game);
+	#print(current_user, " ", game);
 	
 	
 	

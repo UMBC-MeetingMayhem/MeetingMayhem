@@ -15,7 +15,7 @@
 				{% else %}
 				<a>Recipient: {{ msg[0].recipient }} </a>
 				{% endif %}
-				<a>Time Recieved: {{ msg[0].time_recieved }} </a>
+				<a> | Time Recieved: {{ msg[0].time_recieved }} </a>
 				</div>
 				{% if msg[0].edited_content %}
 				<p class="article-content">{{ msg[0].edited_content }}</p>
@@ -42,7 +42,7 @@
 				<div class="article-metadata">
 					<a>Sender: {{ msg[0].sender }} | </a>
 					<a>Recipient: {{ msg[0].recipient }}</a>
-					<a>Time Recieved: {{ msg[0].time_recieved }} </a>
+					<a> | Time Recieved: {{ msg[0].time_recieved }} </a>
 				</div>
 				<!-- check encyption --> 
 				{% if msg[1] %}

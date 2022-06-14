@@ -9,10 +9,25 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <h1 style="text-align:center;">{{game.end_result}}</h1>
-	<h1 style="text-align:center;">[Location image]</h1>
+    <h1 style="text-align:center;">Meeting time and place: {{game.end_result}}</h1>
+	<!--<h1 style="text-align:center;">[Location image]</h1>-->
     </br></br>
-	<h1 style="text-align:center;">{{result}}</h1>
+	<!--<h1 style="text-align:center;">{{result}}</h1>-->
+    {% if result == "AdvWin" %}
+        <h1 style="text-align:center;">You have won!</h1>
+        <h3 style="text-align:center;">The Adversary was able to thwart the player's meeting.</h3>
+    {% elif result == "AdvLose" %}
+        <h1 style="text-align:center;">You have lost.</h1>
+        <h3 style="text-align:center;">The players successfully met in a safe location.</h3>
+    {% elif result == "PlayerWin" %}
+        <h1 style="text-align:center;">You have won!</h1>
+        <h3 style="text-align:center;">The players successfully met in a safe location!</h3>
+    {% elif result == "PlayerLose" %}
+        <h1 style="text-align:center;">You have lost.</h1>
+        <h3 style="text-align:center;">The Adversary was able to thwart the player's meeting.</h3>
+    {% else %}
+        <p>Invalid</p>
+    {% endif %}
 	
 	<!--<h2 style="text-align:center;">other</h1>-->
 {% endblock content %}

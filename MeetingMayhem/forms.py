@@ -66,8 +66,8 @@ class MessageForm(FlaskForm):
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
-				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
@@ -83,8 +83,8 @@ class AdversaryMessageEditForm(FlaskForm):
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
-				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):
@@ -127,7 +127,8 @@ class GMSetupGameForm(FlaskForm):
 #Form for the game master to end a game
 class GMManageGameForm(FlaskForm):
 	game = QuerySelectField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-	end_game = SubmitField('End Game')
+	end_game = SubmitField('End Game') #ends the game completely
+	end_game_page = SubmitField('End Game Page') #brings the game to the end of game page, used for testing
 
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
