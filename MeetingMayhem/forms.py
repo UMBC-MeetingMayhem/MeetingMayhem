@@ -59,7 +59,8 @@ class MessageForm(FlaskForm):
 	submit = SubmitField('Send Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
-
+	meet_location = SelectField('locations', choices=["Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_time = SelectField('time', choices=["1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':
@@ -94,6 +95,7 @@ class GMSetupGameForm(FlaskForm):
 	name = StringField('Game Name', validators=[DataRequired()])
 	adversary = QuerySelectField(u'Adversary', query_factory=getAdversaryFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
 	create_game = SubmitField('Create Game')
+
 
 	def validate_name(self, name):
 		game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
