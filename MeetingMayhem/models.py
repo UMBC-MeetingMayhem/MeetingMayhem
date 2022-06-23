@@ -39,12 +39,13 @@ class User(db.Model, UserMixin):
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
     
     """
-    roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
+    roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator, 6 - inactive
     admin: is able to changes the roles of the users incase we need to do this
     GM: game master, puts different users and adversaries into a specific game instance
     adversary: edits messages from users
     user: plays the game
     spectator: is able to see results for game, probably also messages for each round
+    inactive: removed from game, unable to play
     we might also want to make a role thats both an adversary and a user at some point
     """
 
