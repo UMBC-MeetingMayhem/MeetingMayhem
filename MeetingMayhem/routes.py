@@ -29,8 +29,8 @@ from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 from datetime import datetime 
 from collections import Counter
-
 import pytz
+
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -172,7 +172,7 @@ def messages():
 	#sent messages
 	sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
 	sent_msgs.reverse()
-	
+
 	if form.validate_on_submit(): #when the user submits the message form and it is valid
 		#capture the list of players from the checkboxes and make it into a string delimited by commas
 		checkbox_output_list = request.form.getlist('recipients')

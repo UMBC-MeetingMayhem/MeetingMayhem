@@ -17,6 +17,7 @@ LoginManager - login manager login manager manages login :)
 """
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_socketio import SocketIO
@@ -34,6 +35,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
 #initialize the database
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 #initialize the password hashing lad
 bcrypt = Bcrypt(app)

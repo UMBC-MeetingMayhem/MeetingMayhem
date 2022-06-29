@@ -66,6 +66,8 @@
          <br/>
          <div class="form-group">
             {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+            {{ form.meet_location }}
+            {{ form.meet_time }}
             {% if form.content.errors %} <!-- if there are errors in the form... -->
             {{ form.content(class="form-control form-control-lg is-invalid") }}
             <div class="invalid-feedback">
@@ -142,6 +144,8 @@
                <a>Recipient: {{ sent_msg.recipient }}</a>
                <a> | Time Sent: {{ sent_msg.time_sent }} </a>
             </div>
+             <p>@{{ sent_msg.location_meet }}</p>
+             <p>@{{ sent_msg.time_meet }}</p>
             <p class="article-content">{{ sent_msg.content }}</p>
          </div>
          {% if sent_msg.initial_is_encrypted %}
