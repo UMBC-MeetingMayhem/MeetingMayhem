@@ -7,3 +7,4 @@ wtforms==2.3.3
 flask_wtf
 email_validator
 pytz
+flask-unittest
