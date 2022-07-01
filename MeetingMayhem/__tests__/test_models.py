@@ -21,8 +21,6 @@ class Ex(test.ClientTestCase):
         self.assertTrue(1 == 1)
         self.assertFalse(1 == 2)
 
-        print("kjhgblsdfg")
-
         return
 
 if __name__ == "__main__":
