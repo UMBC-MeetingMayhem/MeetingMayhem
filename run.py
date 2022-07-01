@@ -2,7 +2,7 @@
 File: run.py
 Author: Robert Shovan /Voitheia
 Date Created: 6/15/2021
-Last Modified: 7/16/2021
+Last Modified: 7/1/2022
 E-mail: rshovan1@umbc.edu
 Description: python file responsible for running the Meeting Mayhem website/package
 
@@ -11,6 +11,7 @@ https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUx
 """
 
 #import the app from the package so that we can run it here
+from argparse import ArgumentParser, BooleanOptionalAction, Namespace
 from MeetingMayhem import app, socketio
 #from flask_socketio import SocketIO
 
@@ -19,5 +20,14 @@ Runs the app. For now, the app is run in debug mode for ease of development. Thi
 the website without restarting the server. This will need to change in the future
 """
 if __name__ == '__main__':
-    socketio.run(app, debug=True,) #use this one for local testing
+    parser: ArgumentParser = ArgumentParser()
+    parser.add_argument("-t", "--test", action=BooleanOptionalAction)
+    args: Namespace = parser.parse_args()
+
+    if args.test:
+        # run the tests
+        print("run tests")
+        pass
+    else:
+        socketio.run(app, debug=True,) #use this one for local testing
     #socketio.run(app, debug=True,host="0.0.0.0") #use this one to host for other computers
