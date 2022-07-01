@@ -5,9 +5,10 @@ Testing Framework: flask_unittest
 """
 import flask_unittest as test
 import MeetingMayhem.models as MMmodel
+from MeetingMayhem import app as MMapp
 
 class Ex(test.ClientTestCase):
-    app = None  # app obj goes here when ready
+    app = MMapp  # app obj goes here when ready
 
     def setUp(self, client) -> None:
         return
@@ -18,6 +19,11 @@ class Ex(test.ClientTestCase):
     def test_basic_assertion(self, client) -> None:
         self.assertEqual(1, 1)
         self.assertTrue(1 == 1)
-        self.assertFalse(1, 2)
+        self.assertFalse(1 == 2)
+
+        print("kjhgblsdfg")
 
         return
+
+if __name__ == "__main__":
+    test.main()
