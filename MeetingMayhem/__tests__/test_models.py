@@ -1,39 +1,50 @@
-"""
-Testing Framework: flask_unittest
-    -Unfamiliar with pytest
-    -Unittest DB mocks seem awful
-"""
 import flask_unittest as test
 import MeetingMayhem.models as MMmodel
+from flask import Flask
 from MeetingMayhem import app as MMapp
+from MeetingMayhem import db
+from random import choices
+from string import ascii_letters, digits
+from typing import List
 
-"""
-class Ex(test.ClientTestCase):
-    app = MMapp  # app obj goes here when ready
+# I REALLY hate the idea of using the same DB for testing and production.
+# I'm sure it'll be fine... right?? -Drew
+def insert_user(role: int) -> MMmodel.User:
+    r_name: str = "".join(choices(ascii_letters + digits, k=10))
 
-    def setUp(self, client) -> None:
-        return
+    # UNIQUE constraints >:(
+    user: MMmodel.User = MMmodel.User(
+        username=r_name,
+        email=f"{r_name}@cringe.net",
+        password="gg",
+        role=str(role)
+    )
+    db.session.add(user)
+    db.session.commit()
 
-    def tearDown(self, client) -> None:
-        return
-
-    def test_basic_assertion(self, client) -> None:
-        self.assertEqual(1, 1)
-        self.assertTrue(1 == 1)
-        self.assertFalse(1 == 2)
-
-        return
-"""
+    return user
 
 # Most of these are moreso tests for sqlalchemy operations and therefore
 # are probably not needed. However, they're good documentation. -Drew
 class UserTests(test.ClientTestCase):
-    app = MMapp  # app obj goes here when ready
+    app: Flask = MMapp
+    inserted: List[MMmodel.User] = []
 
     def setUp(self, client) -> None:
+        user1: MMmodel.User = insert_user(4)
+        user2: MMmodel.User = insert_user(4)
+        adversary: MMmodel.User = insert_user(3)
+        gm: MMmodel.User = insert_user(2)
+
+        self.inserted = [user1, user2, adversary, gm]
         return
 
     def tearDown(self, client) -> None:
+        for user in self.inserted:
+            db.session.delete(user)
+
+        db.session.commit()
+        self.inserted = []
         return
 
     def test_get_adversary(self, client) -> None:
