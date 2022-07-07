@@ -71,7 +71,7 @@ class UserTests(test.ClientTestCase):
         result: BaseQuery = MMmodel.getAllUserAdversary()
         diff: int = result.count() - (self.base_num_users + self.base_num_adv)
         self.assertEqual(diff, 3)
-        self.assertTrue(all([self.inserted[i] in result for i in range(2)]))
+        self.assertTrue(all([self.inserted[i] in result for i in range(3)]))
 
         return
 
@@ -83,7 +83,7 @@ class UserTests(test.ClientTestCase):
         result: BaseQuery = MMmodel.getNonGMUsers()
         diff: int = result.count() - (self.base_num_users + self.base_num_adv)
         self.assertEqual(diff, 3)
-        for user in self.inserted: self.AssertIn(user, result)
+        self.assertTrue(all([self.inserted[i] in result for i in range(3)]))
 
         return
 
