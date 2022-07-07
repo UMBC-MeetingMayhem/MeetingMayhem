@@ -1,10 +1,10 @@
+email_validator
 flask
-flask_sqlalchemy
 flask_bcrypt
 flask_login
 flask_socketio
-wtforms==2.3.3
-flask_wtf
-email_validator
-pytz
+flask_sqlalchemy
 flask-unittest
+flask_wtf
+pytz
+wtforms==2.3.3
