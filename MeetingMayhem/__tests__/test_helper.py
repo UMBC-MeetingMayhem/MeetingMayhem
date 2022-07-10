@@ -5,9 +5,14 @@ Testing Framework: flask_unittest
 """
 import flask_unittest as test
 import MeetingMayhem.helper as MMhelper
+import MeetingMayhem.models as MMmodel
 from flask import Flask
+from flask_sqlalchemy import BaseQuery
 from MeetingMayhem import app as MMapp
-from typing import Dict, List, Tuple
+from MeetingMayhem import db
+from random import choices
+from string import ascii_letters, digits
+from typing import List, Tuple, Union
 
 class HelperFxnTests(test.ClientTestCase):
     app: Flask = MMapp
@@ -72,4 +77,52 @@ class HelperFxnTests(test.ClientTestCase):
 
         return
 
+def insert_user(role: int) -> MMmodel.User:
+    r_name: str = "".join(choices(ascii_letters + digits, k=10))
+
+    # UNIQUE constraints >:(
+    user: MMmodel.User = MMmodel.User(
+        username=r_name,
+        email=f"{r_name}@cringe.net",
+        password="gg",
+        role=str(role)
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    return user
+
 # new class starting with create_message()
+class AppSpecificHelperTests(test.ClientTestCase):
+    app: Flask = MMapp
+    inserted: List[Union[MMmodel.User, MMmodel.Game]] = []
+
+    # may need these
+    def setUp(self, _) -> None:
+        return
+
+    def tearDown(self, _) -> None:
+        return
+
+    def test_create_message_adversary(self, client) -> None:
+        """
+        create_message() is used by both adversaries and normal users.
+        It returns a boolean dependant on whether or not the message was sent.
+        The user sending the message, the game, the req, the form, the sender's username,
+          and the timestamp of sending are all required in both cases.
+        This test case is for the adversary case.
+        """
+        print(type(client))  # want this for strict typing (idk what client is :( )
+
+        return
+
+    def test_create_message_normal(self, client) -> None:
+        """
+        create_message() is used by both adversaries and normal users.
+        It returns a boolean dependant on whether or not the message was sent.
+        The user sending the message, the game, the req, the form, the sender's username,
+          and the timestamp of sending are all required in both cases.
+        This test case is for the normal user case.
+        """
+
+        return
