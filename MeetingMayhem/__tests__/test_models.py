@@ -1,3 +1,4 @@
+from re import L
 import flask_unittest as test
 import MeetingMayhem.models as MMmodel
 from flask import Flask
@@ -34,7 +35,7 @@ class UserTests(test.ClientTestCase):
     base_num_adv: int = MMmodel.User.query.filter_by(role=3).count()
     base_num_gm: int = MMmodel.User.query.filter_by(role=2).count()
 
-    def setUp(self, client) -> None:
+    def setUp(self, _) -> None:
         user1: MMmodel.User = insert_user(4)
         user2: MMmodel.User = insert_user(4)
         adversary: MMmodel.User = insert_user(3)
@@ -43,7 +44,7 @@ class UserTests(test.ClientTestCase):
         self.inserted = [user1, user2, adversary, gm]
         return
 
-    def tearDown(self, client) -> None:
+    def tearDown(self, _) -> None:
         for user in self.inserted:
             db.session.delete(user)
 
@@ -51,7 +52,7 @@ class UserTests(test.ClientTestCase):
         self.inserted = []
         return
 
-    def test_get_adversary(self, client) -> None:
+    def test_get_adversary(self, _) -> None:
         """
         Adversaries have role: int = 3.
         getAdversary() should return all users with this role.
@@ -63,7 +64,7 @@ class UserTests(test.ClientTestCase):
 
         return
 
-    def test_get_all_user_adversary(self, client) -> None:
+    def test_get_all_user_adversary(self, _) -> None:
         """
         Normal users have role: int = 4, Adversaries have role: int = 3.
         getAllUserAdversary() should return all users with these roles.
@@ -75,7 +76,7 @@ class UserTests(test.ClientTestCase):
 
         return
 
-    def test_get_non_gm_users(self, client) -> None:
+    def test_get_non_gm_users(self, _) -> None:
         """
         Game Masters have role: int = 2 (I believe).
         getNonGMUsers() should return all users with role: int > 2.
@@ -94,10 +95,10 @@ class UserTests(test.ClientTestCase):
 class MessageTests(test.ClientTestCase):
     app: Flask = MMapp
 
-    def setUp(self, client) -> None:
+    def setUp(self, _) -> None:
         return
 
-    def tearDown(self, client) -> None:
+    def tearDown(self, _) -> None:
         return
 
 # See insert_user() for me complaining. -Drew
@@ -123,14 +124,14 @@ class GameTests(test.ClientTestCase):
     inserted: List[MMmodel.Game] = []
     base_num_running: int = MMmodel.Game.query.filter_by(is_running=True).count()
 
-    def setUp(self, client) -> None:
+    def setUp(self, _) -> None:
         running_details: Tuple[MMmodel.Game, MMmodel.User] = create_game(running=True)
         not_running_details: Tuple[MMmodel.Game, MMmodel.User] = create_game(running=False)
 
         self.inserted = [*running_details, *not_running_details]
         return
 
-    def tearDown(self, client) -> None:
+    def tearDown(self, _) -> None:
         for item in self.inserted:
             db.session.delete(item)
 
@@ -138,7 +139,7 @@ class GameTests(test.ClientTestCase):
         self.inserted = []
         return
 
-    def test_get_game(self, client) -> None:
+    def test_get_game(self, _) -> None:
         """
         Games have an is_running field.
         getGame() should only return games that are currently in progress.
