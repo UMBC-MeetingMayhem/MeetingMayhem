@@ -75,7 +75,7 @@
 		{% if message is iterable %} <!-- this checks if the passed message var has content in it -->
 		{% for message in message%} 
 
-			<article class="media content-section">
+		<article class="media content-section" {% if message.adv_created %} style="background: rgb(20, 75, 20);" {% elif message.is_deleted %} style="background: rgb(75, 20, 20);" {% elif message.is_edited %} style="background: rgb(20, 20, 75);" {% else %} style="background: rgb(60, 60, 20);" {% endif %}>
 			<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
 			{% if message.adv_created %}
 				{% if not message.is_deleted %}
