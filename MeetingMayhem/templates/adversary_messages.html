@@ -388,7 +388,7 @@
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
         {% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
-        <article class="media content-section">
+        <article class="media content-section" {% if prev_msg[0].is_deleted %} style="background: rgb(75, 20, 20);" {% else %} style="background: rgb(20, 20, 75);" {% endif %}>
             <div class="media-body">
                 <div class="article-metadata">
                 {% if prev_msg[0].new_sender %}
@@ -431,7 +431,7 @@
 			{% endif %}
         </article>
         {% elif prev_msg[0].adv_created %} <!-- if the adversary created the message -->
-        <article class="media content-section">
+        <article class="media content-section" style="background: rgb(20, 75, 20);">
             <div class="media-body">
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
@@ -455,12 +455,13 @@
 			{% endif %}
         </article>
         {% else %} <!-- if the message hasn't been edited, display normally -->
-			<article class="media content-section">
+		<article class="media content-section" style="background: rgb(60, 60, 20);">
             <div class="media-body">
                 <div class="article-metadata">
                 <a>Sender: {{ prev_msg[0].sender }} | </a>
                 <a>Recipient: {{ prev_msg[0].recipient }}</a>
                 <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
+				<a> | This message was not edited by the adversary.</a>
                 </div>
 				{% if not prev_msg[1] %}
 				<p class="article-content">--CANNOT DECRYPT--</p>
