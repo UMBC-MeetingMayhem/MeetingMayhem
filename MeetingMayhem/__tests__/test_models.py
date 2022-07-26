@@ -1,4 +1,3 @@
-from re import L
 import flask_unittest as test
 import MeetingMayhem.models as MMmodel
 from flask import Flask

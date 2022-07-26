@@ -7,4 +7,6 @@ flask_sqlalchemy
 flask-unittest
 flask_wtf
 pytz
+selenium
+webdriver_manager
 wtforms==2.3.3
