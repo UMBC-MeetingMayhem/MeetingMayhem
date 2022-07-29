@@ -10,7 +10,7 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 <h1 class="float-start">Messages</h1>
-<button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
+<button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 <script>
    $("#vote_bt").on("click", function() {
    	$(this).prop("disabled", true);
@@ -22,31 +22,6 @@
    });	
 </script>
 
-<style>
-
-.modal-content{
-   background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgb(19, 19, 22) 10%, rgb(106, 108, 110) 64%, rgb(40, 42, 43) 100%);
-}
-
-.form-select{
-   background-color: #333333;
-   color: #0dcaf0;
-}
-
-.modal-footer{
-   border: transparent;
-}
-
-#vote_bt {
-   color: #0dcaf0; border-color:#0dcaf0; background-color: #272822;
-}
-
-#submt_vote{
-   color: #0dcaf0; border-color:#0dcaf0;
-   background: transparent;
-}
-
-</style>
 
 <legend class="border-bottom mb4">Send a Message</legend>
 <div class="content-section">
@@ -59,15 +34,16 @@
             <div class="form-check form-check-inline">
                <!-- below line needs the ', ' in value to make processing usernames easier -->
                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-               <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+               <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
             </div>
             {% endfor %}
          </div>
          <br/>
          <div class="form-group">
             {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-            {{ form.meet_location }}
-            {{ form.meet_time }}
+            {{ form.meet_location (class="gray-blue") }}
+            {{ form.meet_time (class="gray-blue")}}
+            {{ form.meet_am_pm (class="gray-blue") }}
             {% if form.content.errors %} <!-- if there are errors in the form... -->
             {{ form.content(class="form-control form-control-lg is-invalid") }}
             <div class="invalid-feedback">
@@ -90,14 +66,14 @@
          </ul>
          <div class="row g-3 align-items-center">
             <div class="col-auto">
-               <select id="cryptography_type_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                   <option value= "-1" selected>Cryptography Type</option>
                   <option value="Signed">Signed</option>
                   <option value="Encrypted">Encrypted</option>
                </select>
             </div>
             <div class="col-auto">
-               <select id="cryptography_user_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                   <option value= "-1" selected>User</option>
                   {% for username in usernames %}
                   <option value="{{ username }}">{{ username }}</option>
@@ -105,7 +81,7 @@
                </select>
             </div>
             <div class="col-auto">
-               <select id="cryptography_key_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                   <option value= "-1" selected>Key Type</option>
                   <option value="public">Public</option>
                   <option value="private">Private</option>
@@ -117,7 +93,7 @@
       </div>
 	  
       <div class="form-group">
-         {{ form.submit(class="btn btn-outline-info") }}
+        {{ form.submit(class="btn btn-outline-info") }}
       </div>
    </form>
 </div>
@@ -144,9 +120,10 @@
                <a>Recipient: {{ sent_msg.recipient }}</a>
                <a> | Time Sent: {{ sent_msg.time_sent }} </a>
             </div>
-             <p>@{{ sent_msg.location_meet }}</p>
-             <p>@{{ sent_msg.time_meet }}</p>
-            <p class="article-content">{{ sent_msg.content }}</p>
+            <div id="content">
+                 <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{ sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+                 <p class="article-content">{{ sent_msg.content }}</p>
+            </div>
          </div>
          {% if sent_msg.initial_is_encrypted %}
          <div class="m-1 row ">
@@ -345,7 +322,32 @@
 		console.log(submitString);
 		document.getElementById('encryption_and_signed_keys').value = submitString; 
    }
-   
+
+    function setRandomColor(obj, color) {
+        obj.css("color", color);
+    }
+
+    function generatePastelColor() {
+        let R = Math.floor((Math.random() * 127) + 127);
+        let G = Math.floor((Math.random() * 127) + 127);
+        let B = Math.floor((Math.random() * 127) + 127);
+
+        let rgb = (R << 16) + (G << 8) + B;
+        return `#${rgb.toString(16)}`;
+    }
+
+    let usernames = $(".form-check-label")
+
+   // randomizes colors in recipient list
+    for (let name = 0; name < usernames.length; name++){
+        setRandomColor($(usernames[name]), generatePastelColor())
+    }
+
+    function content(message){
+        let h = $("#content");
+        console.log(this.sent_msg)
+   }
+   content(0)
 </script>
 			
 {% endblock content %}

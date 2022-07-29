@@ -25,6 +25,7 @@ body {
   background:rgb(10,10,47);
 }
 
+
   h1, h2, h3, h4, h5, h6 {
     color: white;
   }
@@ -37,7 +38,21 @@ body {
     top:50%;
     border: 1px solid #dbcdc6;
     border-radius: 3px;
-  }
+}
+
+.modal-content{
+   background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgb(19, 19, 22) 10%, rgb(106, 108, 110) 64%, rgb(40, 42, 43) 100%);
+}
+
+.gray-blue{
+    background-color: #333333;
+    color: #0dcaf0;
+    border-color:#0dcaf0;
+}
+
+.modal-footer{
+   border: transparent;
+}
 
   .site-header .navbar-nav .nav-link {
     color: #cbd5db;
@@ -50,7 +65,7 @@ body {
   .site-header .navbar-nav .nav-link.active {
     font-weight: 500;
   }
-  
+
   .content-section {
     background: #888888;
     padding: 10px 20px;
@@ -158,3 +173,4 @@ body {
       background-color: #f1f1f1;
       color: #333;
       outline: none; }
+

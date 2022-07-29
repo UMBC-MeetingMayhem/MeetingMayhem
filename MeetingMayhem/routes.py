@@ -6,6 +6,7 @@ Last Modified: 7/14/2021
 E-mail: rshovan1@umbc.edu
 Description: python file that handles the routes for the website.
 """
+import random
 
 """
 info about imports
@@ -142,10 +143,14 @@ def messages():
 
 	#create list of usernames for checkboxes
 	users = User.query.filter_by(role=4, game=current_game.id).all()
+	adversaries = User.query.filter_by(role=3, game=current_game.id).all()
 	usernames = []
 	for user in users:
 		usernames.append(user.username)
+	for adversary in adversaries:
+		usernames.append(adversary.username)
 
+	usernames = random.sample(usernames, len(usernames)) # randomizes usernames
 	form = MessageForm() #use the standard message form
 	#msgs = None
 	msgs_tuple = []
@@ -176,13 +181,17 @@ def messages():
 	if form.validate_on_submit(): #when the user submits the message form and it is valid
 		#capture the list of players from the checkboxes and make it into a string delimited by commas
 		checkbox_output_list = request.form.getlist('recipients')
-		
+
 
 		#ensure the list isn't empty
 		if not checkbox_output_list:
 			flash(f'Please select at least one recipient.', 'danger')
 			return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
-		
+
+		if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
+			flash(f'Please select a time and location.', 'danger')
+			return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game,
+								   msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 		#ensure keys entered are keys of actual recipients chosen
 		curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
 		create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
@@ -191,7 +200,7 @@ def messages():
 	#sent messages
 	sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
 	sent_msgs.reverse()
-	
+
 	#give the template the vars it needs
 	return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 
@@ -212,9 +221,11 @@ def adv_messages_page():
 		#create list of usernames for checkboxes
 		users = User.query.filter_by(role=4, game=current_game.id).all()
 		usernames = []
+		adversaries = User.query.filter_by(role=3, game=current_game.id).all()
 		for user in users:
 			usernames.append(user.username)
-
+		for adversary in adversaries:
+			usernames.append(adversary.username)
 
 		#grab the messages from previous rounds, this is done here because the previous messages shouldn't change
 
