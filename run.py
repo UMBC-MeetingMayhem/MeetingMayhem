@@ -19,5 +19,5 @@ Runs the app. For now, the app is run in debug mode for ease of development. Thi
 the website without restarting the server. This will need to change in the future
 """
 if __name__ == '__main__':
-    socketio.run(app, debug=True,) #use this one for local testing
+    socketio.run(app, debug=True) #use this one for local testing
     #socketio.run(app, debug=True,host="0.0.0.0") #use this one to host for other computers

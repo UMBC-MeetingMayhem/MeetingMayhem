@@ -59,8 +59,9 @@ class MessageForm(FlaskForm):
 	submit = SubmitField('Send Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
-	meet_location = SelectField('locations', choices=["Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
-	meet_time = SelectField('time', choices=["1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
+	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
+	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':
@@ -72,6 +73,9 @@ class MessageForm(FlaskForm):
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
 	edited_content = StringField('Edited Message')
+	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
+	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	msg_num = IntegerField()
 	submit_edits = SubmitField('Forward Message')
 	send_no_change = SubmitField('Forward Message (no changes)')

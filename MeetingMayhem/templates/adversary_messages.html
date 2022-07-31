@@ -43,7 +43,9 @@
                 </div> <br/>
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    
+                    {{ msg_form.meet_location (class="gray-blue") }}
+                    {{ msg_form.meet_time (class="gray-blue")}}
+                    {{ msg_form.meet_am_pm (class="gray-blue") }}
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
                         {{ msg_form.content(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -65,14 +67,14 @@
 			 </ul>
 			 <div class="row g-3 align-items-center">
 				<div class="col-auto">
-				   <select id="cryptography_type_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+				   <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 					  <option value= "-1" selected>Cryptography Type</option>
 					  <option value="Signed">Signed</option>
 					  <option value="Encrypted">Encrypted</option>
 				   </select>
 				</div>
 				<div class="col-auto">
-				   <select id="cryptography_user_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+				   <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 					  <option value= "-1" selected>User</option>
 					  {% for username in usernames %}
 					  <option value="{{ username }}">{{ username }}</option>
@@ -80,7 +82,7 @@
 				   </select>
 				</div>
 				<div class="col-auto">
-				   <select id="cryptography_key_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+				   <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 					  <option value= "-1" selected>Key Type</option>
 					  <option value="public">Public</option>
 					  <option value="private">Private</option>
@@ -306,7 +308,6 @@
                 </div> <br/>
                 <div class="form-group">
                     {{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    
                     {% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
                         {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -336,14 +337,14 @@
 			 </ul>
 			 <div class="row g-3 align-items-center">
 				<div class="col-auto">
-				   <select id="adv_cryptography_type_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+				   <select id="adv_cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 					  <option value= "-1" selected>Cryptography Type</option>
 					  <option value="Signed">Signed</option>
 					  <option value="Encrypted">Encrypted</option>
 				   </select>
 				</div>
 				<div class="col-auto">
-				   <select id="adv_cryptography_user_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+				   <select id="adv_cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 					  <option value= "-1" selected>User</option>
 					  {% for username in usernames %}
 					  <option value="{{ username }}">{{ username }}</option>
@@ -351,7 +352,7 @@
 				   </select>
 				</div>
 				<div class="col-auto">
-				   <select id="adv_cryptography_key_select" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example">
+				   <select id="adv_cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 					  <option value= "-1" selected>Key Type</option>
 					  <option value="public">Public</option>
 					  <option value="private">Private</option>
