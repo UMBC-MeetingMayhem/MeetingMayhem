@@ -5,6 +5,8 @@ Testing Framework: flask_unittest
 """
 from os import wait
 import flask_unittest as test
+from sqlalchemy.orm import reconstructor
+from sqlalchemy.util.langhelpers import NoneType
 import MeetingMayhem.routes as MMroute
 from flask import Flask
 from flask.testing import FlaskClient
@@ -102,10 +104,60 @@ class RegisterPageViewRouteTests(test.ClientTestCase):
     def register_page_post_invalid(self, client: FlaskClient) -> None:
         return
 
+class CharacterSelectPageViewRouteTests(test.ClientTestCase):
+    app: Flask = MMapp
 
+    def character_select_page_blank(self, client: FlaskClient) -> None:
+        """
 
+        """
 
+        return
 
+    # ...
 
+class AdversaryMessagesPageViewRouteTests(test.ClientTestCase):
+    app: Flask = MMapp
+
+    def adversary_messages_page_blank(self, client: FlaskClient) -> None:
+        """
+
+        """
+
+        return
+
+class MessagesViewRouteTests(test.ClientTestCase):
+    app: Flask = MMapp
+
+    def messages_blank(self, client: FlaskClient) -> None:
+        """
+
+        """
+
+        return
+
+class SpectatingViewRouteTests(test.ClientTestCase):
+    app: Flask = MMapp
+
+    def spectator_view_no_game(self, client: FlaskClient) -> None:
+        """
+
+        """
+
+        return
+
+    def spectator_view_game_no_messages(self, client: FlaskClient) -> None:
+        """
+
+        """
+
+        return
+
+    def spectator_view_game_with_messages(self, client: FlaskClient) -> None:
+        """
+
+        """
+
+        return
 
 
