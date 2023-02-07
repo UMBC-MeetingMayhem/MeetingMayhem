@@ -30,6 +30,7 @@ from MeetingMayhem.models import User, Message, Game
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, can_decrypt
 from datetime import datetime 
 from collections import Counter
+from flask import Flask, send_from_directory
 import pytz
 
 
@@ -743,5 +744,7 @@ def ready_to_vote(json):
 		
 	#print(current_user, " ", game);
 	
-	
+@app.route('/images/<path:filename>')
+def serve_images(filename):
+    return send_from_directory('images', filename)
 	

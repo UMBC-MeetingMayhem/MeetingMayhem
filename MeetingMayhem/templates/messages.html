@@ -34,6 +34,7 @@
             <div class="form-check form-check-inline">
                <!-- below line needs the ', ' in value to make processing usernames easier -->
                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
+               <img src="/images/user_icon.png" alt=""  width="30px" height="30px">
                <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
             </div>
             {% endfor %}
@@ -178,15 +179,16 @@
          <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
       </div>
       <div class="modal-body">
+         <img id="displayedImage" src="/images/cafe.png" width="450px" height="200px" alt="Image description">
          <select id="places_select" class="form-select" aria-label="Default select example">
             <option selected>Select Location</option>
-            <option value="1">Park</option>
-            <option value="2">Alley</option>
-            <option value="3">Cafe</option>
-            <option value="4">Parking Garage</option>
-            <option value="5">Rooftop</option>
-            <option value="6">Bus stop</option>
-            <option value="7">Subway station</option>
+            <option  value="park">Park</option>
+            <option value="alley">Alley</option>
+            <option value="cafe">Cafe</option>
+            <option value="garage">Parking Garage</option>
+            <option value="rooftop">Rooftop</option>
+            <option value="busstop">Bus stop</option>
+            <option value="subway">Subway station</option>
          </select>
          <br>
          <div class="row">
@@ -348,6 +350,15 @@
         console.log(this.sent_msg)
    }
    content(0)
+
+   var dropdown = document.getElementById("places_select");
+   var displayedImage = document.getElementById("displayedImage");
+
+   dropdown.addEventListener("change", function() {
+      var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+      displayedImage.src = "/images/" + selectedOption + ".png";
+   });
+
 </script>
 			
 {% endblock content %}
