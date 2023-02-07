@@ -59,18 +59,23 @@ class MessageForm(FlaskForm):
 	submit = SubmitField('Send Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
-
+	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
+	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
-				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
 	edited_content = StringField('Edited Message')
+	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
+	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	msg_num = IntegerField()
 	submit_edits = SubmitField('Forward Message')
 	send_no_change = SubmitField('Forward Message (no changes)')
@@ -82,8 +87,8 @@ class AdversaryMessageEditForm(FlaskForm):
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("sign[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element))) and not(bool(re.match("encrypt[(][a-zA-Z0-9]+[.](priv|pub)[)]$", element)))):
-				raise ValidationError("Enter in following format Sign/Encrypt(username.priv/pub),Sign/Encrypt(username.priv/pub),....etc")
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to advance the round
 class AdversaryAdvanceRoundForm(FlaskForm):
@@ -94,6 +99,7 @@ class GMSetupGameForm(FlaskForm):
 	name = StringField('Game Name', validators=[DataRequired()])
 	adversary = QuerySelectField(u'Adversary', query_factory=getAdversaryFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
 	create_game = SubmitField('Create Game')
+
 
 	def validate_name(self, name):
 		game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
@@ -125,12 +131,13 @@ class GMSetupGameForm(FlaskForm):
 #Form for the game master to end a game
 class GMManageGameForm(FlaskForm):
 	game = QuerySelectField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-	end_game = SubmitField('End Game')
+	end_game = SubmitField('End Game') #ends the game completely
+	end_game_page = SubmitField('End Game Page') #brings the game to the end of game page, used for testing
 
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
 	user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
-	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator')], validators=[DataRequired()])
+	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator'), ('inac', 'Inactive')], validators=[DataRequired()])
 	update = SubmitField('Update User')
 
 # Form for a user to select a game

@@ -79,6 +79,8 @@ def str_to_list(st, li):
     return li #return the list filled with strings
 
 def create_message(user, game, request, form, username, time_stamp):
+
+    print("---------------\n\n\n\n")
     """Create a message. Used by both the adversary and the users.
     Intention is to use this function with a switch statement so that different actions can
     be taking depending on which code is returned.
@@ -135,13 +137,13 @@ def create_message(user, game, request, form, username, time_stamp):
 
         # Code for determining whether entered keys are valid or not
         for element in checkbox_output_list_keys.split(','):
-            if element.split('(')[0].lower() == 'sign':
-                if element.split('(')[1] == f"{username}.priv)":
+            if element.split('(')[0].lower() == 'signed':
+                if element.split('(')[1] == f"{username}.private)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0].lower() == 'encrypt':
-                if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
+            if element.split('(')[0].lower() == 'encrypted':
+                if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{username}.private)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                      encrypted_keys.append('invalid encrypted key')
@@ -150,7 +152,7 @@ def create_message(user, game, request, form, username, time_stamp):
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
             
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string, time_sent=time_stamp)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         db.session.add(new_message)
         db.session.commit()
         #display success to user
@@ -185,20 +187,20 @@ def create_message(user, game, request, form, username, time_stamp):
 
         #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
-            flash(f'Please select at least one sender and one recipient.', 'danger')
+            flash(f'Duplicate message detected. Please create a new message.', 'danger')
             return False
         
 
 
         # Code for determining whether entered keys are valid or not
         for element in encryption_output.split(','):
-            if element.split('(')[0].lower() == 'sign':
-                if element.split('(')[1] == f"{username}.priv)":
+            if element.split('(')[0].lower() == 'signed':
+                if element.split('(')[1] == f"{username}.private)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0].lower() == 'encrypt':
-                if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'pub)' or element.split('(')[1] == f"{username}.priv)"):
+            if element.split('(')[0].lower() == 'encrypted':
+                if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{username}.private)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                      encrypted_keys.append('invalid encrypted key')
@@ -208,7 +210,7 @@ def create_message(user, game, request, form, username, time_stamp):
         
         #create the message and add it to the db
         
-        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp)
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         
         db.session.add(new_message)
         db.session.commit()

@@ -1,256 +1,353 @@
 <!-- 
-    File: messages.html
-    Author: Robert Shovan /Voitheia
-    Date Created: 6/24/2021
-    Last Modified: 7/6/2021
-    E-mail: rshovan1@umbc.edu
-    Description: html and jinja file for handling the messages page
--->
-
+   File: messages.html
+   Author: Robert Shovan /Voitheia
+   Date Created: 6/24/2021
+   Last Modified: 7/6/2021
+   E-mail: rshovan1@umbc.edu
+   Description: html and jinja file for handling the messages page
+   -->
 {% import 'messages.j2' as messages %}
-
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+<h1 class="float-start">Messages</h1>
+<button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
+<script>
+   $("#vote_bt").on("click", function() {
+   	$(this).prop("disabled", true);
+   	
+   	var socket = io();
+   	socket.on('connect', function() {
+   	socket.emit('ready_to_vote', {game_id: "{{game.id}}", player: "{{current_user.username}}"});
+   	});
+   });	
+</script>
 
 
-    <h1 class="float-start">Messages</h1>
-	
-	<button id="vote_bt" style="box-shadow: none !important" class="btn btn-primary btn-lg float-end" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
-	<script>
-		$("#vote_bt").on("click", function() {
-			$(this).prop("disabled", true);
-			
-			var socket = io();
-			socket.on('connect', function() {
-			socket.emit('ready_to_vote', {game_id: "{{game.id}}", player: "{{current_user.username}}"});
-			});
-		});	
-	</script>
-	
-	
-    <legend class="border-bottom mb4">Send a Message</legend>
-    <div class="content-section">
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <div class="form-group">
-                <label class="form-control-label" for="name">Recipients</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
-                </div> <br/>
-                <div class="form-group">
-                    {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    
-                    {% if form.content.errors %} <!-- if there are errors in the form... -->
-                        {{ form.content(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.content.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ form.content(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div> <br/>
-                <div class="form-group">
-                    {{ form.encryption_and_signed_keys.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    
-                    {% if form.encryption_and_signed_keys.errors %} <!-- if there are errors in the form... -->
-                        {{ form.encryption_and_signed_keys(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.encryption_and_signed_keys.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ form.encryption_and_signed_keys(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div> <br/>
-            </fieldset>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+<legend class="border-bottom mb4">Send a Message</legend>
+<div class="content-section">
+   <form method="POST" action="">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+         <div class="form-group">
+            <label class="form-control-label" for="name">Recipients</label> <br/>
+            {% for username in usernames %}
+            <div class="form-check form-check-inline">
+               <!-- below line needs the ', ' in value to make processing usernames easier -->
+               <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
+               <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
             </div>
-        </form>
-    </div>
-    
-	<div class="row">
-		<div id="Received" class="col">
-			{% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-			<legend class="border-bottom mb4">Recived messages:</legend>
+            {% endfor %}
+         </div>
+         <br/>
+         <div class="form-group">
+            {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+            {{ form.meet_location (class="gray-blue") }}
+            {{ form.meet_time (class="gray-blue")}}
+            {{ form.meet_am_pm (class="gray-blue") }}
+            {% if form.content.errors %} <!-- if there are errors in the form... -->
+            {{ form.content(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+               {% for errors in form.content.errors %}
+               <span>{{ errors }}</span> <!-- display the errors -->
+               {% endfor %}
+            </div>
+            {% else %} <!-- if there aren't errors, just display normally -->
+            {{ form.content(class="form-control form-control-lg") }}
+            {% endif %}
+         </div>
+         <br/>
+         <div class="form-group">
+            {{ form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }} 
+         </div>
+         <br/>
+      </fieldset>
+      <div class="content-section bg-secondary">
+         <ul class="select2-selection__rendered" id="cryptography_tags_list">
+         </ul>
+         <div class="row g-3 align-items-center">
+            <div class="col-auto">
+               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                  <option value= "-1" selected>Cryptography Type</option>
+                  <option value="Signed">Signed</option>
+                  <option value="Encrypted">Encrypted</option>
+               </select>
+            </div>
+            <div class="col-auto">
+               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                  <option value= "-1" selected>User</option>
+                  {% for username in usernames %}
+                  <option value="{{ username }}">{{ username }}</option>
+                  {% endfor %}
+               </select>
+            </div>
+            <div class="col-auto">
+               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                  <option value= "-1" selected>Key Type</option>
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+               </select>
+            </div>
+         </div>
+         <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
+         <br/><br/>
+      </div>
+	  
+      <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+      </div>
+   </form>
+</div>
+
+<div class="row">
+   <div id="Received" class="col">
+      {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
+      <legend class="border-bottom mb4">Recived messages:</legend>
+      {{ messages.print_msgs(msgs) }}
+      {% else %}
+      <legend class="border-bottom mb4">No messages</legend>
+      {% endif %}
+   </div>
+   <div id="Sent" class="col" >
+      {% if sent_msgs %}
+      <legend class="border-bottom mb4">Messages sent by you:</legend>
+      {% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+      <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+      <!-- if the message hasn't been edited, display normally -->
+      <article class="media content-section">
+         <div class="media-body">
+            <div class="article-metadata">
+               <a>Sender: {{ sent_msg.sender }} | </a>
+               <a>Recipient: {{ sent_msg.recipient }}</a>
+               <a> | Time Sent: {{ sent_msg.time_sent }} </a>
+            </div>
+            <div id="content">
+                 <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{ sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+                 <p class="article-content">{{ sent_msg.content }}</p>
+            </div>
+         </div>
+         {% if sent_msg.initial_is_encrypted %}
+         <div class="m-1 row ">
+            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
+         </div>
+         {% endif %}
+         {% if sent_msg.initial_is_signed %}
+         <div class="m-1 row">
+            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
+         </div>
+         {% endif %}
+      </article>
+      {% endfor %}
+      {% else %}
+      <legend class="border-bottom mb4">No messages sent</legend>
+      {% endif %} 
+   </div>
+</div>
+
+<a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
+
+<script>
+   $(document).ready(function() {
+   $(window).scroll(function() {
+   if ($(this).scrollTop() > 20) {
+   $('#toTopBtn').fadeIn();
+   } else {
+   $('#toTopBtn').fadeOut();
+   }
+   });
+   
+   $('#toTopBtn').click(function() {
+   	document.body.scrollTop = 0; // For Safari
+   	document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+   });
+   });
+   
+   function endGame(){
+   
+   
+   }
+   
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal-dialog">
+   <div class="modal-content">
+      <div class="modal-header">
+         <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
+      </div>
+      <div class="modal-body">
+         <select id="places_select" class="form-select" aria-label="Default select example">
+            <option selected>Select Location</option>
+            <option value="1">Park</option>
+            <option value="2">Alley</option>
+            <option value="3">Cafe</option>
+            <option value="4">Parking Garage</option>
+            <option value="5">Rooftop</option>
+            <option value="6">Bus stop</option>
+            <option value="7">Subway station</option>
+         </select>
+         <br>
+         <div class="row">
+            <div class="col-sm-6">
+               <select id="time_s1" class="form-select" aria-label="Default select example">
+                  <option selected>Select Time</option>
+                  <option value="1">1:00</option>
+                  <option value="2">2:00</option>
+                  <option value="3">3:00</option>
+                  <option value="4">4:00</option>
+                  <option value="5">5:00</option>
+                  <option value="6">6:00</option>
+                  <option value="7">7:00</option>
+                  <option value="8">8:00</option>
+                  <option value="9">9:00</option>
+                  <option value="10">10:00</option>
+                  <option value="11">11:00</option>
+                  <option value="12">12:00</option>
+               </select>
+            </div>
+            <div class="col-sm-6">
+               <select id="time_s2" class="form-select" aria-label="Default select example">
+                  <option value="1">PM</option>
+                  <option value="2">AM</option>
+               </select>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+
+<script type="text/javascript" charset="utf-8">
+   $(document).ready(function() {
+	document.getElementById('encryption_and_signed_keys').value = ""; 
+   	var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
+   	// Connect to the Socket.IO server.
+          // The connection URL has the following format, relative to the current page:
+          //     http[s]://<domain>:<port>[/<namespace>]
+          var socket = io();
+   	socket.on('update', function() {
+   		$.get(document.URL, function(data) {
+   			var elem = $(data).find('#Received');
+   			 $('#Received').replaceWith(elem);
+   		});
+   		$.get(document.URL, function(data) {
+   			var elem = $(data).find('#Sent');
+   			 $('#Sent').replaceWith(elem);
+   		});
+          });
+   	
+   	socket.on('start_vote', function() {
+   		myModal.show();
+   	});
+   	
+   	socket.on('end_game', function() {
+   		//console.log("end the game");
+              window.location.href = "{{ url_for('end_of_game') }}";
+          });
+   });
+   
+   function submitVote(){
+   	var socket = io();
+   	
+   	place = $( "#places_select" ).find(':selected').text();
+   	time = $( "#time_s1" ).find(':selected').text();
+   	
+   	if(place == "Select Location" || time == "Select Time"){
+   		return;
+   	}
+   	$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
+   	$("#submt_vote").prop("disabled",true);
+   	
+   	time = time + ' ' + $( "#time_s2" ).find(':selected').text();
+   	
+   	vote = place + ' ' + time;
+   	
+   	socket.emit('cast_vote', {
+   	game_id: "{{game.id}}",
+   	vote: vote
+   	});
+   
+   }
+  
+   function addCryptography(){
+		user_select = $( "#cryptography_user_select" ).val();
+		key_select = $( "#cryptography_key_select" ).val();
+		type_select = $( "#cryptography_type_select" ).val();
 			
-			{{ messages.print_msgs(msgs) }}
-
-			{% else %}
-			<legend class="border-bottom mb4">No messages</legend>
-			{% endif %}
-		</div>
-		
-		<div id="Sent" class="col" >
-			{% if sent_msgs %}
-			<legend class="border-bottom mb4">Messages sent by you:</legend>
-			{% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-				<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-				<!-- if the message hasn't been edited, display normally -->
-				<article class="media content-section">
-					<div class="media-body">
-						<div class="article-metadata">
-						<a>Sender: {{ sent_msg.sender }} | </a>
-						<a>Recipient: {{ sent_msg.recipient }}</a>
-						<a>Time Sent: {{ sent_msg.time_sent }} </a>
-						</div>
-						<p class="article-content">{{ sent_msg.content }}</p>
-					</div>
-					{% if sent_msg.initial_is_encrypted %}
-					<div class="m-1 row ">
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
-					</div>
-					{% endif %}
-					{% if sent_msg.initial_is_signed %}
-					<div class="m-1 row">
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
-					</div>
-					{% endif %}
-				</article>
-			{% endfor %}
-			{% else %}
-			<legend class="border-bottom mb4">No messages sent</legend>
-			{% endif %} 
-		</div>
-	</div>
-	
-	<a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
-		
-	<script>
-		$(document).ready(function() {
-		$(window).scroll(function() {
-		if ($(this).scrollTop() > 20) {
-		$('#toTopBtn').fadeIn();
-		} else {
-		$('#toTopBtn').fadeOut();
-		}
-		});
-
-		$('#toTopBtn').click(function() {
-			document.body.scrollTop = 0; // For Safari
-			document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-		});
-		});
-		
-		function endGame(){
-		
-		
-		}
-		
-	</script>
-
-	<!-- Modal -->
-	<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-		<div class="modal-content">
-		  <div class="modal-header">
-			<h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please vote</h5>
-		  </div>
-		  <div class="modal-body">
-			<select id="places_select" class="form-select" aria-label="Default select example">
-			  <option selected>Select Location</option>
-			  <option value="1">Park</option>
-			  <option value="2">Alley</option>
-			  <option value="3">Cafe</option>
-			  <option value="4">Parking Garage</option>
-			  <option value="5">Rooftop</option>
-			  <option value="6">Bus stop</option>
-			  <option value="7">Subway station</option>
-			</select>
+		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
+			const listEl = document.createElement('li');
+			const buttonEl = document.createElement('button');
+			const spanEl = document.createElement('span');
+			const spanEl2 = document.createElement('span');
 			
-			<div class="row">
-				<div class="col-sm-6">
-					<select id="time_s1" class="form-select" aria-label="Default select example">
-					  <option selected>Select Time</option>
-					  <option value="1">1:00</option>
-					  <option value="2">2:00</option>
-					  <option value="3">3:00</option>
-					  <option value="4">4:00</option>
-					  <option value="5">5:00</option>
-					  <option value="6">6:00</option>
-					  <option value="7">7:00</option>
-					  <option value="8">8:00</option>
-					  <option value="9">9:00</option>
-					  <option value="10">10:00</option>
-					  <option value="11">11:00</option>
-					  <option value="12">12:00</option>
-					</select>
-				</div>
-				<div class="col-sm-6">
-					<select id="time_s2" class="form-select" aria-label="Default select example">
-					<option value="1">PM</option>
-					<option value="2">AM</option>
-					</select>
-				</div>
-			</div>
-		  <div class="modal-footer">
-			<button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
-		  </div>
-		</div>
-	  </div>
-	</div>
-	
-	<script type="text/javascript" charset="utf-8">
-	$(document).ready(function() {
-		var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
-		// Connect to the Socket.IO server.
-        // The connection URL has the following format, relative to the current page:
-        //     http[s]://<domain>:<port>[/<namespace>]
-        var socket = io();
-		socket.on('update', function() {
-			$.get(document.URL, function(data) {
-				var elem = $(data).find('#Received');
-				 $('#Received').replaceWith(elem);
-			});
-			$.get(document.URL, function(data) {
-				var elem = $(data).find('#Sent');
-				 $('#Sent').replaceWith(elem);
-			});
-        });
-		
-		socket.on('start_vote', function() {
-			myModal.show();
-		});
-		
-		socket.on('end_game', function() {
-			//console.log("end the game");
-            window.location.href = "{{ url_for('end_of_game') }}";
-        });
-	});
-	
-	function submitVote(){
-		var socket = io();
-		
-		place = $( "#places_select" ).find(':selected').text();
-		time = $( "#time_s1" ).find(':selected').text();
-		
-		if(place == "Select Location" || time == "Select Time"){
-			return;
-		}
-		$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
-		$("#submt_vote").prop("disabled",true);
-		
-		time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-		
-		vote = place + ' ' + time;
-		
-		socket.emit('cast_vote', {
-		game_id: "{{game.id}}",
-		vote: vote
-		});
+			listEl.classList.add("select2-selection__choice");
+			
+			buttonEl.setAttribute("type", "button");
+			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
+			buttonEl.classList.add("select2-selection__choice__remove");
+			buttonEl.textContent = "×";
+			
+			listEl.appendChild(buttonEl);
+			
+			spanEl.classList.add("select2-selection__choice__display");
+			spanEl.textContent = type_select;
+			listEl.appendChild(spanEl);
+			
+			spanEl2.classList.add("select2-selection__choice__display");
+			spanEl2.textContent = user_select + "." + key_select;
+			listEl.appendChild(spanEl2);
+			
+			var listContainer = $( "#cryptography_tags_list" );
+			listContainer.append(listEl);
+			 
+			var submitString = "";
+			 
+			$('#cryptography_tags_list li').each(function() {
+				var option_all = $(this).children().map(function () {
+					return $(this).text();
+				}).get().join(',');
 
-	}
-	
-	</script>
+				var chars = option_all.split(',');
+				
+				submitString += chars[1] + "(" + chars[2] + "),"
+			}) 		
+		}
+		
+		submitString = submitString.slice(0, -1) 
+		console.log(submitString);
+		document.getElementById('encryption_and_signed_keys').value = submitString; 
+   }
+
+    function setRandomColor(obj, color) {
+        obj.css("color", color);
+    }
+
+    function generatePastelColor() {
+        let R = Math.floor((Math.random() * 127) + 127);
+        let G = Math.floor((Math.random() * 127) + 127);
+        let B = Math.floor((Math.random() * 127) + 127);
+
+        let rgb = (R << 16) + (G << 8) + B;
+        return `#${rgb.toString(16)}`;
+    }
+
+    let usernames = $(".form-check-label")
+
+   // randomizes colors in recipient list
+    for (let name = 0; name < usernames.length; name++){
+        setRandomColor($(usernames[name]), generatePastelColor())
+    }
+
+    function content(message){
+        let h = $("#content");
+        console.log(this.sent_msg)
+   }
+   content(0)
+</script>
+			
 {% endblock content %}

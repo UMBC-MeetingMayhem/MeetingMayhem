@@ -39,12 +39,13 @@ class User(db.Model, UserMixin):
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
     
     """
-    roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator
+    roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator, 6 - inactive
     admin: is able to changes the roles of the users incase we need to do this
     GM: game master, puts different users and adversaries into a specific game instance
     adversary: edits messages from users
     user: plays the game
     spectator: is able to see results for game, probably also messages for each round
+    inactive: removed from game, unable to play
     we might also want to make a role thats both an adversary and a user at some point
     """
 
@@ -113,9 +114,11 @@ class Message(db.Model):
     initial_encryption_details = db.Column(db.String, nullable=False, default="Null") # keeps track of original encryption details
     initial_is_signed = db.Column(db.Boolean, nullable=False, default=False) # keeps track of whether message was initially signed or not
     initial_signed_details = db.Column(db.String, nullable=False, default="Null") # keeps track of original signed details
-
+    time_meet = db.Column(db.String, default="Null") # keeps track of the time user chooses to meet
+    location_meet = db.Column(db.String, default="Null") # keeps track of the location user chooses to meet
+    time_am_pm = db.Column(db.String, default="Null") # keeps track of the choice between am and pm for time
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}')\n"
+        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM={self.time_am_pm})\n"
         
 #game table
 #include information about the game in here so it can by dynamically pulled
@@ -136,7 +139,7 @@ class Game(db.Model):
     end_result = db.Column(db.String)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
-        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n"
+        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', Who_voted='{self.who_voted}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n" 
 
 #queryfactory for games, used for gm to modify specific games
 def getGame(columns=None):
