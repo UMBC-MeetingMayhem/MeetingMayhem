@@ -306,8 +306,8 @@ def adv_messages_page():
 				can_decrypt_curr_message = 1
 			
 			#TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
-			if is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
-
+			#if is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
+			if is_submit_edits:
 				#capture the list of players from the checkboxes and make it into a string delimited by commas
 				checkbox_output_list_new_recipients = request.form.getlist('new_recipients')
 				checkbox_output_list_new_senders = request.form.getlist('new_senders')
