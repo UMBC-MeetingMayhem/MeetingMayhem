@@ -49,14 +49,16 @@
                 {% for username in usernames %}
                     <div class="form-check form-check-inline">
                         <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="players" value="{{ username }}, ">
+                        <input class="form-check-input discheck" type="checkbox" id="inlineCheckbox1" name="players" value="{{ username }}, ">
                         <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
                     </div>
                 {% endfor %}
                 </div> <br/>
             </fieldset>
-            <div class="form-group">
-                {{ setup_form.create_game(class="btn btn-outline-info") }}
+             <div class="form-group">
+                <!-- {{ setup_form.create_game(class="btn btn-outline-info") }} -->
+            
+            <button type="submit" id="submit-button" {% if disabled %}disabled{% endif %} {{ setup_form.create_game(class="btn btn-outline-info") }} Submit </button>
             </div>
         </form>
     </div>
@@ -145,5 +147,27 @@
 			});
         });
 	});
+    const checkboxes = document.querySelectorAll('.discheck');
+const submitButton = document.querySelector('#submit-button');
+
+
+function updateSubmitButtonState() {
+  let numCheckboxSelected = 0;
+  checkboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      numCheckboxSelected++;
+    }
+  });
+  submitButton.disabled = numCheckboxSelected < 2;
+}
+
+checkboxes.forEach((checkbox) => {
+  checkbox.addEventListener('click', updateSubmitButtonState);
+});
+
+
+
+updateSubmitButtonState();
+
 	</script>
 {% endblock content %}
