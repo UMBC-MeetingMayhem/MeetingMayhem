@@ -59,7 +59,7 @@ class MessageForm(FlaskForm):
 	submit = SubmitField('Send Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
-	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_location = SelectField('locations', choices=["Locations", "Park", "Parking Garage", "Alley", "Cafe", "Rooftop", "Bus Stop", "Subway Station"])
 	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
 	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):

@@ -24,7 +24,7 @@
 
 
 <legend class="border-bottom mb4">Send a Message</legend>
-<div class="content-section">
+<div class="content-section" id="body">
    <form method="POST" action="">
       {{ form.hidden_tag() }}
       <fieldset class="form-group">
@@ -34,7 +34,15 @@
             <div class="form-check form-check-inline">
                <!-- below line needs the ', ' in value to make processing usernames easier -->
                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-               <img src="/images/user_icon.png" alt=""  width="30px" height="30px">
+               {% if username == 'user1' %}
+               <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
+               {% elif username == 'user2' %}
+               <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
+               {% elif username == 'sam' %}
+               <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
+               {% elif username == 'pat' %}
+               <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
+               {% endif %}
                <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
             </div>
             {% endfor %}
@@ -42,7 +50,8 @@
          <br/>
          <div class="form-group">
             {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-            {{ form.meet_location (class="gray-blue") }}
+            {{ form.meet_location (class="gray-blue",id="locations")}}
+            <img id="location-image" width="250px" height="180px" src="/images/cafe.png" style="display:block;margin:20px;">
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
             {% if form.content.errors %} <!-- if there are errors in the form... -->
@@ -53,7 +62,7 @@
                {% endfor %}
             </div>
             {% else %} <!-- if there aren't errors, just display normally -->
-            {{ form.content(class="form-control form-control-lg") }}
+            {{ form.content(class="form-control form-control-lg", style="margin:10px;") }}
             {% endif %}
          </div>
          <br/>
@@ -173,10 +182,11 @@
 
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-<div class="modal-dialog">
+<div class="modal-dialog" id="dialog-box">
    <div class="modal-content">
       <div class="modal-header">
          <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
+         <button id="close-button" class="btn btn-danger">X</button>
       </div>
       <div class="modal-body">
          <img id="displayedImage" src="/images/cafe.png" width="450px" height="200px" alt="Image description">
@@ -359,6 +369,46 @@
       displayedImage.src = "/images/" + selectedOption + ".png";
    });
 
-</script>
+   var dialogBox = document.getElementById("dialog-box");
+   var closeButton = document.getElementById("close-button");
+   var body = document.getElementById("body");
+
+   closeButton.addEventListener("click", function() {
+     dialogBox.style.display = "none";
+   });
+
+
+   var select = document.getElementById("locations");
+   var image = document.getElementById("location-image");
+
+   select.addEventListener("change", function() {
+     switch (select.value) {
+        case "Park":
+          image.src = "/images/park.png";
+          break;
+        case "Parking Garage":
+          image.src = "/images/garage.png";
+          break;
+        case "Alley":
+          image.src = "/images/alley.png";
+          break;
+        case "Cafe":
+          image.src = "/images/cafe.png";
+          break;
+        case "Rooftop":
+          image.src = "/images/rooftop.png";
+          break;
+        case "Bus Stop":
+          image.src = "/images/busstop.png";
+          break;
+        case "Subway Station":
+          image.src = "/images/subway.png";
+          break;
+        default:
+          image.src = "/images/cafe.png";
+     }
+   });
+
+   </script>
 			
 {% endblock content %}

@@ -27,7 +27,16 @@
                     <div class="form-check form-check-inline">
                         <!-- below line needs the ', ' in value to make processing usernames easier -->
                         <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="senders" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+						{% if username == 'user1' %}
+						<img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
+						{% elif username == 'user2' %}
+						<img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
+						{% elif username == 'sam' %}
+						<img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
+						{% elif username == 'pat' %}
+						<img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
+						{% endif %}
+						<label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
                     </div>
                 {% endfor %}
                 </div> <br/>
@@ -37,14 +46,24 @@
                     <div class="form-check form-check-inline">
                         <!-- below line needs the ', ' in value to make processing usernames easier -->
                         <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+						{% if username == 'user1' %}
+						<img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
+						{% elif username == 'user2' %}
+						<img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
+						{% elif username == 'sam' %}
+						<img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
+						{% elif username == 'pat' %}
+						<img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
+						{% endif %}
+						<label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
                     </div>
                 {% endfor %}
                 </div> <br/>
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    {{ msg_form.meet_location (class="gray-blue") }}
-                    {{ msg_form.meet_time (class="gray-blue")}}
+                    {{ msg_form.meet_location (class="gray-blue",id="locations") }}
+					<img id="location-image" width="250px" height="180px" src="/images/cafe.png" style="display:block;margin:20px;">
+					{{ msg_form.meet_time (class="gray-blue")}}
                     {{ msg_form.meet_am_pm (class="gray-blue") }}
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
                         {{ msg_form.content(class="form-control form-control-lg is-invalid") }}
@@ -54,7 +73,7 @@
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ msg_form.content(class="form-control form-control-lg") }}
+                        {{ msg_form.content(class="form-control form-control-lg style="margin:10px;"") }}
                     {% endif %}
                 </div> <br>
 				<div class="form-group">
@@ -495,7 +514,8 @@
 	  <div class="modal-dialog">
 		<div class="modal-content">
 		  <div class="modal-header">
-			<h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please vote</h5>
+			<h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please Vote</h5>
+		  	<button id="#close" onclick="submitVote()" type="button" class="btn btn-primary">X</button>
 		  </div>
 		  <div class="modal-body">
 			<select id="places_select" class="form-select" aria-label="Default select example">
@@ -602,5 +622,37 @@
 		});
 
 	}
+
+	var select = document.getElementById("locations");
+   var image = document.getElementById("location-image");
+
+   select.addEventListener("change", function() {
+     switch (select.value) {
+        case "Park":
+          image.src = "/images/park.png";
+          break;
+        case "Parking Garage":
+          image.src = "/images/garage.png";
+          break;
+        case "Alley":
+          image.src = "/images/alley.png";
+          break;
+        case "Cafe":
+          image.src = "/images/cafe.png";
+          break;
+        case "Rooftop":
+          image.src = "/images/rooftop.png";
+          break;
+        case "Bus Stop":
+          image.src = "/images/busstop.png";
+          break;
+        case "Subway Station":
+          image.src = "/images/subway.png";
+          break;
+        default:
+          image.src = "/images/cafe.png";
+     }
+   });
+
 	</script>
 {% endblock content %}

@@ -29,7 +29,21 @@
     {% endif %}
     
     <div class="box-border" style="margin:30px;width:fit-content;float:left;border-width:8px;border-radius:20px;background-color:rgb(49, 67, 124)">
-        <img src="/images/user_icon.png" alt=""  width="100px" height="100px">
+        {% if current_user.email == 'gmaster@gmail.com' %}
+        <img src="/images/gmaster.png" alt="Avatar" width="100px" height="100px">
+        {% elif current_user.email == 'adv@gmail.com' %}
+        <img src="/images/adversary.png" alt="Avatar" width="100px" height="100px">
+        {% elif current_user.email == 'user1@gmail.com' %}
+        <img src="/images/user1.png" alt="Avatar" width="100px" height="100px">
+        {% elif current_user.email == 'user2@gmail.com' %}
+        <img src="/images/user2.png" alt="Avatar" width="100px" height="100px">
+        {% elif current_user.email == 'bob@gmail.com' %}
+        <img src="/images/user3.png" alt="Avatar" width="100px" height="100px">
+        {% elif current_user.email == 'joe@gmail.com' %}
+        <img src="/images/user4.png" alt="Avatar" width="100px" height="100px">
+        {% elif current_user.email == 'spc@gmail.com' %}
+        <img src="/images/spc.png" alt="Avatar" width="100px" height="100px">
+        {% endif %}
     </div> <div style="height:150px;display:flex;float:left;">
     <h1 style="align-self:flex-end;font-size:80px;font-family:Verdana, Geneva, Tahoma, sans-serif"> {{ current_user.username }}</h1>
     </div>
