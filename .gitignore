@@ -1,3 +1,6 @@
 *.pyc
 *.xml
 *.iml
+/venv
+wtforms.zip
+.DS_Store
