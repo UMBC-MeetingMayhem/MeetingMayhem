@@ -67,6 +67,8 @@ def str_to_list(st, li):
     Throws:
         TypeError: when incorrect argument type or empty string is passed to function.
     """
+    if st == "" or st==None:
+        return []
     #check if the passed arguments are the correct type, and string isn't empty
     if isinstance(st, str) and isinstance(li, list) and st:
         li.append(st.partition(', ')[0]) #append the first part of the string to the list
