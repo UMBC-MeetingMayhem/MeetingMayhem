@@ -678,43 +678,7 @@ def update():
 @socketio.on('cast_vote')
 @app.route('/messages', methods=['GET', 'POST'])
 def cast_vote(json):
-	#print(json)
-	
 	current_game = Game.query.filter_by(id=json['game_id']).first()
-
-	# Find usernames
-	users = User.query.filter_by(role=4, game=current_game.id).all()
-	adversaries = User.query.filter_by(role=3, game=current_game.id).all()
-	usernames = []
-	for user in users:
-		usernames.append(user.username)
-	for adversary in adversaries:
-		usernames.append(adversary.username)
-
-	usernames = random.sample(usernames, len(usernames)) # randomizes usernames
-	# forms
-	form = MessageForm() #use the standard message form
-
-	msgs_tuple = []
-	if (current_game.current_round>=1):
-		#pull messages from current_round where the message isn't deleted
-		display_message = Message.query.filter_by(adv_submitted=True, is_deleted=False, game=current_game.id).all()
-		#msgs = [] #create a list to store the messages to dispay to pass to the template
-		for message in display_message: #for each message
-			if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
-				message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
-				msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
-				db.session.commit()
-
-	msg_flag = False
-	if msgs_tuple:
-		msg_flag = True
-		msgs_tuple.reverse()
-		
-	#sent messages
-	sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
-	sent_msgs.reverse()
-
 	vote = json['vote']
 	# current vote list
 	votes_list = []
@@ -746,19 +710,17 @@ def cast_vote(json):
 		current_game.end_result = c.most_common()[0][0]
 		if len(c) == 1:
 			current_game.vote_ready = "PlayerWin"
-			#render_template('account.html', title='Account',result=game.vote_ready,place=game.end_result)
 			db.session.commit()
 			print(current_game.votes)
 			print(current_game.vote_ready)
-			#return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 		else:
 			current_game.vote_ready = "PlayerLose"
 			db.session.commit()		
 			print(current_game.votes)
 			print(current_game.vote_ready)
-			#return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 	socketio.emit("return_result",current_game.vote_ready)
-	#print(current_user, " ", game);
+	return 
+
 		
 	
 @socketio.on('ready_to_vote')
