@@ -154,7 +154,8 @@ def messages():
 	for adversary in adversaries:
 		usernames.append(adversary.username)
 
-	usernames = random.sample(usernames, len(usernames)) # randomizes usernames
+	#usernames = random.sample(usernames, len(usernames)) # randomizes usernames
+	usernames = sorted(usernames)
 	form = MessageForm() #use the standard message form
 	#msgs = None
 	msgs_tuple = []
@@ -230,7 +231,7 @@ def adv_messages_page():
 			usernames.append(user.username)
 		for adversary in adversaries:
 			usernames.append(adversary.username)
-
+		usernames = sorted(usernames)
 		#grab the messages from previous rounds, this is done here because the previous messages shouldn't change
 
 		prev_msgs_tuple = []
