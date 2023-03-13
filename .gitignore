@@ -1,3 +1,7 @@
 *.pyc
 *.xml
 *.iml
+instance/
+wtforms/
+venv/
+help.txt
