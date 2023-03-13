@@ -107,6 +107,7 @@
          </div>
       </form>
    </div>
+<<<<<<< HEAD
    
    <div class="row">
       <div id="Received" class="col">
@@ -116,6 +117,80 @@
          {% else %}
          <legend class="border-bottom mb4">No messages</legend>
          {% endif %}
+=======
+   <div id="Sent" class="col" >
+      {% if sent_msgs %}
+      <legend class="border-bottom mb4">Messages sent by you:</legend>
+      {% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+      <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+      <!-- if the message hasn't been edited, display normally -->
+      {% if not sent_msg.adv_created %}
+      <article class="media content-section">
+         <div class="media-body">
+            <div class="article-metadata">
+               <a>Sender: {{ sent_msg.sender }} | </a>
+               <a>Recipient: {{ sent_msg.recipient }}</a>
+               <a> | Time Sent: {{ sent_msg.time_sent }} </a>
+            </div>
+            <div id="content">
+                 <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{ sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+                 <p class="article-content">{{ sent_msg.content }}</p>
+            </div>
+         </div>
+         {% if sent_msg.initial_is_encrypted %}
+         <div class="m-1 row ">
+            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
+            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
+         </div>
+         {% endif %}
+         {% if sent_msg.initial_is_signed %}
+         <div class="m-1 row">
+            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
+            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
+         </div>
+         {% endif %}
+      </article>
+      {% endif %}
+      {% endfor %}
+      {% else %}
+      <legend class="border-bottom mb4">No messages sent</legend>
+      {% endif %} 
+   </div>
+</div>
+
+<a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
+
+<script>
+   $(document).ready(function() {
+   $(window).scroll(function() {
+   if ($(this).scrollTop() > 20) {
+   $('#toTopBtn').fadeIn();
+   } else {
+   $('#toTopBtn').fadeOut();
+   }
+   });
+   
+   $('#toTopBtn').click(function() {
+   	document.body.scrollTop = 0; // For Safari
+   	document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+   });
+   });
+   
+   function endGame(){
+   
+   
+   }
+   
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal-dialog" id="dialog-box">
+   <div class="modal-content">
+      <div class="modal-header">
+         <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
+         <button id="close-button" class="btn btn-danger">X</button>
+>>>>>>> 98fe4a7bde85ea632a96c48d7f8ea1f601d6aa04
       </div>
       <div id="Sent" class="col" >
          {% if sent_msgs %}
@@ -154,6 +229,7 @@
          {% endif %} 
       </div>
    </div>
+<<<<<<< HEAD
    
    <a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
    
@@ -412,3 +488,189 @@
       </script>
             
    {% endblock content %}
+=======
+</div>
+
+
+<script type="text/javascript" charset="utf-8">
+   $(document).ready(function() {
+	document.getElementById('encryption_and_signed_keys').value = ""; 
+   	var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
+   	// Connect to the Socket.IO server.
+          // The connection URL has the following format, relative to the current page:
+          //     http[s]://<domain>:<port>[/<namespace>]
+          var socket = io();
+   	socket.on('update', function() {
+   		$.get(document.URL, function(data) {
+   			var elem = $(data).find('#Received');
+   			 $('#Received').replaceWith(elem);
+   		});
+   		$.get(document.URL, function(data) {
+   			var elem = $(data).find('#Sent');
+   			 $('#Sent').replaceWith(elem);
+   		});
+          });
+   	
+   	socket.on('start_vote', function() {
+   		myModal.show();
+   	});
+   	
+   });
+   
+   function submitVote(){
+   	var socket = io();
+   	place = $( "#places_select" ).find(':selected').text();
+   	time = $( "#time_s1" ).find(':selected').text();
+   	
+   	if(place == "Select Location" || time == "Select Time"){
+   		return;
+   	}
+      $("#submt_vote").prop("disabled",true);  	
+   	time = time + ' ' + $( "#time_s2" ).find(':selected').text();
+   	vote = place + ' ' + time;
+
+      socket.emit('cast_vote', {
+   	game_id: "{{game.id}}",
+   	vote: vote
+   	});
+      socket.on('return_result',function(msg){
+         switch(msg){
+            case "PlayerWin":
+            $( "#staticBackdropLabel" ).text("You won. The players successfully met in a safe location!"); 
+            break;
+            case "PlayerLose":
+            $( "#staticBackdropLabel" ).text("You Lost. The Adversary was able to thwart the player's meeting."); 
+            break;
+            default:$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
+         }
+      });
+   }
+  
+   function addCryptography(){
+		user_select = $( "#cryptography_user_select" ).val();
+		key_select = $( "#cryptography_key_select" ).val();
+		type_select = $( "#cryptography_type_select" ).val();
+			
+		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
+			const listEl = document.createElement('li');
+			const buttonEl = document.createElement('button');
+			const spanEl = document.createElement('span');
+			const spanEl2 = document.createElement('span');
+			
+			listEl.classList.add("select2-selection__choice");
+			
+			buttonEl.setAttribute("type", "button");
+			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
+			buttonEl.classList.add("select2-selection__choice__remove");
+			buttonEl.textContent = "×";
+			
+			listEl.appendChild(buttonEl);
+			
+			spanEl.classList.add("select2-selection__choice__display");
+			spanEl.textContent = type_select;
+			listEl.appendChild(spanEl);
+			
+			spanEl2.classList.add("select2-selection__choice__display");
+			spanEl2.textContent = user_select + "." + key_select;
+			listEl.appendChild(spanEl2);
+			
+			var listContainer = $( "#cryptography_tags_list" );
+			listContainer.append(listEl);
+			 
+			var submitString = "";
+			 
+			$('#cryptography_tags_list li').each(function() {
+				var option_all = $(this).children().map(function () {
+					return $(this).text();
+				}).get().join(',');
+
+				var chars = option_all.split(',');
+				
+				submitString += chars[1] + "(" + chars[2] + "),"
+			}) 		
+		}
+		
+		submitString = submitString.slice(0, -1) 
+		console.log(submitString);
+		document.getElementById('encryption_and_signed_keys').value = submitString; 
+   }
+
+    function setRandomColor(obj, color) {
+        obj.css("color", color);
+    }
+
+    function generatePastelColor() {
+        let R = Math.floor((Math.random() * 127) + 127);
+        let G = Math.floor((Math.random() * 127) + 127);
+        let B = Math.floor((Math.random() * 127) + 127);
+
+        let rgb = (R << 16) + (G << 8) + B;
+        return `#${rgb.toString(16)}`;
+    }
+
+    let usernames = $(".form-check-label")
+
+   // randomizes colors in recipient list
+    for (let name = 0; name < usernames.length; name++){
+        setRandomColor($(usernames[name]), generatePastelColor())
+    }
+
+    function content(message){
+        let h = $("#content");
+        console.log(this.sent_msg)
+   }
+   content(0)
+
+   var dropdown = document.getElementById("places_select");
+   var displayedImage = document.getElementById("displayedImage");
+
+   dropdown.addEventListener("change", function() {
+      var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+      displayedImage.src = "/images/" + selectedOption + ".png";
+   });
+
+   var dialogBox = document.getElementById("dialog-box");
+   var closeButton = document.getElementById("close-button");
+   var body = document.getElementById("body");
+
+   closeButton.addEventListener("click", function() {
+     dialogBox.style.display = "none";
+     location.reload();	
+   });
+
+
+   var select = document.getElementById("locations");
+   var image = document.getElementById("location-image");
+
+   select.addEventListener("change", function() {
+     switch (select.value) {
+        case "Park":
+          image.src = "/images/park.png";
+          break;
+        case "Parking Garage":
+          image.src = "/images/garage.png";
+          break;
+        case "Alley":
+          image.src = "/images/alley.png";
+          break;
+        case "Cafe":
+          image.src = "/images/cafe.png";
+          break;
+        case "Rooftop":
+          image.src = "/images/rooftop.png";
+          break;
+        case "Bus Stop":
+          image.src = "/images/busstop.png";
+          break;
+        case "Subway Station":
+          image.src = "/images/subway.png";
+          break;
+        default:
+          image.src = "/images/cafe.png";
+     }
+   });
+
+   </script>
+		
+{% endblock content %}
+>>>>>>> 98fe4a7bde85ea632a96c48d7f8ea1f601d6aa04

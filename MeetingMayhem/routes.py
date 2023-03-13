@@ -103,13 +103,16 @@ def logout():
 def account():
 	#create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
 	form = AdversaryAdvanceRoundForm()
-	current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
+	current_game = Game.query.filter_by(is_running=True).first()
+	print(current_game.votes)
+	print(current_game.who_voted)
+	print("!!!!")
 	if form.advance_round.data and current_game:
 		current_game.current_round -= 1
 		current_game.adv_current_msg = 0
 		current_game.adv_current_msg_list_size = 0
 		db.session.commit()
-	return render_template('account.html', title='Account', form=form)
+	return render_template('account.html', title='Account',result=current_game.vote_ready)
 
 #message page
 #TODO: check for duplicate post request when sending messages
@@ -151,7 +154,8 @@ def messages():
 	for adversary in adversaries:
 		usernames.append(adversary.username)
 
-	usernames = random.sample(usernames, len(usernames)) # randomizes usernames
+	#usernames = random.sample(usernames, len(usernames)) # randomizes usernames
+	usernames = sorted(usernames)
 	form = MessageForm() #use the standard message form
 	#msgs = None
 	msgs_tuple = []
@@ -227,7 +231,7 @@ def adv_messages_page():
 			usernames.append(user.username)
 		for adversary in adversaries:
 			usernames.append(adversary.username)
-
+		usernames = sorted(usernames)
 		#grab the messages from previous rounds, this is done here because the previous messages shouldn't change
 
 		prev_msgs_tuple = []
@@ -631,7 +635,7 @@ def character_select():
 	
 	return render_template('character_select.html', title='Select Your Character')
 """
-
+'''
 @app.route('/end_of_game', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 #@login_required  # user must be logged in
 def end_of_game():
@@ -659,7 +663,7 @@ def end_of_game():
 					return render_template('end_of_game.html', title='Results', game=game, result="PlayerLose")
 			
 	return render_template('end_of_game.html', title='Results', game=game, result="Loser")
-
+'''
 #sample route for testing pages
 #when you copy this to test a page, make sure to change all instances of "testing"
 #@app.route('/testing') #this decorator tells the website what to put after the http://<IP>
@@ -673,77 +677,58 @@ def update():
 	socketio.emit('update',broadcast=True)
 
 @socketio.on('cast_vote')
+@app.route('/messages', methods=['GET', 'POST'])
 def cast_vote(json):
-	#print(json)
-	
-	game = Game.query.filter_by(id=json['game_id']).first()
-	
-	if (current_user.role == 3):
-		game.adv_vote = json['vote']
-		db.session.commit()
-	
+	current_game = Game.query.filter_by(id=json['game_id']).first()
+	vote = json['vote']
+	# current vote list
 	votes_list = []
-	try: 
-		votes_list = str_to_list(game.votes, votes_list) 
-	except:
-		pass
-			
+	votes_list = str_to_list(current_game.votes, votes_list) 
 	who_voted = []
-	try: 
-		who_voted = str_to_list(game.who_voted, who_voted) 
-	except:
-		pass
-	
-	if (current_user.username not in who_voted) and current_user.role != 3:
+	# current voted users
+	who_voted = str_to_list(current_game.who_voted, who_voted) 
+	# user not vote before
+	if current_user.username not in who_voted:
 		who_voted.append(current_user.username)
-		game.who_voted = ', '.join(who_voted)
+		current_game.who_voted = ', '.join(who_voted)
 		db.session.commit()
-		
-		votes_list.append(json['vote'])
-		game.votes = ', '.join(votes_list)
+
+		votes_list.append(vote)
+		current_game.votes = ', '.join(votes_list)
 		db.session.commit()
-		
+	else:
+		index = who_voted.index(current_user.username)
+		votes_list[index] = vote
+		current_game.votes = ', '.join(votes_list)
+		db.session.commit()
+
 	player_list = []
-	str_to_list(game.players, player_list) 
-		
-	if (len(votes_list) >= len(player_list) and game.adv_vote != None):
+	str_to_list(current_game.players, player_list) 
+	current_game.vote_ready = ""	
+	if len(votes_list) == len(player_list):
 		c = Counter(votes_list)
-		game.end_result = c.most_common()[0][0]
-		if(c.most_common()[0][1] == 1):
-			game.end_result = game.adv_vote;  
-		db.session.commit()
-		socketio.emit('end_game',broadcast=True)
-	
-	#print(current_user, " ", game);
+		# The most common result
+		current_game.end_result = c.most_common()[0][0]
+		if len(c) == 1:
+			current_game.vote_ready = "PlayerWin"
+			db.session.commit()
+			print(current_game.votes)
+			print(current_game.vote_ready)
+		else:
+			current_game.vote_ready = "PlayerLose"
+			db.session.commit()		
+			print(current_game.votes)
+			print(current_game.vote_ready)
+	socketio.emit("return_result",current_game.vote_ready)
+	return 
+
 		
 	
 @socketio.on('ready_to_vote')
 def ready_to_vote(json):
-	#print(json)
-
 	game = Game.query.filter_by(id=json['game_id']).first()
-	
-	# try for the cases where no player has voted yet
-	voted_list = []
-	try: 
-		voted_list = str_to_list(game.vote_ready, voted_list) 
-	except:
-		pass
-	
-	if json['player'] not in voted_list:
-		voted_list.append(json['player'])
-		game.vote_ready = ', '.join(voted_list)
-		db.session.commit()
-	
-	player_list = []
-	player_list = str_to_list(game.players, player_list)
-	
-	if (len(voted_list) / len(player_list) >= .5):
-		#print("lets vote")
-		socketio.emit('start_vote',broadcast=True)
-		
-	#print(current_user, " ", game);
-	
+	socketio.emit('start_vote',broadcast=True)
+
 @app.route('/images/<path:filename>')
 def serve_images(filename):
     return send_from_directory('images', filename)
