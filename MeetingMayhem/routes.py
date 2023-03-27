@@ -33,7 +33,6 @@ from collections import Counter
 from flask import Flask, send_from_directory
 import pytz
 
-
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
 #by using the render_template, we are able to pass an html document to flask for it to put on the web server
@@ -45,6 +44,10 @@ def home():
 	elif not current_user.game and (current_user.role == 3 or current_user.role == 4): #if the user is logged in but isn't in a game, display below message
 		flash(f'You are not currently in a game. Please have your game master create a game to proceed.', 'info')
 	return render_template('home.html', title='Home') #this line passes the template we want to use and any variables it needs to it
+
+@app.route('/homepage')
+def homepage():
+	return render_template('homepage.html', title='HomePage') #this line passes the template we want to use and any variables it needs to it
 
 #about page route, this page doesn't really do anything right now
 @app.route('/about')
@@ -85,7 +88,7 @@ def login():
 				login_user(user, remember=form.remember.data) #log the user in, and if the user checked the remeber box, remember the user (not sure if remember actually works)
 				next_page = request.args.get('next') #check if the next argument exists (i.e. user tried to go somewhere they needed to login to see)
 				flash(f'You are now logged in!', 'success') #notify the user they are logged in
-			return redirect(next_page) if next_page else redirect(url_for('home')) #redir the user to the next_page arg if it exists, if not send them to home page
+			return redirect(next_page) if next_page else redirect(url_for('homepage')) #redir the user to the next_page arg if it exists, if not send them to home page
 		else:
 			flash(f'Login Unsuccessful. Please check username and password.', 'danger') #display error message
 	return render_template('login.html', title='Login', form=form)
@@ -747,4 +750,3 @@ def ready_to_vote(json):
 @app.route('/images/<path:filename>')
 def serve_images(filename):
     return send_from_directory('images', filename)
-	
