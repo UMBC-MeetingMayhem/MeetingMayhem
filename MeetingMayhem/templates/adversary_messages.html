@@ -598,10 +598,6 @@
 			advVoteModal.show();
 		});
 		
-		socket.on('end_game', function() {
-            window.location.href = "{{ url_for('end_of_game') }}";
-        });
-		
 	});
 	
 	function submitVote(){

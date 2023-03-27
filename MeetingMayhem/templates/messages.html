@@ -161,6 +161,7 @@
       {% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
       <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
       <!-- if the message hasn't been edited, display normally -->
+      {% if not sent_msg.adv_created %}
       <article class="media content-section">
          <div class="media-body">
             <div class="article-metadata">
@@ -186,6 +187,7 @@
          </div>
          {% endif %}
       </article>
+      {% endif %}
       {% endfor %}
       {% else %}
       <legend class="border-bottom mb4">No messages sent</legend>
@@ -295,33 +297,35 @@
    		myModal.show();
    	});
    	
-   	socket.on('end_game', function() {
-   		//console.log("end the game");
-              window.location.href = "{{ url_for('end_of_game') }}";
-          });
    });
    
    function submitVote(){
    	var socket = io();
-   	
    	place = $( "#places_select" ).find(':selected').text();
    	time = $( "#time_s1" ).find(':selected').text();
    	
    	if(place == "Select Location" || time == "Select Time"){
    		return;
    	}
-   	$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
-   	$("#submt_vote").prop("disabled",true);
-   	
+      $("#submt_vote").prop("disabled",true);  	
    	time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-   	
    	vote = place + ' ' + time;
-   	
-   	socket.emit('cast_vote', {
+
+      socket.emit('cast_vote', {
    	game_id: "{{game.id}}",
    	vote: vote
    	});
-   
+      socket.on('return_result',function(msg){
+         switch(msg){
+            case "PlayerWin":
+            $( "#staticBackdropLabel" ).text("You won. The players successfully met in a safe location!"); 
+            break;
+            case "PlayerLose":
+            $( "#staticBackdropLabel" ).text("You Lost. The Adversary was able to thwart the player's meeting."); 
+            break;
+            default:$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
+         }
+      });
    }
   
 
@@ -440,6 +444,7 @@
 
    closeButton.addEventListener("click", function() {
      dialogBox.style.display = "none";
+     location.reload();	
    });
 
 
@@ -475,5 +480,5 @@
    });
 
    </script>
-			
+		
 {% endblock content %}
