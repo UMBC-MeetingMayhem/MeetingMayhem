@@ -6,124 +6,136 @@
    E-mail: rshovan1@umbc.edu
    Description: html and jinja file for handling the messages page
    -->
-   {% import 'messages.j2' as messages %}
-   {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
-   {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-   <h1 class="float-start">Messages</h1>
-   <button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
-   <script>
-      $("#vote_bt").on("click", function() {
-         $(this).prop("disabled", true);
-         
-         var socket = io();
-         socket.on('connect', function() {
-         socket.emit('ready_to_vote', {game_id: "{{game.id}}", player: "{{current_user.username}}"});
-         });
-      });	
-   </script>
-   
-   
-   <legend class="border-bottom mb4">Send a Message</legend>
-   <div class="content-section" id="body">
-      <form method="POST" action="">
-         {{ form.hidden_tag() }}
-         <fieldset class="form-group">
-            <div class="form-group">
-               <label class="form-control-label" for="name">Recipients</label> <br/>
-               {% for username in usernames %}
-               <div class="form-check form-check-inline">
-                  <!-- below line needs the ', ' in value to make processing usernames easier -->
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-                  {% if username == 'user1' %}
-                  <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'user2' %}
-                  <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'sam' %}
-                  <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'pat' %}
-                  <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-                  {% endif %}
-                  <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
-               </div>
+{% import 'messages.j2' as messages %}
+{% extends "layout.html" %}
+<!-- this tells jinja that we are using a template -->
+{% block content %}
+<!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+<h1 class="float-start">Messages</h1>
+<button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue"
+   data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
+<script>
+   $("#vote_bt").on("click", function () {
+      $(this).prop("disabled", true);
+
+      var socket = io();
+      socket.on('connect', function () {
+         socket.emit('ready_to_vote', { game_id: "{{game.id}}", player: "{{current_user.username}}" });
+      });
+   });	
+</script>
+
+
+<legend class="border-bottom mb4">Send a Message</legend>
+<div class="content-section" id="body">
+   <form method="POST" action="">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+         <div class="form-group">
+            <label class="form-control-label" for="name">Recipients</label> <br />
+            {% for username in usernames %}
+            <div class="form-check form-check-inline">
+               <!-- below line needs the ', ' in value to make processing usernames easier -->
+               <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients"
+                  value="{{ username }}, ">
+               {% if username == 'user1' %}
+               <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
+               {% elif username == 'user2' %}
+               <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
+               {% elif username == 'sam' %}
+               <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
+               {% elif username == 'pat' %}
+               <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
+               {% endif %}
+               <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
+            </div>
+            {% endfor %}
+         </div>
+         <br />
+         <div class="form-group">
+            {{ form.content.label(class="form-control-label") }}
+            <!-- i think this tells jinja to put a form box in here -->
+            {{ form.meet_location (class="gray-blue",id="locations")}}
+            <img id="location-image" width="250px" height="180px" src="/images/cafe.png"
+               style="display:block;margin:20px;">
+            {{ form.meet_time (class="gray-blue")}}
+            {{ form.meet_am_pm (class="gray-blue") }}
+            {% if form.content.errors %}
+            <!-- if there are errors in the form... -->
+            {{ form.content(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+               {% for errors in form.content.errors %}
+               <span>{{ errors }}</span> <!-- display the errors -->
                {% endfor %}
             </div>
-            <br/>
-            <div class="form-group">
-               {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-               {{ form.meet_location (class="gray-blue",id="locations")}}
-               <img id="location-image" width="250px" height="180px" src="/images/cafe.png" style="display:block;margin:20px;">
-               {{ form.meet_time (class="gray-blue")}}
-               {{ form.meet_am_pm (class="gray-blue") }}
-               {% if form.content.errors %} <!-- if there are errors in the form... -->
-               {{ form.content(class="form-control form-control-lg is-invalid") }}
-               <div class="invalid-feedback">
-                  {% for errors in form.content.errors %}
-                  <span>{{ errors }}</span> <!-- display the errors -->
-                  {% endfor %}
-               </div>
-               {% else %} <!-- if there aren't errors, just display normally -->
-               {{ form.content(class="form-control form-control-lg", style="margin:10px;") }}
-               {% endif %}
-            </div>
-            <br/>
-            <div class="form-group">
-               {{ form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }} 
-            </div>
-            <br/>
-         </fieldset>
-         <div class="content-section bg-secondary">
-            <ul class="select2-selection__rendered" id="cryptography_tags_list">
-            </ul>
-            <div class="row g-3 align-items-center">
-               <div class="col-auto">
-                  <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>Cryptography Type</option>
-                     <option value="Signed">Signed</option>
-                     <option value="Encrypted">Encrypted</option>
-                  </select>
-               </div>
-               <div class="col-auto">
-                  <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>User</option>
-                     {% for username in usernames %}
-                     <option value="{{ username }}">{{ username }}</option>
-                     {% endfor %}
-                  </select>
-               </div>
-               <div class="col-auto">
-                  <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>Key Type</option>
-                     <option value="public">Public</option>
-                     <option value="private">Private</option>
-                  </select>
-               </div>
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
-            <br/><br/>
+            {% else %}
+            <!-- if there aren't errors, just display normally -->
+            {{ form.content(class="form-control form-control-lg", style="margin:10px;") }}
+            {% endif %}
          </div>
-        
+         <br />
          <div class="form-group">
-           {{ form.submit(class="btn btn-outline-info") }}
+            {{ form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }}
          </div>
-      </form>
+         <br />
+      </fieldset>
+      <div class="content-section bg-secondary">
+         <ul class="select2-selection__rendered" id="cryptography_tags_list">
+         </ul>
+         <div class="row g-3 align-items-center">
+            <div class="col-auto">
+               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue"
+                  aria-label=".form-select-lg example">
+                  <option value="-1" selected>Cryptography Type</option>
+                  <option value="Signed">Signed</option>
+                  <option value="Encrypted">Encrypted</option>
+               </select>
+            </div>
+            <div class="col-auto">
+               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue"
+                  aria-label=".form-select-lg example">
+                  <option value="-1" selected>User</option>
+                  {% for username in usernames %}
+                  <option value="{{ username }}">{{ username }}</option>
+                  {% endfor %}
+               </select>
+            </div>
+            <div class="col-auto">
+               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue"
+                  aria-label=".form-select-lg example">
+                  <option value="-1" selected>Key Type</option>
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+               </select>
+            </div>
+         </div>
+         <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
+         <br /><br />
+      </div>
+
+      <div class="form-group">
+         {{ form.submit(class="btn btn-outline-info") }}
+      </div>
+   </form>
+</div>
+
+<div class="row">
+   <div id="Received" class="col">
+      {% if msg_flag %}
+      <!-- this checks if the passed message var has content in it -->
+      <legend class="border-bottom mb4">Recived messages:</legend>
+      {{ messages.print_msgs(msgs) }}
+      {% else %}
+      <legend class="border-bottom mb4">No messages</legend>
+      {% endif %}
    </div>
-<<<<<<< HEAD
-   
-   <div class="row">
-      <div id="Received" class="col">
-         {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-         <legend class="border-bottom mb4">Recived messages:</legend>
-         {{ messages.print_msgs(msgs) }}
-         {% else %}
-         <legend class="border-bottom mb4">No messages</legend>
-         {% endif %}
-=======
-   <div id="Sent" class="col" >
+
+
+
+   <div id="Sent" class="col">
       {% if sent_msgs %}
       <legend class="border-bottom mb4">Messages sent by you:</legend>
-      {% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-      <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-      <!-- if the message hasn't been edited, display normally -->
+      {% for sent_msg in sent_msgs %}
       {% if not sent_msg.adv_created %}
       <article class="media content-section">
          <div class="media-body">
@@ -132,132 +144,94 @@
                <a>Recipient: {{ sent_msg.recipient }}</a>
                <a> | Time Sent: {{ sent_msg.time_sent }} </a>
             </div>
+            {% if (sent_msg.initial_encryption_details != "invalid encrypted key" or sent_msg.initial_signed_details !=
+            "invalid sign key") %}
             <div id="content">
-                 <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{ sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
-                 <p class="article-content">{{ sent_msg.content }}</p>
+               <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
+                  sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+               {% if sent_msg.initial_encryption_details != "invalid encrypted key" %}
+               {% if sent_msg.initial_is_encrypted %}
+               <p class="article-content"> #######################</p>
+               {% else %}
+               <p class="article-content">{{ sent_msg.content }}</p>
+               {% endif %}
+               {% elif sent_msg.initial_signed_details != "invalid sign key" %}
+               {% if sent_msg.initial_is_signed %}
+               <p class="article-content">#######################</p>
+               {% else %}
+               <p class="article-content">{{ sent_msg.content }}</p>
+               {% endif %}
+               {% else %}
+               <p class="article-content">{{ getRandomString(sent_msg.content.length) }}</p>
+               {% endif %}
             </div>
-         </div>
-         {% if sent_msg.initial_is_encrypted %}
-         <div class="m-1 row ">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
-         </div>
-         {% endif %}
-         {% if sent_msg.initial_is_signed %}
-         <div class="m-1 row">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
-         </div>
-         {% endif %}
+            {% endif %}
+
+            {% if sent_msg.initial_is_encrypted %}
+            <div class="m-1 row ">
+               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                  Encrypted For:</div>
+               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                  sent_msg.initial_encryption_details }}</div>
+            </div>
+            {% endif %}
+            {% if sent_msg.initial_is_signed %}
+            <div class="m-1 row">
+               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                  Signed by:</div>
+               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                  sent_msg.initial_signed_details }}</div>
+            </div>
+            {% endif %}
       </article>
       {% endif %}
       {% endfor %}
       {% else %}
       <legend class="border-bottom mb4">No messages sent</legend>
-      {% endif %} 
+      {% endif %}
    </div>
+
+   <script>
+      function special_chars(length) {
+         var chars = "!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+         var result = "";
+         for (var i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+         }
+         return result;
+      }
+   </script>
+
 </div>
 
 <a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
 
 <script>
-   $(document).ready(function() {
-   $(window).scroll(function() {
-   if ($(this).scrollTop() > 20) {
-   $('#toTopBtn').fadeIn();
-   } else {
-   $('#toTopBtn').fadeOut();
-   }
-   });
-   
-   $('#toTopBtn').click(function() {
-   	document.body.scrollTop = 0; // For Safari
-   	document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-   });
-   });
-   
-   function endGame(){
-   
-   
-   }
-   
-</script>
-
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-<div class="modal-dialog" id="dialog-box">
-   <div class="modal-content">
-      <div class="modal-header">
-         <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
-         <button id="close-button" class="btn btn-danger">X</button>
->>>>>>> 98fe4a7bde85ea632a96c48d7f8ea1f601d6aa04
-      </div>
-      <div id="Sent" class="col" >
-         {% if sent_msgs %}
-         <legend class="border-bottom mb4">Messages sent by you:</legend>
-         {% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-         <!-- if the message hasn't been edited, display normally -->
-         <article class="media content-section">
-            <div class="media-body">
-               <div class="article-metadata">
-                  <a>Sender: {{ sent_msg.sender }} | </a>
-                  <a>Recipient: {{ sent_msg.recipient }}</a>
-                  <a> | Time Sent: {{ sent_msg.time_sent }} </a>
-               </div>
-               <div id="content">
-                    <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{ sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
-                    <p class="article-content">{{ sent_msg.content }}</p>
-               </div>
-            </div>
-            {% if sent_msg.initial_is_encrypted %}
-            <div class="m-1 row ">
-               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
-            </div>
-            {% endif %}
-            {% if sent_msg.initial_is_signed %}
-            <div class="m-1 row">
-               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
-            </div>
-            {% endif %}
-         </article>
-         {% endfor %}
-         {% else %}
-         <legend class="border-bottom mb4">No messages sent</legend>
-         {% endif %} 
-      </div>
-   </div>
-<<<<<<< HEAD
-   
-   <a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
-   
-   <script>
-      $(document).ready(function() {
-      $(window).scroll(function() {
-      if ($(this).scrollTop() > 20) {
-      $('#toTopBtn').fadeIn();
-      } else {
-      $('#toTopBtn').fadeOut();
-      }
+   $(document).ready(function () {
+      $(window).scroll(function () {
+         if ($(this).scrollTop() > 20) {
+            $('#toTopBtn').fadeIn();
+         } else {
+            $('#toTopBtn').fadeOut();
+         }
       });
-      
-      $('#toTopBtn').click(function() {
+
+      $('#toTopBtn').click(function () {
          document.body.scrollTop = 0; // For Safari
          document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
       });
-      });
-      
-      function endGame(){
-      
-      
-      }
-      
-   </script>
-   
-   <!-- Modal -->
-   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+   });
+
+   function endGame() {
+
+
+   }
+
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+   aria-labelledby="staticBackdropLabel" aria-hidden="true">
    <div class="modal-dialog" id="dialog-box">
       <div class="modal-content">
          <div class="modal-header">
@@ -268,7 +242,7 @@
             <img id="displayedImage" src="/images/cafe.png" width="450px" height="200px" alt="Image description">
             <select id="places_select" class="form-select" aria-label="Default select example">
                <option selected>Select Location</option>
-               <option  value="park">Park</option>
+               <option value="park">Park</option>
                <option value="alley">Alley</option>
                <option value="cafe">Cafe</option>
                <option value="garage">Parking Garage</option>
@@ -308,369 +282,216 @@
          </div>
       </div>
    </div>
-   
-   
+
+
    <script type="text/javascript" charset="utf-8">
-      $(document).ready(function() {
-      document.getElementById('encryption_and_signed_keys').value = ""; 
+      $(document).ready(function () {
+         document.getElementById('encryption_and_signed_keys').value = "";
          var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
          // Connect to the Socket.IO server.
-             // The connection URL has the following format, relative to the current page:
-             //     http[s]://<domain>:<port>[/<namespace>]
-             var socket = io();
-         socket.on('update', function() {
-            $.get(document.URL, function(data) {
+         // The connection URL has the following format, relative to the current page:
+         //     http[s]://<domain>:<port>[/<namespace>]
+         var socket = io();
+         socket.on('update', function () {
+            $.get(document.URL, function (data) {
                var elem = $(data).find('#Received');
-                $('#Received').replaceWith(elem);
+               $('#Received').replaceWith(elem);
             });
-            $.get(document.URL, function(data) {
+            $.get(document.URL, function (data) {
                var elem = $(data).find('#Sent');
-                $('#Sent').replaceWith(elem);
+               $('#Sent').replaceWith(elem);
             });
-             });
-         
-         socket.on('start_vote', function() {
+         });
+
+         socket.on('start_vote', function () {
             myModal.show();
          });
-         
-         socket.on('end_game', function() {
-            //console.log("end the game");
-                 window.location.href = "{{ url_for('end_of_game') }}";
-             });
+
       });
-      
-      function submitVote(){
+
+      function submitVote() {
          var socket = io();
-         
-         place = $( "#places_select" ).find(':selected').text();
-         time = $( "#time_s1" ).find(':selected').text();
-         
-         if(place == "Select Location" || time == "Select Time"){
+         place = $("#places_select").find(':selected').text();
+         time = $("#time_s1").find(':selected').text();
+
+         if (place == "Select Location" || time == "Select Time") {
             return;
          }
-         $( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
-         $("#submt_vote").prop("disabled",true);
-         
-         time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-         
+         $("#submt_vote").prop("disabled", true);
+         time = time + ' ' + $("#time_s2").find(':selected').text();
          vote = place + ' ' + time;
-         
+
          socket.emit('cast_vote', {
-         game_id: "{{game.id}}",
-         vote: vote
+            game_id: "{{game.id}}",
+            vote: vote
          });
-      
+         socket.on('return_result', function (msg) {
+            switch (msg) {
+               case "PlayerWin":
+                  $("#staticBackdropLabel").text("You won. The players successfully met in a safe location!");
+                  break;
+               case "PlayerLose":
+                  $("#staticBackdropLabel").text("You Lost. The Adversary was able to thwart the player's meeting.");
+                  break;
+               default: $("#staticBackdropLabel").text("Thank you for voting: Please Wait");
+            }
+         });
       }
-     
-      function addCryptography(){
-         user_select = $( "#cryptography_user_select" ).val();
-         key_select = $( "#cryptography_key_select" ).val();
-         type_select = $( "#cryptography_type_select" ).val();
-            
-         if(!(user_select == -1 || key_select == -1 || type_select == -1)){
+
+      function addCryptography() {
+         user_select = $("#cryptography_user_select").val();
+         key_select = $("#cryptography_key_select").val();
+         type_select = $("#cryptography_type_select").val();
+
+         if (!(user_select == -1 || key_select == -1 || type_select == -1)) {
             const listEl = document.createElement('li');
             const buttonEl = document.createElement('button');
             const spanEl = document.createElement('span');
             const spanEl2 = document.createElement('span');
-            
+
             listEl.classList.add("select2-selection__choice");
-            
+
             buttonEl.setAttribute("type", "button");
             buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
             buttonEl.classList.add("select2-selection__choice__remove");
             buttonEl.textContent = "×";
-            
+
             listEl.appendChild(buttonEl);
-            
+
             spanEl.classList.add("select2-selection__choice__display");
             spanEl.textContent = type_select;
             listEl.appendChild(spanEl);
-            
+
             spanEl2.classList.add("select2-selection__choice__display");
             spanEl2.textContent = user_select + "." + key_select;
             listEl.appendChild(spanEl2);
-            
-            var listContainer = $( "#cryptography_tags_list" );
+
+            var listContainer = $("#cryptography_tags_list");
             listContainer.append(listEl);
-             
+
             var submitString = "";
-             
-            $('#cryptography_tags_list li').each(function() {
+
+            $('#cryptography_tags_list li').each(function () {
                var option_all = $(this).children().map(function () {
                   return $(this).text();
                }).get().join(',');
-   
+
                var chars = option_all.split(',');
-               
+
                submitString += chars[1] + "(" + chars[2] + "),"
-            }) 		
+            })
          }
-         
-         submitString = submitString.slice(0, -1) 
+
+         submitString = submitString.slice(0, -1)
          console.log(submitString);
-         document.getElementById('encryption_and_signed_keys').value = submitString; 
+         document.getElementById('encryption_and_signed_keys').value = submitString;
       }
-   
-       function setRandomColor(obj, color) {
-           obj.css("color", color);
-       }
-   
-       function generatePastelColor() {
-           let R = Math.floor((Math.random() * 127) + 127);
-           let G = Math.floor((Math.random() * 127) + 127);
-           let B = Math.floor((Math.random() * 127) + 127);
-   
-           let rgb = (R << 16) + (G << 8) + B;
-           return `#${rgb.toString(16)}`;
-       }
-   
-       let usernames = $(".form-check-label")
-   
+
+      function setRandomColor(obj, color) {
+         obj.css("color", color);
+      }
+
+      function generatePastelColor() {
+         let R = Math.floor((Math.random() * 127) + 127);
+         let G = Math.floor((Math.random() * 127) + 127);
+         let B = Math.floor((Math.random() * 127) + 127);
+
+         let rgb = (R << 16) + (G << 8) + B;
+         return `#${rgb.toString(16)}`;
+      }
+
+      let usernames = $(".form-check-label")
+
       // randomizes colors in recipient list
-       for (let name = 0; name < usernames.length; name++){
-           setRandomColor($(usernames[name]), generatePastelColor())
-       }
-   
-       function content(message){
-           let h = $("#content");
-           console.log(this.sent_msg)
+      for (let name = 0; name < usernames.length; name++) {
+         setRandomColor($(usernames[name]), generatePastelColor())
+      }
+
+      function content(message) {
+         let h = $("#content");
+         console.log(this.sent_msg)
       }
       content(0)
-   
+
       var dropdown = document.getElementById("places_select");
       var displayedImage = document.getElementById("displayedImage");
-   
-      dropdown.addEventListener("change", function() {
+
+      dropdown.addEventListener("change", function () {
          var selectedOption = dropdown.options[dropdown.selectedIndex].value;
          displayedImage.src = "/images/" + selectedOption + ".png";
       });
-   
+
       var dialogBox = document.getElementById("dialog-box");
       var closeButton = document.getElementById("close-button");
       var body = document.getElementById("body");
-   
-      closeButton.addEventListener("click", function() {
-        dialogBox.style.display = "none";
+
+      closeButton.addEventListener("click", function () {
+         dialogBox.style.display = "none";
+         location.reload();
       });
-   
-   
+
+
       var select = document.getElementById("locations");
       var image = document.getElementById("location-image");
-   
-      select.addEventListener("change", function() {
-        switch (select.value) {
-           case "Park":
-             image.src = "/images/park.png";
-             break;
-           case "Parking Garage":
-             image.src = "/images/garage.png";
-             break;
-           case "Alley":
-             image.src = "/images/alley.png";
-             break;
-           case "Cafe":
-             image.src = "/images/cafe.png";
-             break;
-           case "Rooftop":
-             image.src = "/images/rooftop.png";
-             break;
-           case "Bus Stop":
-             image.src = "/images/busstop.png";
-             break;
-           case "Subway Station":
-             image.src = "/images/subway.png";
-             break;
-           default:
-             image.src = "/images/cafe.png";
-        }
-      });
-   
-      </script>
-            
-   {% endblock content %}
-=======
-</div>
 
-
-<script type="text/javascript" charset="utf-8">
-   $(document).ready(function() {
-	document.getElementById('encryption_and_signed_keys').value = ""; 
-   	var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
-   	// Connect to the Socket.IO server.
-          // The connection URL has the following format, relative to the current page:
-          //     http[s]://<domain>:<port>[/<namespace>]
-          var socket = io();
-   	socket.on('update', function() {
-   		$.get(document.URL, function(data) {
-   			var elem = $(data).find('#Received');
-   			 $('#Received').replaceWith(elem);
-   		});
-   		$.get(document.URL, function(data) {
-   			var elem = $(data).find('#Sent');
-   			 $('#Sent').replaceWith(elem);
-   		});
-          });
-   	
-   	socket.on('start_vote', function() {
-   		myModal.show();
-   	});
-   	
-   });
-   
-   function submitVote(){
-   	var socket = io();
-   	place = $( "#places_select" ).find(':selected').text();
-   	time = $( "#time_s1" ).find(':selected').text();
-   	
-   	if(place == "Select Location" || time == "Select Time"){
-   		return;
-   	}
-      $("#submt_vote").prop("disabled",true);  	
-   	time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-   	vote = place + ' ' + time;
-
-      socket.emit('cast_vote', {
-   	game_id: "{{game.id}}",
-   	vote: vote
-   	});
-      socket.on('return_result',function(msg){
-         switch(msg){
-            case "PlayerWin":
-            $( "#staticBackdropLabel" ).text("You won. The players successfully met in a safe location!"); 
-            break;
-            case "PlayerLose":
-            $( "#staticBackdropLabel" ).text("You Lost. The Adversary was able to thwart the player's meeting."); 
-            break;
-            default:$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
+      select.addEventListener("change", function () {
+         switch (select.value) {
+            case "Park":
+               image.src = "/images/park.png";
+               break;
+            case "Parking Garage":
+               image.src = "/images/garage.png";
+               break;
+            case "Alley":
+               image.src = "/images/alley.png";
+               break;
+            case "Cafe":
+               image.src = "/images/cafe.png";
+               break;
+            case "Rooftop":
+               image.src = "/images/rooftop.png";
+               break;
+            case "Bus Stop":
+               image.src = "/images/busstop.png";
+               break;
+            case "Subway Station":
+               image.src = "/images/subway.png";
+               break;
+            default:
+               image.src = "/images/cafe.png";
          }
       });
-   }
-  
-   function addCryptography(){
-		user_select = $( "#cryptography_user_select" ).val();
-		key_select = $( "#cryptography_key_select" ).val();
-		type_select = $( "#cryptography_type_select" ).val();
-			
-		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
-			
-			listEl.classList.add("select2-selection__choice");
-			
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
-			
-			listEl.appendChild(buttonEl);
-			
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = type_select;
-			listEl.appendChild(spanEl);
-			
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = user_select + "." + key_select;
-			listEl.appendChild(spanEl2);
-			
-			var listContainer = $( "#cryptography_tags_list" );
-			listContainer.append(listEl);
-			 
-			var submitString = "";
-			 
-			$('#cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
 
-				var chars = option_all.split(',');
-				
-				submitString += chars[1] + "(" + chars[2] + "),"
-			}) 		
-		}
-		
-		submitString = submitString.slice(0, -1) 
-		console.log(submitString);
-		document.getElementById('encryption_and_signed_keys').value = submitString; 
-   }
+      $(document).ready(function () {
+         $('#cryptography_type_select, #cryptography_user_select').on('change', function () {
+            var selectedCryptographyType = $('#cryptography_type_select').val();
+            var selectedUser = $('#cryptography_user_select').val();
+            var keyTypeDropdown = $('#cryptography_key_select');
 
-    function setRandomColor(obj, color) {
-        obj.css("color", color);
-    }
-
-    function generatePastelColor() {
-        let R = Math.floor((Math.random() * 127) + 127);
-        let G = Math.floor((Math.random() * 127) + 127);
-        let B = Math.floor((Math.random() * 127) + 127);
-
-        let rgb = (R << 16) + (G << 8) + B;
-        return `#${rgb.toString(16)}`;
-    }
-
-    let usernames = $(".form-check-label")
-
-   // randomizes colors in recipient list
-    for (let name = 0; name < usernames.length; name++){
-        setRandomColor($(usernames[name]), generatePastelColor())
-    }
-
-    function content(message){
-        let h = $("#content");
-        console.log(this.sent_msg)
-   }
-   content(0)
-
-   var dropdown = document.getElementById("places_select");
-   var displayedImage = document.getElementById("displayedImage");
-
-   dropdown.addEventListener("change", function() {
-      var selectedOption = dropdown.options[dropdown.selectedIndex].value;
-      displayedImage.src = "/images/" + selectedOption + ".png";
-   });
-
-   var dialogBox = document.getElementById("dialog-box");
-   var closeButton = document.getElementById("close-button");
-   var body = document.getElementById("body");
-
-   closeButton.addEventListener("click", function() {
-     dialogBox.style.display = "none";
-     location.reload();	
-   });
+            if (selectedCryptographyType === 'Encrypted' || selectedCryptographyType === 'Signed') {
+               if (selectedUser === '{{ current_user.username }}') {
+                  keyTypeDropdown.find('option[value=private]').show();
+               } else {
+                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();
+                  keyTypeDropdown.find('option[value=private]').hide();
+               }
+               keyTypeDropdown.show();
+            } else {
+               keyTypeDropdown.val('-1').hide();
+            }
+         });
+      });
 
 
-   var select = document.getElementById("locations");
-   var image = document.getElementById("location-image");
 
-   select.addEventListener("change", function() {
-     switch (select.value) {
-        case "Park":
-          image.src = "/images/park.png";
-          break;
-        case "Parking Garage":
-          image.src = "/images/garage.png";
-          break;
-        case "Alley":
-          image.src = "/images/alley.png";
-          break;
-        case "Cafe":
-          image.src = "/images/cafe.png";
-          break;
-        case "Rooftop":
-          image.src = "/images/rooftop.png";
-          break;
-        case "Bus Stop":
-          image.src = "/images/busstop.png";
-          break;
-        case "Subway Station":
-          image.src = "/images/subway.png";
-          break;
-        default:
-          image.src = "/images/cafe.png";
-     }
-   });
+
+
+
+
+
+
+
 
    </script>
-		
-{% endblock content %}
->>>>>>> 98fe4a7bde85ea632a96c48d7f8ea1f601d6aa04
+
+   {% endblock content %}
