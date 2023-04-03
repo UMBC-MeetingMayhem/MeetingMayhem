@@ -10,6 +10,7 @@ Docstring info: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_
 from flask import flash
 from MeetingMayhem import db
 from MeetingMayhem.models import Message
+from cryptography.fernet import Fernet
 
 #recursivley parse the given string for usernames, return true if the given username is found
 def check_for_str(str, check):
@@ -151,8 +152,7 @@ def create_message(user, game, request, form, username, time_stamp):
                      encrypted_keys.append('invalid encrypted key')
 
         signed_keys_string = ", ".join(map(str, signed_keys))
-        encrypted_keys_string = ", ".join(map(str, encrypted_keys))
-            
+        encrypted_keys_string = ", ".join(map(str, encrypted_keys))            
         #create the message and add it to the db
         new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         db.session.add(new_message)
@@ -178,8 +178,6 @@ def create_message(user, game, request, form, username, time_stamp):
         encrypted_keys = [] # list to keep track of encryption keys
 
         dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
-
-        
         # Code to remove wierd commas from get request 
         for i in range(len(checkbox_output_list)):
             checkbox_output_list[i] = checkbox_output_list[i].split(',')[0]
@@ -209,6 +207,14 @@ def create_message(user, game, request, form, username, time_stamp):
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
+        if 'invalid' in signed_keys_string or 'invalid' in encrypted_keys_string:
+             new_message_content = form.content.data
+        else:
+               #Replace message content with hashtags
+             key = Fernet.generate_key()
+             fernet = Fernet(key)
+             new_message_content = form.content.data
+      
         
         #create the message and add it to the db
         
@@ -221,6 +227,7 @@ def create_message(user, game, request, form, username, time_stamp):
         return True
     else: #if someone who isn't a user or adversary manages to call this function, return false
         return False
+
     
 def can_decrypt(user, encryption_keys, is_encrypted, sender):
     """Decides who can or cannot read an encrypted message.
