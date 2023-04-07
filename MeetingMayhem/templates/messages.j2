@@ -2,6 +2,7 @@
 {% for msg in msgs %}
 {% if msg[0].is_edited %}
 <!-- if the message has been edited, display the edited parts-->
+
 <article class="media content-section">
     <div class="media-body">
         <div class="article-metadata">
@@ -78,6 +79,53 @@
             <a>Recipient: {{ msg[0].recipient }}</a>
             <a> | Time Received: {{ msg[0].time_received }} </a>
         </div>
+
+
+        <div class="row g-3 align-items-center">
+           <div class="col-auto">
+              <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                 <option value= "-1" selected>No Encryption</option>
+                 <option value="symmetric">Symmetric Encryption</option>
+                 <option value="asymmetric">Asymmetric Encryption</option>
+              </select>
+           </div>
+           <div class="col-auto">
+              <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                 <option value= "-1" selected>User</option>
+              </select>
+           </div>
+           <div class="col-auto">
+              <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                 <option value= "-1" selected>Key Type</option>
+                 <option value="public">Public</option>
+                 <option value="private">Private</option>
+              </select>
+           </div>
+        </div>
+
+        <div class="row g-3 align-items-center">
+           <div class="col-auto">
+              <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                 <option value= "-1" selected>No Signature</option>
+                 <option value="signed">Signed</option>
+              </select>
+           </div>
+           <div class="col-auto">
+              <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                 <option value= "-1" selected>User</option>
+                 {% for username in usernames %}
+                 <option value="{{ username }}">{{ username }}</option>
+                 {% endfor %}
+              </select>
+           </div>
+           <div class="col-auto">
+              <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                 <option value= "-1" selected>Key Type</option>
+                 <option value="public">Public</option>
+                 <option value="private">Private</option>
+              </select>
+           </div>
+        </div>
         <button id="decrypt-{{ msg_id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
         <div id="content-{{ msg_id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
     </div>
@@ -111,6 +159,8 @@
         document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
         document.getElementById("content-{{ msg_id }}").style.display = "block";
     });
+
+
 </script>
 {% endfor %}
 

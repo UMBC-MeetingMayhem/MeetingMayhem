@@ -81,84 +81,132 @@
          </div>
          <br />
       </fieldset>
-      <div class="content-section bg-secondary">
-         <ul class="select2-selection__rendered" id="cryptography_tags_list">
-         </ul>
-         <label class="form-control-label" >Select your encryption type:</label> <br/><br>
-         <div class="row g-3 align-items-center">
-            <div class="col-auto">
-               <label class="form-control-label" style="display:inline;" >Encryption</label> <br/>
+         <div class="content-section bg-secondary">
+            <ul class="select2-selection__rendered" id="cryptography_tags_list">
+            </ul>
+            <div class="row g-3 align-items-center">
+               <div class="col-auto">
+                  <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option value= "-1" selected>No Encryption</option>
+                     <option value="symmetric">Symmetric Encryption</option>
+                     <option value="asymmetric">Asymmetric Encryption</option>
+                  </select>
+               </div>
+               <div class="col-auto">
+                  <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option value= "-1" selected>User</option>
+                     {% for username in usernames %}
+                     <option value="{{ username }}">{{ username }}</option>
+                     {% endfor %}
+                  </select>
+               </div>
+               <div class="col-auto">
+                  <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option value= "-1" selected>Key Type</option>
+                     <option value="public">Public</option>
+                     <option value="private">Private</option>
+                  </select>
+               </div>
             </div>
-            <div class="col-auto">
-               <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" style="display:inline;">
-                  <option value= "-1" selected>No Encryption</option>
-                  <option value="Symmetric">Symmetric Encryption</option>
-                  <option value="Assymetric">Assymetric Encyption</option>
-               </select>
-            </div>
-            <div class="col-auto">
-               <label class="form-control-label" style="display:inline;" >with key:</label> <br/>
-            </div>
-            <div class="col-auto">
-               <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>User</option>
-                  {% for username in usernames %}
-                  <option value="{{ username }}">{{ username }}</option>
-                  {% endfor %}
-               </select>
-            </div>
-            <div class="col-auto">
-               <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>Key Type</option>
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-               </select>
-            </div>
-         </div>
-         <div class="row g-3 align-items-center">
-            <div class="col-auto">
-               <label class="form-control-label" style="display:inline;" >Signature</label> <br/>
-            </div>
-            <div class="col-auto">
-               <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" style="display:inline;">
-                  <option value= "-1" selected>No Signature</option>
 
-<!--               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue"-->
-<!--                  aria-label=".form-select-lg example">-->
-<!--                  <option value="-1" selected>Cryptography Type</option>-->
-
-                  <option value="Signed">Signed</option>
-               </select>
+            <div class="row g-3 align-items-center">
+               <div class="col-auto">
+                  <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option value= "-1" selected>No Signature</option>
+                     <option value="signed">Signed</option>
+                  </select>
+               </div>
+               <div class="col-auto">
+                  <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option value= "-1" selected>User</option>
+                     {% for username in usernames %}
+                     <option value="{{ username }}">{{ username }}</option>
+                     {% endfor %}
+                  </select>
+               </div>
+               <div class="col-auto">
+                  <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option value= "-1" selected>Key Type</option>
+                     <option value="public">Public</option>
+                     <option value="private">Private</option>
+                  </select>
+               </div>
             </div>
-            <div class="col-auto">
-               <label class="form-control-label" style="display:inline;" >with key:</label> <br/>
-            </div>
-            <div class="col-auto">
-               <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>User</option>
 
-<!--               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue"-->
-<!--                  aria-label=".form-select-lg example">-->
-<!--                  <option value="-1" selected>User</option>-->
+<!--         <div class="row g-3 align-items-center">-->
+<!--            <div class="col-auto">-->
+<!--               <label class="form-control-label" style="display:inline;" >Signature</label> <br/>-->
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--               <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" style="display:inline;">-->
+<!--                  <option value= "-1" selected>No Signature</option>-->
 
-                  {% for username in usernames %}
-                  <option value="{{ username }}">{{ username }}</option>
-                  {% endfor %}
-               </select>
-            </div>
-            <div class="col-auto">
-               <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>Key Type</option>
+<!--&lt;!&ndash;               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue"&ndash;&gt;-->
+<!--&lt;!&ndash;                  aria-label=".form-select-lg example">&ndash;&gt;-->
+<!--&lt;!&ndash;                  <option value="-1" selected>Cryptography Type</option>&ndash;&gt;-->
 
-<!--               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue"-->
-<!--                  aria-label=".form-select-lg example">-->
-<!--                  <option value="-1" selected>Key Type</option>-->
+<!--                  <option value="Signed">Signed</option>-->
+<!--               </select>-->
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--               <label class="form-control-label" style="display:inline;" >with key:</label> <br/>-->
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--               <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">-->
+<!--                  <option value= "-1" selected>User</option>-->
 
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-               </select>
-            </div>
-         </div>
+<!--&lt;!&ndash;               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue"&ndash;&gt;-->
+<!--&lt;!&ndash;                  aria-label=".form-select-lg example">&ndash;&gt;-->
+<!--&lt;!&ndash;                  <option value="-1" selected>User</option>&ndash;&gt;-->
+
+<!--                  {% for username in usernames %}-->
+<!--                  <option value="{{ username }}">{{ username }}</option>-->
+<!--                  {% endfor %}-->
+<!--               </select>-->
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--               <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">-->
+<!--                  <option value= "-1" selected>Key Type</option>-->
+
+<!--&lt;!&ndash;               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue"&ndash;&gt;-->
+<!--&lt;!&ndash;                  aria-label=".form-select-lg example">&ndash;&gt;-->
+<!--&lt;!&ndash;                  <option value="-1" selected>Key Type</option>&ndash;&gt;-->
+
+<!--                  <option value="public">Public</option>-->
+<!--                  <option value="private">Private</option>-->
+<!--               </select>-->
+<!--            </div>-->
+<!--         </div>-->
+
+
+
+<!--      <div class="content-section bg-secondary">-->
+<!--         <ul class="select2-selection__rendered" id="cryptography_tags_list">-->
+<!--         </ul>-->
+<!--         <div class="row g-3 align-items-center">-->
+<!--            <div class="col-auto">-->
+<!--               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">-->
+<!--                  <option value= "-1" selected>Cryptography Type</option>-->
+<!--                  <option value="Signed">Signed</option>-->
+<!--                  <option value="Encrypted">Encrypted</option>-->
+<!--               </select>-->
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">-->
+<!--                  <option value= "-1" selected>User</option>-->
+<!--                  {% for username in usernames %}-->
+<!--                  <option value="{{ username }}">{{ username }}</option>-->
+<!--                  {% endfor %}-->
+<!--               </select>-->
+<!--            </div>-->
+<!--            <div class="col-auto">-->
+<!--               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">-->
+<!--                  <option value= "-1" selected>Key Type</option>-->
+<!--                  <option value="public">Public</option>-->
+<!--                  <option value="private">Private</option>-->
+<!--               </select>-->
+<!--            </div>-->
+<!--         </div>-->
          <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
          <br /><br />
       </div>
@@ -194,7 +242,7 @@
                <a> | Time Sent: {{ sent_msg.time_sent }} </a>
             </div>
             {% if (sent_msg.initial_encryption_details != "invalid encrypted key" or sent_msg.initial_signed_details !=
-            "invalid sign key") %}
+            "invalid sign key" or sent_msg.initial_asymmetric_details != "invalid asymmetric key") %}
             <div id="content">
                <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
                   sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
@@ -204,6 +252,14 @@
                {% else %}
                <p class="article-content">{{ sent_msg.content }}</p>
                {% endif %}
+
+<!--               {% elif sent_msg.initial_asymmetric_encryption_details != "invalid asymmetric key" %}-->
+<!--               {% if sent_msg.initial_is_asymmetric %}-->
+<!--               <p class="article-content"> #######################</p>-->
+<!--               {% else %}-->
+<!--               <p class="article-content">{{ sent_msg.content }}</p>-->
+<!--               {% endif %}-->
+
                {% elif sent_msg.initial_signed_details != "invalid sign key" %}
                {% if sent_msg.initial_is_signed %}
                <p class="article-content">#######################</p>
@@ -387,54 +443,153 @@
          });
       }
 
-      function addCryptography() {
-         user_select = $("#cryptography_user_select").val();
-         key_select = $("#cryptography_key_select").val();
-         type_select = $("#cryptography_type_select").val();
+<!--      function addCryptography(){-->
+<!--		user_select = $( "#cryptography_user_select" ).val();-->
+<!--		key_select = $( "#cryptography_key_select" ).val();-->
+<!--		type_select = $( "#cryptography_type_select" ).val();-->
 
-         if (!(user_select == -1 || key_select == -1 || type_select == -1)) {
-            const listEl = document.createElement('li');
-            const buttonEl = document.createElement('button');
-            const spanEl = document.createElement('span');
-            const spanEl2 = document.createElement('span');
+<!--		if(!(user_select == -1 || key_select == -1 || type_select == -1)){-->
+<!--			const listEl = document.createElement('li');-->
+<!--			const buttonEl = document.createElement('button');-->
+<!--			const spanEl = document.createElement('span');-->
+<!--			const spanEl2 = document.createElement('span');-->
 
-            listEl.classList.add("select2-selection__choice");
+<!--			listEl.classList.add("select2-selection__choice");-->
 
-            buttonEl.setAttribute("type", "button");
-            buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-            buttonEl.classList.add("select2-selection__choice__remove");
-            buttonEl.textContent = "×";
+<!--			buttonEl.setAttribute("type", "button");-->
+<!--			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");-->
+<!--								console.log(this.parentNode);-->
 
-            listEl.appendChild(buttonEl);
+<!--			buttonEl.classList.add("select2-selection__choice__remove");-->
+<!--			buttonEl.textContent = "×";-->
 
-            spanEl.classList.add("select2-selection__choice__display");
-            spanEl.textContent = type_select;
-            listEl.appendChild(spanEl);
+<!--			listEl.appendChild(buttonEl);-->
 
-            spanEl2.classList.add("select2-selection__choice__display");
-            spanEl2.textContent = user_select + "." + key_select;
-            listEl.appendChild(spanEl2);
+<!--			spanEl.classList.add("select2-selection__choice__display");-->
+<!--			spanEl.textContent = type_select;-->
+<!--			listEl.appendChild(spanEl);-->
 
-            var listContainer = $("#cryptography_tags_list");
-            listContainer.append(listEl);
+<!--			spanEl2.classList.add("select2-selection__choice__display");-->
+<!--			spanEl2.textContent = user_select + "." + key_select;-->
+<!--			listEl.appendChild(spanEl2);-->
 
-            var submitString = "";
+<!--			var listContainer = $( "#cryptography_tags_list" );-->
+<!--			listContainer.append(listEl);-->
 
-            $('#cryptography_tags_list li').each(function () {
-               var option_all = $(this).children().map(function () {
-                  return $(this).text();
-               }).get().join(',');
+<!--			var submitString = "";-->
 
-               var chars = option_all.split(',');
+<!--			$('#cryptography_tags_list li').each(function() {-->
+<!--				var option_all = $(this).children().map(function () {-->
+<!--					return $(this).text();-->
+<!--				}).get().join(',');-->
 
-               submitString += chars[1] + "(" + chars[2] + "),"
-            })
-         }
+<!--				var chars = option_all.split(',');-->
 
-         submitString = submitString.slice(0, -1)
-         console.log(submitString);
-         document.getElementById('encryption_and_signed_keys').value = submitString;
-      }
+<!--				submitString += chars[1] + "(" + chars[2] + "),"-->
+<!--			})-->
+<!--		}-->
+
+<!--		submitString = submitString.slice(0, -1)-->
+<!--		console.log(submitString);-->
+<!--		document.getElementById('encryption_and_signed_keys').value = submitString;-->
+<!--   }-->
+
+   function addCryptography(){
+		encryption_user_select = $( "#encryption_user_select" ).val();
+		encryption_key_select = $( "#encryption_key_select" ).val();
+		encryption_type_select = $( "#encryption_type_select" ).val();
+
+        signature_user_select = $( "#signature_user_select" ).val();
+		signature_key_select = $( "#signature_key_select" ).val();
+		signature_type_select = $( "#signature_type_select" ).val();
+
+		if(!(encryption_user_select == -1 || encryption_key_select == -1 || encryption_type_select == -1)){
+			const listEl = document.createElement('li');
+			const buttonEl = document.createElement('button');
+			const spanEl = document.createElement('span');
+			const spanEl2 = document.createElement('span');
+
+			listEl.classList.add("select2-selection__choice");
+
+			buttonEl.setAttribute("type", "button");
+			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
+								console.log(this.parentNode);
+
+			buttonEl.classList.add("select2-selection__choice__remove");
+			buttonEl.textContent = "×";
+
+			listEl.appendChild(buttonEl);
+
+			spanEl.classList.add("select2-selection__choice__display");
+			spanEl.textContent = encryption_type_select;
+			listEl.appendChild(spanEl);
+
+			spanEl2.classList.add("select2-selection__choice__display");
+			spanEl2.textContent = encryption_user_select + "." + encryption_key_select;
+			listEl.appendChild(spanEl2);
+
+			var listContainer = $( "#cryptography_tags_list" );
+			listContainer.append(listEl);
+
+			var submitString = "";
+
+			$('#cryptography_tags_list li').each(function() {
+				var option_all = $(this).children().map(function () {
+					return $(this).text();
+				}).get().join(',');
+
+				var chars = option_all.split(',');
+
+				submitString += chars[1] + "(" + chars[2] + "),"
+			})
+		}
+
+		if(!(signature_user_select == -1 || signature_key_select == -1 || signature_type_select == -1)){
+			const listEl = document.createElement('li');
+			const buttonEl = document.createElement('button');
+			const spanEl = document.createElement('span');
+			const spanEl2 = document.createElement('span');
+
+			listEl.classList.add("select2-selection__choice");
+
+			buttonEl.setAttribute("type", "button");
+			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
+								console.log(this.parentNode);
+
+			buttonEl.classList.add("select2-selection__choice__remove");
+			buttonEl.textContent = "×";
+
+			listEl.appendChild(buttonEl);
+
+			spanEl.classList.add("select2-selection__choice__display");
+			spanEl.textContent = signature_type_select;
+			listEl.appendChild(spanEl);
+
+			spanEl2.classList.add("select2-selection__choice__display");
+			spanEl2.textContent = signature_user_select + "." + signature_key_select;
+			listEl.appendChild(spanEl2);
+
+			var listContainer = $( "#cryptography_tags_list" );
+			listContainer.append(listEl);
+
+			var submitString = "";
+
+			$('#cryptography_tags_list li').each(function() {
+				var option_all = $(this).children().map(function () {
+					return $(this).text();
+				}).get().join(',');
+
+				var chars = option_all.split(',');
+
+				submitString += chars[1] + "(" + chars[2] + "),"
+			})
+		}
+
+		submitString = submitString.slice(0, -1)
+		console.log(submitString);
+		document.getElementById('encryption_and_signed_keys').value = submitString;
+		console.log(encryption_and_signed_keys.value);
+   }
 
       function setRandomColor(obj, color) {
          obj.css("color", color);
@@ -510,111 +665,47 @@
                image.src = "/images/cafe.png";
          }
       });
-  
-
-   function addCryptography() {
-  var selectedEncryptionUser = $( "#encryption_user_select" ).val();
-  var selectedEncryptionKey = $( "#encryption_key_select" ).val();
-  var selectedEncryptionType = $( "#encryption_type_select" ).val();
-  var selectedSignedUser = $( "#signature_user_select" ).val();
-  var selectedSignedKey = $( "#signature_key_select" ).val();
-  var selectedSignedType = $( "#signature_type_select" ).val();
-
-  if ((selectedEncryptionType == -1 || selectedEncryptionType ==  "undefined") && (selectedSignedType == -1 || selectedSignedType == "undefined")) {
-     console.log("encr", selectedEncryptionType);
-     console.log("sign" , selectedSignedType);
-    alert("Please select either encryption or signed.");
-    return false;
-  }
-
-  if (selectedEncryptionType != -1 && selectedSignedType != -1) {
-  console.log("encr",selectedEncryptionType);
-     console.log("sign" ,selectedSignedType);
-    alert("Please select only one of either encryption or signed.");
-    return false;
-  }
-
-  var listEl = document.createElement('li');
-  var buttonEl = document.createElement('button');
-  var spanEl = document.createElement('span');
-  var spanEl2 = document.createElement('span');
-
-  listEl.classList.add("select2-selection__choice");
-
-  buttonEl.setAttribute("type", "button");
-  buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-  buttonEl.classList.add("select2-selection__choice__remove");
-  buttonEl.textContent = "×";
-
-  listEl.appendChild(buttonEl);
-
-  spanEl.classList.add("select2-selection__choice__display");
-  spanEl.textContent = selectedEncryptionType;
-  listEl.appendChild(spanEl);
-
-  var selectedUser = "";
-  var selectedKey = "";
-  if (selectedEncryptionType != -1) {
-    selectedUser = selectedEncryptionType;
-    selectedKey = selectedEncryptionKey;
-  } else if (selectedSignedType != -1) {
-    selectedUser = selectedSignedType;
-    selectedKey = selectedSignedKey;
-  }
-
-  spanEl2.classList.add("select2-selection__choice__display");
-  spanEl2.textContent = selectedUser + "." + selectedKey;
-  listEl.appendChild(spanEl2);
-
-  var listContainer = $( "#cryptography_tags_list" );
-  listContainer.append(listEl);
-
-  var submitString = "";
-
-  $('#cryptography_tags_list li').each(function() {
-    var optionAll = $(this).children().map(function () {
-      return $(this).text();
-    }).get().join(',');
-
-    var chars = optionAll.split(',');
-
-    submitString += chars[1] + "(" + chars[2] + "),";
-  });
-
-  submitString = submitString.slice(0, -1);
-  console.log(submitString);
-  document.getElementById('encryption_and_signed_keys').value = submitString;
-}
-
-      $(document).ready(function () {
-         $('#cryptography_type_select, #cryptography_user_select').on('change', function () {
-            var selectedCryptographyType = $('#cryptography_type_select').val();
-            var selectedUser = $('#cryptography_user_select').val();
-            var keyTypeDropdown = $('#cryptography_key_select');
-
-            if (selectedCryptographyType === 'Encrypted' || selectedCryptographyType === 'Signed') {
-               if (selectedUser === '{{ current_user.username }}') {
-                  keyTypeDropdown.find('option[value=private]').show();
-               } else {
-                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();
-                  keyTypeDropdown.find('option[value=private]').hide();
-               }
-               keyTypeDropdown.show();
-            } else {
-               keyTypeDropdown.val('-1').hide();
-            }
-         });
-      });
 
 
+<!--      $(document).ready(function () {-->
+<!--         $('#cryptography_type_select, #cryptography_user_select').on('change', function () {-->
+<!--            var selectedCryptographyType = $('#cryptography_type_select').val();-->
+<!--            var selectedUser = $('#cryptography_user_select').val();-->
+<!--            var keyTypeDropdown = $('#cryptography_key_select');-->
 
+<!--            if (selectedCryptographyType === 'Encrypted' || selectedCryptographyType === 'Signed') {-->
+<!--               if (selectedUser === '{{ current_user.username }}') {-->
+<!--                  keyTypeDropdown.find('option[value=private]').show();-->
+<!--               } else {-->
+<!--                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();-->
+<!--                  keyTypeDropdown.find('option[value=private]').hide();-->
+<!--               }-->
+<!--               keyTypeDropdown.show();-->
+<!--            } else {-->
+<!--               keyTypeDropdown.val('-1').hide();-->
+<!--            }-->
+<!--         });-->
+<!--      });-->
 
+<!--      $(document).ready(function () {-->
+<!--         $('#encryption_type_select, #encryption_user_select').on('change', function () {-->
+<!--            var selectedCryptographyType = $('#encryption_type_select').val();-->
+<!--            var selectedUser = $('#encryption_user_select').val();-->
+<!--            var keyTypeDropdown = $('#encryption_key_select');-->
 
-
-
-
-
-
+<!--            if (selectedCryptographyType === 'Symmetric' || selectedCryptographyType === 'Assymmetric') {-->
+<!--               if (selectedUser === '{{ current_user.username }}') {-->
+<!--                  keyTypeDropdown.find('option[value=private]').show();-->
+<!--               } else {-->
+<!--                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();-->
+<!--                  keyTypeDropdown.find('option[value=private]').hide();-->
+<!--               }-->
+<!--               keyTypeDropdown.show();-->
+<!--            } else {-->
+<!--               keyTypeDropdown.val('-1').hide();-->
+<!--            }-->
+<!--         });-->
+<!--      });-->
 
    </script>
 

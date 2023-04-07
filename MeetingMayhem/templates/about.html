@@ -1,13 +1,73 @@
-<!-- 
-    File: about.html
+<!--
+    File: home.html
     Author: Robert Shovan /Voitheia
-    Date: 6/15/2021
+    Date Created: 6/15/2021
     Last Modified: 7/6/2021
     E-mail: rshovan1@umbc.edu
-    Description: html and jinja file for handling the about page
+    Description: html and jinja file for handling the home page
+    this page doesn't really have anything useful for now
 -->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <h1 style="text-align:center;">Here, we shall describe how the game works, I suppose</h1>
+
+<h1 style="text-align:center" >
+    Scenario:
+</h1>
+
+<p style="text-align:center; font-family:Lucida Console, Courier New, monospace;">
+    You are an agent embedded in hostile territory.
+    One of your fellow agents has been caught, and your mission is to aid them in their escape.
+    You are attempting to arrange a meeting with other allied agents to exchange information critical to this mission.
+    However, your only means of communication with your team has been compromised by a hostile Adversary.
+    Can you successfully arrange a safe meeting with your team, or will the Adversary trick you into meeting somewhere unsafe?
+</p></br></br>
+
+<h1 style="text-align:center;">
+    Directions:
+</h1>
+
+<p style="text-align:center;">
+<ul>
+    <li>Send messages to your allies to arrange a meeting time and place.</li>
+    <li>The majority of the players need to vote for the same safe location to win.</li>
+    <li>The Adversary will also vote for a location, and that location will not be safe.</li>
+    <li>Beware of the Adversary attempting to cause confusion or trick you.</li>
+    <li>The Adversary is able to create, edit, and delete messages.</li>
+    <li>When available, use cryptography primitives to your advantage.</li>
+    <li>Encryption: encrypt a message with a recipient's public key.</li>
+    <li>Successful encryption will prevent the Adversary from readying your message.</li>
+    <li>Signing: sign a message with your private key.</li>
+    <li>A successful signature will validate that the message came from you.</li>
+    <li>You can also include multiple cryptography primitives in one message.</li>
+    <li>This can be useful if you are sending a message to multiple people.</li>
+    <li>When you are ready to vote for a meeting time and place, click the "Ready to Vote" button.</li>
+    <li>The meeting places are: Park, Alley, Cafe, Parking Garage, Rooftop, Bus stop, Subway station.</li>
+    <li>The meeting times are every hour on a 12 hour AM/PM scale.</li>
+    <li>Once two players have clicked the "Ready to Vote" button, the game will be brought to a vote.</li>
+</ul>
+</p>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('ingame', function() {
+            window.location.href = "{{ url_for('messages') }}";
+        });
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock content %}

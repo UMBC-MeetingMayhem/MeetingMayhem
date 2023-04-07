@@ -21,7 +21,7 @@ def check_for_str(str, check):
         check (str): the username we are looking for
     Returns:
         bool: True if the username we are looking for is found.
-    
+
     Todo:
         Rename check to something better.
     """
@@ -42,7 +42,7 @@ def strip_list_str(str_list):
     This is used by the game_seutp page to clean up lists of usernames and game names.
     Args:
         str_list (list): the list that we want to clean up
-    
+
     Returns:
         list: the same list of players that was passed as an argument with commas and white space removed from the end of the string.
     """
@@ -62,7 +62,7 @@ def str_to_list(st, li):
     Args:
         st (str): a string delimited by ", " which we want to make into a list.
         li (list): an empty list where we will put the list of strings.
-    
+
     Returns:
         list: the same list that was passed as an argument, now filled with strings.
     Throws:
@@ -124,11 +124,11 @@ def create_message(user, game, request, form, username, time_stamp):
 
         dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
         dict_of_senders = {} # Dictionary to allow for quick look up times when seeing if sender among encryption/sign keys
-        
-        # Code to remove wierd commas from get request 
+
+        # Code to remove wierd commas from get request
         for i in range(len(checkbox_output_list_recipients)):
             checkbox_output_list_recipients[i] = checkbox_output_list_recipients[i].split(',')[0]
-        
+
         for i in range(len(checkbox_output_list_senders)):
             checkbox_output_list_senders[i] = checkbox_output_list_senders[i].split(',')[0]
 
@@ -140,19 +140,20 @@ def create_message(user, game, request, form, username, time_stamp):
 
         # Code for determining whether entered keys are valid or not
         for element in checkbox_output_list_keys.split(','):
+            print(element)
             if element.split('(')[0].lower() == 'signed':
                 if element.split('(')[1] == f"{username}.private)":
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0].lower() == 'encrypted':
+            if element.split('(')[0].lower() == 'symmetric' or  element.split('(')[0].lower() == 'asymmetric':
                 if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{username}.private)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                      encrypted_keys.append('invalid encrypted key')
 
         signed_keys_string = ", ".join(map(str, signed_keys))
-        encrypted_keys_string = ", ".join(map(str, encrypted_keys))            
+        encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         #create the message and add it to the db
         new_message = Message(round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed=len(signed_keys) > 0, signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         db.session.add(new_message)
@@ -178,7 +179,7 @@ def create_message(user, game, request, form, username, time_stamp):
         encrypted_keys = [] # list to keep track of encryption keys
 
         dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
-        # Code to remove wierd commas from get request 
+        # Code to remove wierd commas from get request
         for i in range(len(checkbox_output_list)):
             checkbox_output_list[i] = checkbox_output_list[i].split(',')[0]
 
@@ -189,7 +190,7 @@ def create_message(user, game, request, form, username, time_stamp):
         if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
             flash(f'Duplicate message detected. Please create a new message.', 'danger')
             return False
-        
+
 
 
         # Code for determining whether entered keys are valid or not
@@ -199,7 +200,7 @@ def create_message(user, game, request, form, username, time_stamp):
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0].lower() == 'encrypted':
+            if element.split('(')[0].lower() == 'symmetric' or element.split('(')[0].lower() == 'asymmetric':
                 if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{username}.private)"):
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
@@ -214,12 +215,12 @@ def create_message(user, game, request, form, username, time_stamp):
              key = Fernet.generate_key()
              fernet = Fernet(key)
              new_message_content = form.content.data
-      
-        
+
+
         #create the message and add it to the db
-        
+
         new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
-        
+
         db.session.add(new_message)
         db.session.commit()
         #display success to user
@@ -228,7 +229,7 @@ def create_message(user, game, request, form, username, time_stamp):
     else: #if someone who isn't a user or adversary manages to call this function, return false
         return False
 
-    
+
 def can_decrypt(user, encryption_keys, is_encrypted, sender):
     """Decides who can or cannot read an encrypted message.
     Args:
@@ -239,28 +240,27 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
         bool: whether or not the user can decrypt message
     """
     #flash(list_of_keys)
-    
+
     # determines if adversary can read a message
     if user.role == 3:
         if is_encrypted == False:
-            return True 
+            return True
         list_of_keys = str_to_list(encryption_keys, [])
         if "invalid encrypted key" in list_of_keys:
-            return True 
+            return True
         return False
-    
+
     # determines if a user can read a message
     if sender == user.username:
-        return True 
+        return True
     if is_encrypted == False:
-        return True 
+        return True
     list_of_keys = str_to_list(encryption_keys, [])
     for element in list_of_keys:
         if user.username in element:
             return True
     if "invalid encrypted key" in list_of_keys:
-            return True  
-    return False 
+            return True
+    return False
 
 
-    
