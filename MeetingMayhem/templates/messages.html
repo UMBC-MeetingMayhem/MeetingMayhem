@@ -247,27 +247,19 @@
                <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
                   sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
                {% if sent_msg.initial_encryption_details != "invalid encrypted key" %}
-               {% if sent_msg.initial_is_encrypted %}
-               <p class="article-content"> #######################</p>
-               {% else %}
-               <p class="article-content">{{ sent_msg.content }}</p>
-               {% endif %}
-
-<!--               {% elif sent_msg.initial_asymmetric_encryption_details != "invalid asymmetric key" %}-->
-<!--               {% if sent_msg.initial_is_asymmetric %}-->
-<!--               <p class="article-content"> #######################</p>-->
-<!--               {% else %}-->
-<!--               <p class="article-content">{{ sent_msg.content }}</p>-->
-<!--               {% endif %}-->
-
+                  {% if sent_msg.initial_is_encrypted %}
+                  <p class="article-content"> #######################</p>
+                  {% else %}
+                  <p class="article-content">{{ sent_msg.content }}</p>
+                  {% endif %}
                {% elif sent_msg.initial_signed_details != "invalid sign key" %}
-               {% if sent_msg.initial_is_signed %}
-               <p class="article-content">#######################</p>
+                  {% if sent_msg.initial_is_signed %}
+                  <p class="article-content">#######################</p>
+                  {% else %}
+                  <p class="article-content">{{ sent_msg.content }}</p>
+                  {% endif %}
                {% else %}
-               <p class="article-content">{{ sent_msg.content }}</p>
-               {% endif %}
-               {% else %}
-               <p class="article-content">{{ getRandomString(sent_msg.content.length) }}</p>
+                  <p class="article-content">{{ getRandomString(sent_msg.content.length) }}</p>
                {% endif %}
             </div>
             {% endif %}
