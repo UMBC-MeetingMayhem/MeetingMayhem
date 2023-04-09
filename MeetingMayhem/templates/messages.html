@@ -221,7 +221,7 @@
    <div id="Received" class="col">
       {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
       <legend class="border-bottom mb4">Received messages:</legend>
-      {{ messages.print_msgs(msgs) }}
+      {{ messages.print_msgs(msgs,usernames) }}
       {% else %}
       <legend class="border-bottom mb4">No messages</legend>
       {% endif %}

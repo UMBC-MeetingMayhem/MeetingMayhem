@@ -1,4 +1,4 @@
-{% macro print_msgs(msgs) -%}
+{% macro print_msgs(msgs,usernames) -%}
 {% for msg in msgs %}
 {% if msg[0].is_edited %}
 <!-- if the message has been edited, display the edited parts-->
@@ -92,8 +92,11 @@
            <div class="col-auto">
               <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
+                 {% for username in usernames %}
+                 <option value="{{ username }}">{{ username }}</option>
+                 {% endfor %}
               </select>
-           </div>
+            </div>
            <div class="col-auto">
               <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
