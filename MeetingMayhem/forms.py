@@ -62,6 +62,7 @@ class MessageForm(FlaskForm):
 	meet_location = SelectField('locations', choices=["Locations", "Park", "Parking Garage", "Alley", "Cafe", "Rooftop", "Bus Stop", "Subway Station"])
 	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
 	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
+	encryption_type = SelectField('encryption', choices=["No Encryption", "Symmetric Encryption", "Asymmetric Encryption"], default="No Encryption")
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':

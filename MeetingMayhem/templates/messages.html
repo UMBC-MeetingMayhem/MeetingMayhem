@@ -62,6 +62,7 @@
                style="display:block;margin:20px;">
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
+<!--            {{ form.encryption_type.label(class="form-control-label") }}-->
             {% if form.content.errors %}
             <!-- if there are errors in the form... -->
             {{ form.content(class="form-control form-control-lg is-invalid") }}
@@ -74,6 +75,7 @@
             <!-- if there aren't errors, just display normally -->
             {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
             {% endif %}
+<!--            {{ form.encryption_type(class="gray-blue") }}-->
          </div>
          <br />
          <div class="form-group">
@@ -208,11 +210,11 @@
 <!--               </select>-->
 <!--            </div>-->
 <!--         </div>-->
-         <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
+<!--         <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>-->
       </div>
 
       <div class="form-group">
-         {{ form.submit(class="btn btn-outline-info", disabled="disabled", id="submitButton") }}
+         {{ form.submit(class="btn btn-outline-info", disabled="disabled", onclick="addCryptography()", id="submitButton") }}
       </div>
    </form>
 </div>
@@ -623,12 +625,16 @@ dropboxes.forEach(function(dropbox) {
     var allSelectedValues = Array.from(dropboxes).every(function(db) {
       return db.value !== '-1';
     });
+      var myButton = document.getElementById('submitButton');
 
     if(allSelectedValues){
-      var myButton = document.getElementById('submitButton');
 
             // Enable the button
             myButton.disabled = false;
+    }
+    else{
+    // Enable the button
+            myButton.disabled = true;
     }
     console.log(allSelectedValuesNotMinusOne);
         console.log(allSelectedValues);
@@ -663,11 +669,16 @@ dropboxes1.forEach(function(dropbox) {
     var allSelectedValues = Array.from(dropboxes1).every(function(db) {
       return db.value !== '-1';
     });
+          var myButton = document.getElementById('submitButton');
+
    if(allSelectedValues){
-      var myButton = document.getElementById('submitButton');
 
             // Enable the button
             myButton.disabled = false;
+    }
+    else{
+    // Enable the button
+            myButton.disabled = true;
     }
     console.log(allSelectedValuesNotMinusOne);
 
@@ -687,115 +698,329 @@ dropboxes1.forEach(function(dropbox) {
   });
 });
 
+<!--   function addCryptography(){-->
+
+<!--         var submitString1 = "";-->
+
+<!--		encryption_user_select = $( "#encryption_user_select" ).val();-->
+<!--		encryption_key_select = $( "#encryption_key_select" ).val();-->
+<!--		encryption_type_select = $( "#encryption_type_select" ).val();-->
+
+<!--        signature_user_select = $( "#signature_user_select" ).val();-->
+<!--		signature_key_select = $( "#signature_key_select" ).val();-->
+<!--		signature_type_select = $( "#signature_type_select" ).val();-->
+
+<!--		if(encryption_user_select !== -1 && encryption_key_select !== -1 && encryption_type_select !== -1){-->
+
+
+
+<!--			const listEl = document.createElement('li');-->
+<!--			const buttonEl = document.createElement('button');-->
+<!--			const spanEl = document.createElement('span');-->
+<!--			const spanEl2 = document.createElement('span');-->
+
+<!--			listEl.classList.add("select2-selection__choice");-->
+
+<!--			buttonEl.setAttribute("type", "button");-->
+<!--			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");-->
+<!--								console.log(this.parentNode);-->
+
+<!--			buttonEl.classList.add("select2-selection__choice__remove");-->
+<!--			buttonEl.textContent = "×";-->
+
+<!--			listEl.appendChild(buttonEl);-->
+
+<!--			spanEl.classList.add("select2-selection__choice__display");-->
+<!--			spanEl.textContent = encryption_type_select;-->
+<!--			listEl.appendChild(spanEl);-->
+
+<!--			spanEl2.classList.add("select2-selection__choice__display");-->
+<!--			spanEl2.textContent = encryption_user_select + "." + encryption_key_select;-->
+<!--			listEl.appendChild(spanEl2);-->
+
+<!--			var listContainer = $( "#cryptography_tags_list" );-->
+<!--			listContainer.append(listEl);-->
+
+<!--			var submitString1 = "";-->
+
+<!--			$('#cryptography_tags_list li').each(function() {-->
+<!--				var option_all = $(this).children().map(function () {-->
+<!--					return $(this).text();-->
+<!--				}).get().join(',');-->
+
+<!--				var chars = option_all.split(',');-->
+
+<!--				submitString1 += chars[1] + "(" + chars[2] + "),"-->
+<!--			})-->
+
+<!--			submitString1 = submitString1.slice(0, -1)-->
+<!--		console.log(submitString1);-->
+<!--		document.getElementById('encryption_and_signed_keys').value = submitString1;-->
+<!--		console.log(encryption_and_signed_keys.value);-->
+<!--		}-->
+
+<!--		else if(signature_user_select != -1 && signature_key_select != -1 && signature_type_select != -1){-->
+<!--			const listEl = document.createElement('li');-->
+<!--			const buttonEl = document.createElement('button');-->
+<!--			const spanEl = document.createElement('span');-->
+<!--			const spanEl2 = document.createElement('span');-->
+
+<!--			listEl.classList.add("select2-selection__choice");-->
+
+<!--			buttonEl.setAttribute("type", "button");-->
+<!--			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");-->
+<!--								console.log(this.parentNode);-->
+
+<!--			buttonEl.classList.add("select2-selection__choice__remove");-->
+<!--			buttonEl.textContent = "×";-->
+
+<!--			listEl.appendChild(buttonEl);-->
+
+<!--			spanEl.classList.add("select2-selection__choice__display");-->
+<!--			spanEl.textContent = signature_type_select;-->
+<!--			listEl.appendChild(spanEl);-->
+
+<!--			spanEl2.classList.add("select2-selection__choice__display");-->
+<!--			spanEl2.textContent = signature_user_select + "." + signature_key_select;-->
+<!--			listEl.appendChild(spanEl2);-->
+
+<!--			var listContainer = $( "#cryptography_tags_list" );-->
+<!--			listContainer.append(listEl);-->
+
+<!--			var submitString2 = "";-->
+
+<!--			$('#cryptography_tags_list li').each(function() {-->
+<!--				var option_all = $(this).children().map(function () {-->
+<!--					return $(this).text();-->
+<!--				}).get().join(',');-->
+
+<!--				var chars = option_all.split(',');-->
+
+<!--				submitString2 += chars[1] + "(" + chars[2] + "),"-->
+<!--			})-->
+<!--			submitString2 = submitString2.slice(0, -1)-->
+<!--		console.log(submitString2);-->
+<!--		document.getElementById('encryption_and_signed_keys').value = submitString2;-->
+<!--		console.log(encryption_and_signed_keys.value);-->
+<!--		}-->
+
+
+<!--   }-->
+<!--   -->
    function addCryptography(){
 
-         var submitString1 = "";
-          var submitString2 = "";
+var dropboxes = document.querySelectorAll('#encryption_type_select, #encryption_user_select, #encryption_key_select');
+    var dropboxes1 = document.querySelectorAll('#signature_type_select, #signature_user_select, #signature_key_select');
 
-		encryption_user_select = $( "#encryption_user_select" ).val();
-		encryption_key_select = $( "#encryption_key_select" ).val();
-		encryption_type_select = $( "#encryption_type_select" ).val();
+    var submitString = "";
+    encryption_user_select = $( "#encryption_user_select" ).val();
+    encryption_key_select = $( "#encryption_key_select" ).val();
+    encryption_type_select = $( "#encryption_type_select" ).val();
 
-        signature_user_select = $( "#signature_user_select" ).val();
-		signature_key_select = $( "#signature_key_select" ).val();
-		signature_type_select = $( "#signature_type_select" ).val();
+    signature_user_select = $( "#signature_user_select" ).val();
+    signature_key_select = $( "#signature_key_select" ).val();
+    signature_type_select = $( "#signature_type_select" ).val();
 
-		if(encryption_user_select != -1 && encryption_key_select != -1 && encryption_type_select != -1){
+    var allSelectedValues = Array.from(dropboxes).every(function(db) {
+      return db.value !== '-1';
+    });
+
+    if(allSelectedValues)
+    {
+      console.log("doneeeee");
+      const listEl = document.createElement('li');
+        const buttonEl = document.createElement('button');
+        const spanEl = document.createElement('span');
+        const spanEl2 = document.createElement('span');
+
+        listEl.classList.add("select2-selection__choice");
+
+        buttonEl.setAttribute("type", "button");
+        buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
+        console.log(this.parentNode);
+
+        buttonEl.classList.add("select2-selection__choice__remove");
+        buttonEl.textContent = "×";
+
+        listEl.appendChild(buttonEl);
+
+        spanEl.classList.add("select2-selection__choice__display");
+        spanEl.textContent = encryption_type_select;
+        listEl.appendChild(spanEl);
+
+        spanEl2.classList.add("select2-selection__choice__display");
+        spanEl2.textContent = encryption_user_select + "." + encryption_key_select;
+        listEl.appendChild(spanEl2);
+
+        var listContainer = $( "#cryptography_tags_list" );
+        listContainer.append(listEl);
+
+        var submitString = "";
+
+        $('#cryptography_tags_list li').each(function() {
+            var option_all = $(this).children().map(function () {
+                return $(this).text();
+            }).get().join(',');
+
+            var chars = option_all.split(',');
+
+            submitString += chars[1] + "(" + chars[2] + "),"
+        })
+
+        submitString = submitString.slice(0, -1);
+        console.log(submitString);
+        document.getElementById('encryption_and_signed_keys').value = submitString;
+        console.log(encryption_and_signed_keys.value);
+    }
+
+    var allSelectedValues1 = Array.from(dropboxes1).every(function(db) {
+      return db.value !== '-1';
+    });
+
+    if(allSelectedValues1)
+    {
+      console.log("yayyyy");
+      const listEl = document.createElement('li');
+        const buttonEl = document.createElement('button');
+        const spanEl = document.createElement('span');
+        const spanEl2 = document.createElement('span');
+
+        listEl.classList.add("select2-selection__choice");
+
+        buttonEl.setAttribute("type", "button");
+        buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
+        console.log(this.parentNode);
+
+        buttonEl.classList.add("select2-selection__choice__remove");
+        buttonEl.textContent = "×";
+
+        listEl.appendChild(buttonEl);
+
+        spanEl.classList.add("select2-selection__choice__display");
+        spanEl.textContent = signature_type_select;
+        listEl.appendChild(spanEl);
+
+        spanEl2.classList.add("select2-selection__choice__display");
+        spanEl2.textContent = signature_user_select + "." + signature_key_select;
+        listEl.appendChild(spanEl2);
+
+        var listContainer = $( "#cryptography_tags_list" );
+        listContainer.append(listEl);
+
+        var submitString = "";
+
+        $('#cryptography_tags_list li').each(function() {
+            var option_all = $(this).children().map(function () {
+                return $(this).text();
+            }).get().join(',');
+
+            var chars = option_all.split(',');
+
+            submitString += chars[1] + "(" + chars[2] + "),"
+        })
+
+        submitString = submitString.slice(0, -1);
+        console.log(submitString);
+        document.getElementById('encryption_and_signed_keys').value = submitString;
+        console.log(encryption_and_signed_keys.value);
+    }
 
 
 
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
+<!--    if (encryption_user_select !== -1 && encryption_key_select !== -1 && encryption_type_select !== -1) {-->
 
-			listEl.classList.add("select2-selection__choice");
+<!--        const listEl = document.createElement('li');-->
+<!--        const buttonEl = document.createElement('button');-->
+<!--        const spanEl = document.createElement('span');-->
+<!--        const spanEl2 = document.createElement('span');-->
 
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-								console.log(this.parentNode);
+<!--        listEl.classList.add("select2-selection__choice");-->
 
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
+<!--        buttonEl.setAttribute("type", "button");-->
+<!--        buttonEl.setAttribute("onclick", "return this.parentNode.remove();");-->
+<!--        console.log(this.parentNode);-->
 
-			listEl.appendChild(buttonEl);
+<!--        buttonEl.classList.add("select2-selection__choice__remove");-->
+<!--        buttonEl.textContent = "×";-->
 
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = encryption_type_select;
-			listEl.appendChild(spanEl);
+<!--        listEl.appendChild(buttonEl);-->
 
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = encryption_user_select + "." + encryption_key_select;
-			listEl.appendChild(spanEl2);
+<!--        spanEl.classList.add("select2-selection__choice__display");-->
+<!--        spanEl.textContent = encryption_type_select;-->
+<!--        listEl.appendChild(spanEl);-->
 
-			var listContainer = $( "#cryptography_tags_list" );
-			listContainer.append(listEl);
+<!--        spanEl2.classList.add("select2-selection__choice__display");-->
+<!--        spanEl2.textContent = encryption_user_select + "." + encryption_key_select;-->
+<!--        listEl.appendChild(spanEl2);-->
 
-			var submitString1 = "";
+<!--        var listContainer = $( "#cryptography_tags_list" );-->
+<!--        listContainer.append(listEl);-->
 
-			$('#cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
+<!--        var submitString = "";-->
 
-				var chars = option_all.split(',');
+<!--        $('#cryptography_tags_list li').each(function() {-->
+<!--            var option_all = $(this).children().map(function () {-->
+<!--                return $(this).text();-->
+<!--            }).get().join(',');-->
 
-				submitString1 += chars[1] + "(" + chars[2] + "),"
-			})
+<!--            var chars = option_all.split(',');-->
 
-			submitString1 = submitString1.slice(0, -1)
-		console.log(submitString1);
-		document.getElementById('encryption_and_signed_keys').value = submitString1;
-		console.log(encryption_and_signed_keys.value);
-		}
+<!--            submitString += chars[1] + "(" + chars[2] + "),"-->
+<!--        })-->
 
-		else if(!(signature_user_select == -1 || signature_key_select == -1 || signature_type_select == -1)){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
+<!--        submitString = submitString.slice(0, -1);-->
+<!--        console.log(submitString);-->
+<!--        document.getElementById('encryption_and_signed_keys').value = submitString;-->
+<!--        console.log(encryption_and_signed_keys.value);-->
+<!--    }-->
 
-			listEl.classList.add("select2-selection__choice");
+<!--    else if (signature_user_select !== -1 && signature_key_select !== -1 && signature_type_select !== -1) {-->
 
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-								console.log(this.parentNode);
+<!--        const listEl = document.createElement('li');-->
+<!--        const buttonEl = document.createElement('button');-->
+<!--        const spanEl = document.createElement('span');-->
+<!--        const spanEl2 = document.createElement('span');-->
 
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
+<!--        listEl.classList.add("select2-selection__choice");-->
 
-			listEl.appendChild(buttonEl);
+<!--        buttonEl.setAttribute("type", "button");-->
+<!--        buttonEl.setAttribute("onclick", "return this.parentNode.remove();");-->
+<!--        console.log(this.parentNode);-->
 
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = signature_type_select;
-			listEl.appendChild(spanEl);
+<!--        buttonEl.classList.add("select2-selection__choice__remove");-->
+<!--        buttonEl.textContent = "×";-->
 
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = signature_user_select + "." + signature_key_select;
-			listEl.appendChild(spanEl2);
+<!--        listEl.appendChild(buttonEl);-->
 
-			var listContainer = $( "#cryptography_tags_list" );
-			listContainer.append(listEl);
+<!--        spanEl.classList.add("select2-selection__choice__display");-->
+<!--        spanEl.textContent = signature_type_select;-->
+<!--        listEl.appendChild(spanEl);-->
 
-			var submitString2 = "";
+<!--        spanEl2.classList.add("select2-selection__choice__display");-->
+<!--        spanEl2.textContent = signature_user_select + "." + signature_key_select;-->
+<!--        listEl.appendChild(spanEl2);-->
 
-			$('#cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
+<!--        var listContainer = $( "#cryptography_tags_list" );-->
+<!--        listContainer.append(listEl);-->
 
-				var chars = option_all.split(',');
+<!--        var submitString = "";-->
 
-				submitString2 += chars[1] + "(" + chars[2] + "),"
-			})
-			submitString2 = submitString2.slice(0, -1)
-		console.log(submitString2);
-		document.getElementById('encryption_and_signed_keys').value = submitString2;
-		console.log(encryption_and_signed_keys.value);
-		}
+<!--        $('#cryptography_tags_list li').each(function() {-->
+<!--            var option_all = $(this).children().map(function () {-->
+<!--                return $(this).text();-->
+<!--            }).get().join(',');-->
 
+<!--            var chars = option_all.split(',');-->
 
-   }
+<!--            submitString += chars[1] + "(" + chars[2] + "),"-->
+<!--        })-->
+
+<!--        submitString = submitString.slice(0, -1);-->
+<!--        console.log(submitString);-->
+<!--        document.getElementById('encryption_and_signed_keys').value = submitString;-->
+<!--        console.log(encryption_and_signed_keys.value);-->
+<!--    }-->
+}
 
       function setRandomColor(obj, color) {
          obj.css("color", color);
@@ -893,25 +1118,26 @@ dropboxes1.forEach(function(dropbox) {
 <!--         });-->
 <!--      });-->
 
-<!--      $(document).ready(function () {-->
-<!--         $('#encryption_type_select, #encryption_user_select').on('change', function () {-->
-<!--            var selectedCryptographyType = $('#encryption_type_select').val();-->
-<!--            var selectedUser = $('#encryption_user_select').val();-->
-<!--            var keyTypeDropdown = $('#encryption_key_select');-->
+   $(document).ready(function () {
+         $('#encryption_type_select, #encryption_user_select').on('change', function () {
+            var selectedCryptographyType = $('#encryption_type_select').val();
+            var selectedUser = $('#encryption_user_select').val();
+            var keyTypeDropdown = $('#encryption_key_select');
 
-<!--            if (selectedCryptographyType === 'Symmetric' || selectedCryptographyType === 'Assymmetric') {-->
-<!--               if (selectedUser === '{{ current_user.username }}') {-->
-<!--                  keyTypeDropdown.find('option[value=private]').show();-->
-<!--               } else {-->
-<!--                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();-->
-<!--                  keyTypeDropdown.find('option[value=private]').hide();-->
-<!--               }-->
-<!--               keyTypeDropdown.show();-->
-<!--            } else {-->
+            if (selectedCryptographyType === 'Symmetric') {
+               if (selectedUser === '{{ current_user.username }}') {
+                  keyTypeDropdown.find('option[value=private]').show();
+               } else {
+                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();
+                  keyTypeDropdown.find('option[value=private]').hide();
+               }
+               keyTypeDropdown.show();
+            }
+<!--             else {-->
 <!--               keyTypeDropdown.val('-1').hide();-->
 <!--            }-->
-<!--         });-->
-<!--      });-->
+         });
+      });
 
    </script>
 
