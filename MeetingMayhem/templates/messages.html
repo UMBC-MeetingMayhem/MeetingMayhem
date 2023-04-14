@@ -1118,26 +1118,26 @@ var dropboxes = document.querySelectorAll('#encryption_type_select, #encryption_
 <!--         });-->
 <!--      });-->
 
-   $(document).ready(function () {
-         $('#encryption_type_select, #encryption_user_select').on('change', function () {
-            var selectedCryptographyType = $('#encryption_type_select').val();
-            var selectedUser = $('#encryption_user_select').val();
-            var keyTypeDropdown = $('#encryption_key_select');
+<!--   $(document).ready(function () {-->
+<!--         $('#encryption_type_select, #encryption_user_select').on('change', function () {-->
+<!--            var selectedCryptographyType = $('#encryption_type_select').val();-->
+<!--            var selectedUser = $('#encryption_user_select').val();-->
+<!--            var keyTypeDropdown = $('#encryption_key_select');-->
 
-            if (selectedCryptographyType === 'Symmetric') {
-               if (selectedUser === '{{ current_user.username }}') {
-                  keyTypeDropdown.find('option[value=private]').show();
-               } else {
-                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();
-                  keyTypeDropdown.find('option[value=private]').hide();
-               }
-               keyTypeDropdown.show();
-            }
-<!--             else {-->
-<!--               keyTypeDropdown.val('-1').hide();-->
+<!--            if (selectedCryptographyType === 'Symmetric') {-->
+<!--               if (selectedUser === '{{ current_user.username }}') {-->
+<!--                  keyTypeDropdown.find('option[value=private]').show();-->
+<!--               } else {-->
+<!--                  keyTypeDropdown.find('option[value=public]').prop('selected', true).show();-->
+<!--                  keyTypeDropdown.find('option[value=private]').hide();-->
+<!--               }-->
+<!--               keyTypeDropdown.show();-->
 <!--            }-->
-         });
-      });
+<!--             else {-->
+<!--              keyTypeDropdown.val('-1').hide();-->
+<!--         }-->
+<!--         });-->
+<!--      });-->
 
    </script>
 
