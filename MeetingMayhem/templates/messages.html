@@ -32,7 +32,7 @@
       {{ form.hidden_tag() }}
       <fieldset class="form-group">
          <div class="form-group">
-            <label class="form-control-label" for="name">Recipients</label> <br />
+            <label class="form-control-label" for="name">Choose who you want to send the message to:</label> <br />
             {% for username in usernames %}
             <div class="form-check form-check-inline">
                <!-- below line needs the ', ' in value to make processing usernames easier -->
@@ -72,7 +72,7 @@
             </div>
             {% else %}
             <!-- if there aren't errors, just display normally -->
-            {{ form.content(class="form-control form-control-lg", style="margin:10px;") }}
+            {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
             {% endif %}
          </div>
          <br />
@@ -81,12 +81,13 @@
          </div>
          <br />
       </fieldset>
-         <div class="content-section bg-secondary">
+         <div class="content-section">
             <ul class="select2-selection__rendered" id="cryptography_tags_list">
             </ul>
+            <p>Select one of the encryption types below:</p>
             <div class="row g-3 align-items-center">
                <div class="col-auto">
-                  <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                  <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
                      <option value= "-1" selected>No Encryption</option>
                      <option value="symmetric">Symmetric Encryption</option>
                      <option value="asymmetric">Asymmetric Encryption</option>
@@ -208,11 +209,10 @@
 <!--            </div>-->
 <!--         </div>-->
          <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
-         <br /><br />
       </div>
 
       <div class="form-group">
-         {{ form.submit(class="btn btn-outline-info") }}
+         {{ form.submit(class="btn btn-outline-info", disabled="disabled", id="submitButton") }}
       </div>
    </form>
 </div>
@@ -486,7 +486,212 @@
 <!--		document.getElementById('encryption_and_signed_keys').value = submitString;-->
 <!--   }-->
 
+<!--      document.getElementById('encryption_type_select').addEventListener('change', function() {-->
+
+<!--        var selectedValue = this.value;-->
+<!--        console.log(selectedValue);-->
+
+<!--        // Disable the options in the second set of dropboxes-->
+<!--     var dropdown1 = document.getElementById('signature_type_select').options;-->
+<!--     var dropdown2 = document.getElementById('signature_user_select').options;-->
+<!--     var dropdown3 = document.getElementById('signature_key_select').options;-->
+
+
+<!--  if (selectedValue !== '-1') {-->
+
+<!--     for (var i = 0; i < dropdown1.length; i++) {-->
+<!--         dropdown1[i].disabled = true;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown2.length; i++) {-->
+<!--         dropdown2[i].disabled = true;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown3.length; i++) {-->
+<!--         dropdown3[i].disabled = true;-->
+<!--     }-->
+<!--  }-->
+<!--  else{-->
+<!--  for (var i = 0; i < dropdown1.length; i++) {-->
+<!--         dropdown1[i].disabled = false;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown2.length; i++) {-->
+<!--         dropdown2[i].disabled = false;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown3.length; i++) {-->
+<!--         dropdown3[i].disabled = false;-->
+<!--     }-->
+<!--  }-->
+<!--});-->
+
+<!--document.getElementById('signature_type_select').addEventListener('change', function() {-->
+
+<!--  var selectedValue = this.value;-->
+
+<!--  // Disable the options in the second set of dropboxes-->
+<!--     var dropdown1 = document.getElementById('encryption_type_select').options;-->
+<!--     var dropdown2 = document.getElementById('encryption_user_select').options;-->
+<!--     var dropdown3 = document.getElementById('encryption_key_select').options;-->
+
+<!--  if (selectedValue !== '-1') {-->
+
+<!--     for (var i = 0; i < dropdown1.length; i++) {-->
+<!--         dropdown1[i].disabled = true;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown2.length; i++) {-->
+<!--         dropdown2[i].disabled = true;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown3.length; i++) {-->
+<!--         dropdown3[i].disabled = true;-->
+<!--     }-->
+<!--  }-->
+<!--  else{-->
+<!--     for (var i = 0; i < dropdown1.length; i++) {-->
+<!--         dropdown1[i].disabled = false;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown2.length; i++) {-->
+<!--         dropdown2[i].disabled = false;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown3.length; i++) {-->
+<!--         dropdown3[i].disabled = false;-->
+<!--     }-->
+<!--  }-->
+<!--});-->
+
+<!--var dropboxes = document.querySelectorAll('#encryption_type_select, #encryption_user_select, #encryption_key_select');-->
+
+<!--// Add event listener to all selected elements-->
+<!--dropboxes.forEach(function(dropbox) {-->
+<!--  dropbox.addEventListener('change', function() {-->
+<!--    // Get the selected value from the current dropbox-->
+<!--    var selectedValue = this.value;-->
+<!--    console.log(selectedValue);-->
+<!--    var dropdown1 = document.getElementById('signature_type_select').options;-->
+<!--     var dropdown2 = document.getElementById('signature_user_select').options;-->
+<!--     var dropdown3 = document.getElementById('signature_key_select').options;-->
+
+<!--    // Check if the selected value is not equal to -1-->
+<!--    if (selectedValue !== '-1') {-->
+
+<!--     for (var i = 0; i < dropdown1.length; i++) {-->
+<!--         dropdown1[i].disabled = true;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown2.length; i++) {-->
+<!--         dropdown2[i].disabled = true;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown3.length; i++) {-->
+<!--         dropdown3[i].disabled = true;-->
+<!--     }-->
+<!--  }-->
+<!--  else{-->
+<!--     for (var i = 0; i < dropdown1.length; i++) {-->
+<!--         dropdown1[i].disabled = false;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown2.length; i++) {-->
+<!--         dropdown2[i].disabled = false;-->
+<!--     }-->
+
+<!--     for (var i = 0; i < dropdown3.length; i++) {-->
+<!--         dropdown3[i].disabled = false;-->
+<!--     }-->
+<!--  }-->
+<!--});-->
+<!--});-->
+
+
+
+
+var dropboxes = document.querySelectorAll('#encryption_type_select, #encryption_user_select, #encryption_key_select');
+
+// Add event listener to all selected elements
+dropboxes.forEach(function(dropbox) {
+  dropbox.addEventListener('change', function() {
+    // Check if all selected values are not equal to -1
+    var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
+      return db.value !== '-1';
+    });
+
+    var allSelectedValues = Array.from(dropboxes).every(function(db) {
+      return db.value !== '-1';
+    });
+
+    if(allSelectedValues){
+      var myButton = document.getElementById('submitButton');
+
+            // Enable the button
+            myButton.disabled = false;
+    }
+    console.log(allSelectedValuesNotMinusOne);
+        console.log(allSelectedValues);
+
+
+    var otherDropboxes = document.querySelectorAll('#signature_type_select, #signature_user_select, #signature_key_select');
+
+    // Enable or disable the options in the other relevant dropboxes accordingly
+    otherDropboxes.forEach(function(otherDropbox) {
+      var options = otherDropbox.options;
+      for (var i = 0; i < options.length; i++) {
+        if (allSelectedValuesNotMinusOne && options[i].value !== this.value) {
+          options[i].disabled = true;
+        } else {
+          options[i].disabled = false;
+        }
+      }
+    });
+  });
+});
+
+var dropboxes1 = document.querySelectorAll('#signature_type_select, #signature_user_select, #signature_key_select');
+
+// Add event listener to all selected elements
+dropboxes1.forEach(function(dropbox) {
+  dropbox.addEventListener('change', function() {
+    // Check if all selected values are not equal to -1
+    var allSelectedValuesNotMinusOne = Array.from(dropboxes1).some(function(db) {
+      return db.value !== '-1';
+    });
+
+    var allSelectedValues = Array.from(dropboxes1).every(function(db) {
+      return db.value !== '-1';
+    });
+   if(allSelectedValues){
+      var myButton = document.getElementById('submitButton');
+
+            // Enable the button
+            myButton.disabled = false;
+    }
+    console.log(allSelectedValuesNotMinusOne);
+
+    var otherDropboxes1 = document.querySelectorAll('#encryption_type_select, #encryption_user_select, #encryption_key_select');
+
+    // Enable or disable the options in the other relevant dropboxes accordingly
+    otherDropboxes1.forEach(function(otherDropbox) {
+      var options = otherDropbox.options;
+      for (var i = 0; i < options.length; i++) {
+        if (allSelectedValuesNotMinusOne && options[i].value !== this.value) {
+          options[i].disabled = true;
+        } else {
+          options[i].disabled = false;
+        }
+      }
+    });
+  });
+});
+
    function addCryptography(){
+
+         var submitString1 = "";
+          var submitString2 = "";
+
 		encryption_user_select = $( "#encryption_user_select" ).val();
 		encryption_key_select = $( "#encryption_key_select" ).val();
 		encryption_type_select = $( "#encryption_type_select" ).val();
@@ -495,7 +700,10 @@
 		signature_key_select = $( "#signature_key_select" ).val();
 		signature_type_select = $( "#signature_type_select" ).val();
 
-		if(!(encryption_user_select == -1 || encryption_key_select == -1 || encryption_type_select == -1)){
+		if(encryption_user_select != -1 && encryption_key_select != -1 && encryption_type_select != -1){
+
+
+
 			const listEl = document.createElement('li');
 			const buttonEl = document.createElement('button');
 			const spanEl = document.createElement('span');
@@ -523,7 +731,7 @@
 			var listContainer = $( "#cryptography_tags_list" );
 			listContainer.append(listEl);
 
-			var submitString = "";
+			var submitString1 = "";
 
 			$('#cryptography_tags_list li').each(function() {
 				var option_all = $(this).children().map(function () {
@@ -532,11 +740,16 @@
 
 				var chars = option_all.split(',');
 
-				submitString += chars[1] + "(" + chars[2] + "),"
+				submitString1 += chars[1] + "(" + chars[2] + "),"
 			})
+
+			submitString1 = submitString1.slice(0, -1)
+		console.log(submitString1);
+		document.getElementById('encryption_and_signed_keys').value = submitString1;
+		console.log(encryption_and_signed_keys.value);
 		}
 
-		if(!(signature_user_select == -1 || signature_key_select == -1 || signature_type_select == -1)){
+		else if(!(signature_user_select == -1 || signature_key_select == -1 || signature_type_select == -1)){
 			const listEl = document.createElement('li');
 			const buttonEl = document.createElement('button');
 			const spanEl = document.createElement('span');
@@ -564,7 +777,7 @@
 			var listContainer = $( "#cryptography_tags_list" );
 			listContainer.append(listEl);
 
-			var submitString = "";
+			var submitString2 = "";
 
 			$('#cryptography_tags_list li').each(function() {
 				var option_all = $(this).children().map(function () {
@@ -573,14 +786,15 @@
 
 				var chars = option_all.split(',');
 
-				submitString += chars[1] + "(" + chars[2] + "),"
+				submitString2 += chars[1] + "(" + chars[2] + "),"
 			})
+			submitString2 = submitString2.slice(0, -1)
+		console.log(submitString2);
+		document.getElementById('encryption_and_signed_keys').value = submitString2;
+		console.log(encryption_and_signed_keys.value);
 		}
 
-		submitString = submitString.slice(0, -1)
-		console.log(submitString);
-		document.getElementById('encryption_and_signed_keys').value = submitString;
-		console.log(encryption_and_signed_keys.value);
+
    }
 
       function setRandomColor(obj, color) {

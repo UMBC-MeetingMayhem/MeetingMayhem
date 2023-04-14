@@ -44,7 +44,7 @@ def home():
         flash(f'You are not currently in a game. Please have your game master create a game to proceed.', 'info')
     return render_template('home.html', title='Home') #this line passes the template we want to use and any variables it needs to it
 
-@app.route('/') #this line states that if the user tries to access http:/<IP>:5000/ it will use the home funciton
+@app.route('/') #this line states that if the user tries to access http:/<IP>:5000/ it will use the home funcito
 @app.route('/homepage')
 def homepage():
     if current_user.is_anonymous: #ask the user to login or register if they aren't logged in
@@ -80,7 +80,9 @@ def register():
 @app.route('/login', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to login with
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home')) #if the user is logged in, redir to home
+        return redirect(url_for('homepage')) #if the user is logged in, redir to home
+#     elif current_user.role==2:
+#         return redirect(url_for('game_setup'))
     form = LoginForm() #specify which form to use
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first() #check that the user exists, using username because that's what the user uses to log in
@@ -214,6 +216,8 @@ def messages():
         curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
         create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
         update()
+
+
 
     #sent messages
     sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()

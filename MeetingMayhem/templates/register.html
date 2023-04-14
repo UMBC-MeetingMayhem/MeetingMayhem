@@ -9,7 +9,7 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<div style="margin:auto;width:fit-content;display:flex;">
+<div style="margin:auto;width:fit-content;display:flex;margin-top:40px;">
         <div class="logobox bg-dark" style="border-top-right-radius:0px;border-bottom-right-radius:0px;margin:auto;">
                 <img src="{{ url_for('static', filename='MM_white.svg') }}" 
                 style="width:90%;margin:30px auto;display:block;">
@@ -82,7 +82,7 @@
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
-            <small class="text-muted"> <!-- link asking user to login if they already have an account -->
+            <small class=""> <!-- link asking user to login if they already have an account -->
                 Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
             </small>
         </form>
