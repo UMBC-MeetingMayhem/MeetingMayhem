@@ -234,6 +234,117 @@ def messages():
 # def get_usernames():
 #     usernames = ['adv', 'user1', 'user2']  # Replace with actual list of usernames
 #     return jsonify(usernames)
+#message page
+#TODO: check for duplicate post request when sending messages
+@app.route('/multilevelmessages', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
+@login_required
+def multiLevelMessages():
+
+    #if the current user isn't in a game, send them to the homepage and display message
+    if not current_user.game:
+        flash(f'You are not currently in a game. Please have your game master put you in a game.', 'danger')
+        return render_template('home.html', title='Home')
+
+    #set the display_message to None initially so that if there is no message to display it doesn't break the website
+    display_message = None
+
+    # -----------------------------------------------------------------------------------------------------------
+    #if the current_user is of adversary role, then display the adversary version of the page
+    if (current_user.role==3):
+        return adv_messages_page()
+
+    # -----------------------------------------------------------------------------------------------------------
+    #for regular users
+
+    #setup the current_game variable so we can pull information from it
+    game_id = None
+    games = Game.query.filter_by(is_running=True).all() #grab all the running games
+    for game in games:
+        if check_for_str(game.players, current_user.username): #check if the current_user is in the target game
+            game_id = game.id #if they are, set the game_id variable to the found game
+
+    current_game = Game.query.filter_by(id=game_id).first() #select the current_game by id
+
+    #create list of usernames for checkboxes
+    users = User.query.filter_by(role=4, game=current_game.id).all()
+    adversaries = User.query.filter_by(role=3, game=current_game.id).all()
+    usernames = []
+    for user in users:
+        usernames.append(user.username)
+    for adversary in adversaries:
+        usernames.append(adversary.username)
+
+    #usernames = random.sample(usernames, len(usernames)) # randomizes usernames
+    usernames = sorted(usernames)
+    form = MessageForm() #use the standard message form
+    #msgs = None
+    msgs_tuple = []
+    if (current_game.current_round>=1):
+        #pull messages from current_round where the message isn't deleted
+        display_message = Message.query.filter_by(adv_submitted=True, is_deleted=False, game=current_game.id).all()
+        #msgs = [] #create a list to store the messages to dispay to pass to the template
+        for message in display_message: #for each message
+            if (message.is_edited and check_for_str(message.new_recipient, current_user.username)) or ((not message.is_edited) and check_for_str(message.recipient, current_user.username)):
+                message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+                msgs_tuple.append((message, can_decrypt(current_user, message.encryption_details, message.is_encrypted, message.sender)))
+                db.session.commit()
+
+    #setup message flag to tell template if it should display messages or not
+    #msg_flag = True
+    #if not msgs_tuple: #if the list of messages is empty, set the flag to false
+    #	msg_flag = False
+
+    msg_flag = False
+    if msgs_tuple:
+        msg_flag = True
+        msgs_tuple.reverse()
+
+    #sent messages
+    sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
+    sent_msgs.reverse()
+
+    if form.validate_on_submit(): #when the user submits the message form and it is valid
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        checkbox_output_list = request.form.getlist('recipients')
+
+
+        #ensure the list isn't empty
+        if not checkbox_output_list:
+            flash(f'Please select at least one recipient.', 'danger')
+#             html_template =
+            return render_template('MultilevelSample.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+#             j2_template = render_template('messages.j2', usernames=usernames)
+#             return f"{html_template} {j2_template}"
+
+        if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
+            flash(f'Please select a time and location.', 'danger')
+#             html_template =
+            return render_template('MultilevelSample.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+#             j2_template = render_template('messages.j2', usernames=usernames)
+#             return f"{html_template} {j2_template}"
+#             return render_template('messages.j2', usernames=usernames)
+        #ensure keys entered are keys of actual recipients chosen
+        curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+        create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
+        update()
+
+
+
+    #sent messages
+    sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
+    sent_msgs.reverse()
+
+    #give the template the vars it needs
+#     html_template =
+    return render_template('MultilevelSample.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+#     j2_template = render_template('messages.j2', usernames=usernames)
+#     print("hiiiii",usernames)
+#     return f"{html_template} {j2_template}"
+
+# @app.route('/get_usernames')
+# def get_usernames():
+#     usernames = ['adv', 'user1', 'user2']  # Replace with actual list of usernames
+#     return jsonify(usernames)
 
 def adv_messages_page():
         #setup the current_game so that we can pull information from it
@@ -600,6 +711,129 @@ def game_setup():
 
     #display webpage normally
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
+
+@app.route('/game_setup_multi', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
+@login_required #requires the user to be logged in
+def game_setup_multi():
+    if current_user.role != 2: #if the user isn't a game master
+        flash(f'Your permissions are insufficient to access this page.', 'danger') #flash error message
+        return render_template('home.html', title='Home') #display the home page when they try to access this page directly.
+
+    #seutp the forms the gm uses
+    mng_form = GMManageGameForm()
+    setup_form = GMSetupGameForm()
+    usr_form = GMManageUserForm()
+
+    #grab the state of the submit buttons so they only need to be pressed once
+    is_mng_submit = mng_form.end_game.data
+    is_end_game_page_submit = mng_form.end_game_page.data
+    is_setup_submit = setup_form.create_game.data
+    is_usr_form = usr_form.update.data
+
+    #create list of usernames for checkboxes
+    users = User.query.filter_by(role=4).all()
+    usernames = []
+    for user in users:
+        usernames.append(user.username)
+
+    #game setup
+    if is_setup_submit and setup_form.validate(): #when the create game button is pressed and the form is valid
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        checkbox_output_list = request.form.getlist('players')
+        checkbox_output_str = ''.join(map(str, checkbox_output_list))
+        players = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
+
+
+        #validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
+        #doing it this way is kinda janky, the error messages don't look the same as other validation, but it works
+        try:
+            GMSetupGameForm.validate_players_checkbox(players)
+        except ValidationError:
+            #if validation for players fails, display an error and refresh the page so the game doesn't get created
+            flash(f'One of the selected users is already in a game.', 'danger')
+            return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
+
+        #create the game with info from the form
+        new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
+        db.session.add(new_game) #send to db
+        db.session.commit()
+        game = Game.query.order_by(-Game.id).filter_by(adversary=setup_form.adversary.data.username,players=players).first() #this finds the last game in the db with the passed players and adversary
+        adv = User.query.filter_by(username=setup_form.adversary.data.username).first() #grab the adversary user of the game we just made
+        adv.game = game.id #set their game to this game
+        db.session.commit()
+        player_list = []
+        player_list = str_to_list(players, player_list)
+        for player in strip_list_str(player_list): #for each player in the string of players
+            user = User.query.filter_by(username=player).first() #grab their user object
+            user.game = game.id #set their game to this game
+            db.session.commit()
+        flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
+        socketio.emit('ingame',broadcast=True)
+
+    #game management
+    if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
+        game = Game.query.filter_by(name=mng_form.game.data.name).first()
+        game.is_running = False
+        adv = User.query.filter_by(username=game.adversary).first() #find the game's adversary
+        adv.game = None #remove the game from the user
+        db.session.commit() #commit
+        player_list = []
+        player_list = str_to_list(game.players, player_list) #grab a list of players from the game
+        for player in player_list:
+            user = User.query.filter_by(username=player).first() #find each of the player objects
+            user.game = None #remove the game from the user
+            db.session.commit() #commit
+        flash(f'The game has been ended.', 'success') #show success message upon completion
+
+        #pull the forms again because their information has updated, might not need to do this
+        mng_form = GMManageGameForm()
+        setup_form = GMSetupGameForm()
+
+    #bring the selected game to the end game screen, used for testing
+    if is_end_game_page_submit and mng_form.validate():
+        game = Game.query.filter_by(name=mng_form.game.data.name).first()
+        game.end_result = "testing"
+        db.session.commit()
+        socketio.emit('end_game',broadcast=True)
+        flash(f'The game has been brought to the end game page.', 'success')
+
+    #user management
+    if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
+        user = User.query.filter_by(username=usr_form.user.data.username).first() #grab the targeted user
+        if user.game: #if the user is in a game
+            #show an error message. changing a user's role while they are in a game will break stuff
+            flash(f'Unable to change a user\'s role while they are in a game. Please end the game first.', 'danger')
+            return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+        if usr_form.role.data == 'adv': #if the selected new role is adversary
+            if user.role == 3:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+            user.role = 3 #update to adversary
+        if usr_form.role.data == 'usr': #if the selected new role is user
+            if user.role == 4:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+            user.role = 4 #update to user
+        if usr_form.role.data == 'spec': #if the selected new role is spectator
+            if user.role == 5:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+            user.role = 5 #update to spectator
+        if usr_form.role.data == 'inac': #if the selected new role is inactive
+            if user.role == 6:
+                # show an error message. can't change a user's role to what they already are
+                flash(f"You cannot change a user's role to what it already is!", 'danger')
+                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
+            user.role = 6 #update to spectator
+        db.session.commit()
+        flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
+        update()
+
+    #display webpage normally
+    return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
 
 # Route for spectating
 @app.route('/spectate', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
