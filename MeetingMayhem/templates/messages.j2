@@ -83,14 +83,14 @@
 
         <div class="row g-3 align-items-center">
            <div class="col-auto">
-              <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="encryption_type_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>No Encryption</option>
                  <option value="symmetric">Symmetric Encryption</option>
                  <option value="asymmetric">Asymmetric Encryption</option>
               </select>
            </div>
            <div class="col-auto">
-              <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="encryption_user_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
                  <option value="{{ username }}">{{ username }}</option>
@@ -98,7 +98,7 @@
               </select>
             </div>
            <div class="col-auto">
-              <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="encryption_key_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
                  <option value="private">Private</option>
@@ -108,13 +108,13 @@
 
         <div class="row g-3 align-items-center">
            <div class="col-auto">
-              <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="signature_type_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>No Signature</option>
                  <option value="signed">Signed</option>
               </select>
            </div>
            <div class="col-auto">
-              <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="signature_user_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
                  <option value="{{ username }}">{{ username }}</option>
@@ -122,7 +122,7 @@
               </select>
            </div>
            <div class="col-auto">
-              <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="signature_key_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
                  <option value="private">Private</option>
