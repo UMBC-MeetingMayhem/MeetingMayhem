@@ -51,6 +51,7 @@
             <a>Recipient: {{ msg[0].recipient }}</a>
             <a> | Time Received: {{ msg[0].time_received }} </a>
         </div>
+
         <p class="article-content">{{ msg[0].content }}</p>
         {% if msg[0].is_encrypted %}
         <div class="m-1 row ">
@@ -83,14 +84,14 @@
 
         <div class="row g-3 align-items-center">
            <div class="col-auto">
-              <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="decryption_type_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>No Encryption</option>
                  <option value="symmetric">Symmetric Encryption</option>
                  <option value="asymmetric">Asymmetric Encryption</option>
               </select>
            </div>
            <div class="col-auto">
-              <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="decryption_user_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
                  <option value="{{ username }}">{{ username }}</option>
@@ -98,23 +99,24 @@
               </select>
             </div>
            <div class="col-auto">
-              <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="decryption_key_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
                  <option value="private">Private</option>
+                 <option value="shared">Shared Key</option>
               </select>
            </div>
         </div>
 
         <div class="row g-3 align-items-center">
            <div class="col-auto">
-              <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="de_signature_type_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>No Signature</option>
                  <option value="signed">Signed</option>
               </select>
            </div>
            <div class="col-auto">
-              <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="de_signature_user_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
                  <option value="{{ username }}">{{ username }}</option>
@@ -122,7 +124,7 @@
               </select>
            </div>
            <div class="col-auto">
-              <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+              <select id="de_signature_key_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
                  <option value="private">Private</option>
@@ -150,21 +152,64 @@
 </article>
 {% endif %}
 {% endif%}
+{% endfor %}
 
 <script>
-    var clicked = localStorage.getItem("clicked") || "";
-    if (clicked.indexOf("{{ msg_id }}") !== -1) {
-        document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
-        document.getElementById("content-{{ msg_id }}").style.display = "block";
-    }
-    document.getElementById("decrypt-{{ msg_id }}").addEventListener("click", function () {
-        localStorage.setItem("clicked", clicked + "{{ msg_id }}");
-        document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
-        document.getElementById("content-{{ msg_id }}").style.display = "block";
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  var decrypt_buttons = document.querySelectorAll(".decrypt-button");
+
+  for (let i = 0; i < decrypt_buttons.length; i++) {
+    decrypt_buttons[i].addEventListener("click", function() {
+      //const msg_id = decrypt_buttons[i].id.split("-")[1];
+      const msg_id = this.id.split("-")[1];
+
+      const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
+      const decryption_user = document.getElementById(`decryption_user_select-${msg_id}`).value;
+      const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
+      const signature_type = document.getElementById(`de_signature_type_select-${msg_id}`).value;
+      const signature_user = document.getElementById(`de_signature_user_select-${msg_id}`).value;
+      const signature_key = document.getElementById(`de_signature_key_select-${msg_id}`).value;
+
+      //var msg = msgs.find(m => m.id === msg_id);
+
+      console.log("im here");
+      console.log(msg_id);
+
+          console.log(decryption_type);
+      console.log(decryption_user);
+      console.log(decryption_key);
+      //console.log(msg.recipient);
+
+      if (decryption_type === "symmetric" && decryption_key !== "shared") {
+        alert("Please select Shared Key for symmetric encryption");
+        return;
+      } else if (decryption_type === "asymmetric" && decryption_key !== "private") {
+        alert("Please select Receiver's Private Key for asymmetric encryption");
+        return;
+      } else if (signature_type === "signed" && signature_key !== "public") {
+        alert("Please select Sender's Public Key for signed message verification");
+        return;
+      }
+        else{
+      var clicked = localStorage.getItem("clicked") || "";
+      if (clicked.indexOf("{{ msg_id }}") !== -1) {
+          document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
+          document.getElementById("content-{{ msg_id }}").style.display = "block";
+      }
+      document.getElementById("decrypt-{{ msg_id }}").addEventListener("click", function () {
+          localStorage.setItem("clicked", clicked + "{{ msg_id }}");
+          document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
+          document.getElementById("content-{{ msg_id }}").style.display = "block";
+      });
+}
     });
+  }
+});
+
 
 
 </script>
-{% endfor %}
 
 {%- endmacro -%}
