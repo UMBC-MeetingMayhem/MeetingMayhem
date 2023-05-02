@@ -79,17 +79,15 @@
             <a>Recipient: {{ msg[0].recipient }}</a>
             <a> | Time Received: {{ msg[0].time_received }} </a>
         </div>
-
-
         <div class="row g-3 align-items-center">
-           <div class="col-auto">
+           <div class="col">
               <select id="encryption_type_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>No Encryption</option>
-                 <option value="symmetric">Symmetric Encryption</option>
-                 <option value="asymmetric">Asymmetric Encryption</option>
+                 <option value= "-1" selected>No Decryption</option>
+                 <option value="symmetric">Symmetric Decryption</option>
+                 <option value="asymmetric">Asymmetric Decryption</option>
               </select>
            </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="encryption_user_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
@@ -97,9 +95,10 @@
                  {% endfor %}
               </select>
             </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="encryption_key_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
+                 <option value="key pair">Public+Key Pair</option>
                  <option value="public">Public</option>
                  <option value="private">Private</option>
               </select>
@@ -107,13 +106,13 @@
         </div>
 
         <div class="row g-3 align-items-center">
-           <div class="col-auto">
+           <div class="col">
               <select id="signature_type_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>No Signature</option>
                  <option value="signed">Signed</option>
               </select>
            </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="signature_user_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
@@ -121,7 +120,7 @@
                  {% endfor %}
               </select>
            </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="signature_key_select_new" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
@@ -129,6 +128,10 @@
               </select>
            </div>
         </div>
+
+
+
+
         <button id="decrypt-{{ msg_id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
         <div id="content-{{ msg_id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
     </div>
@@ -152,7 +155,7 @@
 {% endif%}
 
 <script>
-    var clicked = localStorage.getItem("clicked") || "";
+var clicked = localStorage.getItem("clicked") || "";
     if (clicked.indexOf("{{ msg_id }}") !== -1) {
         document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
         document.getElementById("content-{{ msg_id }}").style.display = "block";
