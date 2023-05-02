@@ -146,11 +146,21 @@ def create_message(user, game, request, form, username, time_stamp):
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0].lower() == 'symmetric' or  element.split('(')[0].lower() == 'asymmetric':
-                if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{username}.private)"):
+            if element.split('(')[0].lower() == 'symmetric':
+#                 if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and element.split('.')[1] == f"{username}.private)":
+                if element.split('.')[1] == 'shared)':
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
-                     encrypted_keys.append('invalid encrypted key')
+                    encrypted_keys.append('invalid encrypted key')
+            elif element.split('(')[0].lower() == 'asymmetric':
+                if (element.split('.')[0].split('(')[1] in dict_of_recipients) and element.split('.')[1] == 'public)':
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    encrypted_keys.append('invalid encrypted key')
+            else:
+                encrypted_keys.append('invalid encrypted key')
+
+
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
@@ -200,11 +210,20 @@ def create_message(user, game, request, form, username, time_stamp):
                     signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
                     signed_keys.append('invalid sign key')
-            if element.split('(')[0].lower() == 'symmetric' or element.split('(')[0].lower() == 'asymmetric':
-                if element.split('.')[0].split('(')[1] in dict_of_recipients and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{username}.private)"):
+            if element.split('(')[0].lower() == 'symmetric':
+            #                 if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and element.split('.')[1] == f"{username}.private)":
+                if element.split('.')[1] == 'shared)':
                     encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
                 else:
-                     encrypted_keys.append('invalid encrypted key')
+                    encrypted_keys.append('invalid encrypted key')
+            elif element.split('(')[0].lower() == 'asymmetric':
+                if (element.split('.')[0].split('(')[1] in dict_of_recipients) and element.split('.')[1] == 'public)':
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    encrypted_keys.append('invalid encrypted key')
+            else:
+                encrypted_keys.append('invalid encrypted key')
+
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
@@ -263,4 +282,74 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
             return True
     return False
 
+def decrypt_message(user, game, request, form, username, time_stamp):
+    if user.role == 4: #if the user is a user
+        #get the list of recipients
+        checkbox_output_list = request.getlist('recipients')
+        #if that list is empty, display an error, return false
+        if not checkbox_output_list:
+            flash(f'There was an error in creating your message. Please try again.', 'danger')
+            return False
+        #make the list into a string
+        checkbox_output_str = ''.join(map(str, checkbox_output_list))
+        #remove the last ', ' off the string
+        recipients = checkbox_output_str[:len(checkbox_output_str)-2]
+        #check if the message is a duplicate, and if it is, display an error, return false
+        checkbox_output_list = request.getlist('recipients')
+        encryption_output = request.get('encryption_and_signed_keys')
+        signed_keys = [] # list to keep track of digital signatures
+        encrypted_keys = [] # list to keep track of encryption keys
+
+        dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
+        # Code to remove wierd commas from get request
+        for i in range(len(checkbox_output_list)):
+            checkbox_output_list[i] = checkbox_output_list[i].split(',')[0]
+
+        for element in checkbox_output_list: #populates dict with recipients chosen
+            dict_of_recipients[element] = 0
+
+        # Code for determining whether entered keys are valid or not
+        for element in encryption_output.split(','):
+            if element.split('(')[0].lower() == 'signed':
+                if element.split('(')[1] == f"{username}.private)":
+                    signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    signed_keys.append('invalid sign key')
+            if element.split('(')[0].lower() == 'symmetric':
+            #                 if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and element.split('.')[1] == f"{username}.private)":
+                if element.split('.')[1] == 'shared)':
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    encrypted_keys.append('invalid encrypted key')
+            elif element.split('(')[0].lower() == 'asymmetric':
+                if (element.split('.')[0].split('(')[1] in dict_of_recipients) and element.split('.')[1] == 'public)':
+                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                else:
+                    encrypted_keys.append('invalid encrypted key')
+            else:
+                encrypted_keys.append('invalid encrypted key')
+
+
+        signed_keys_string = ", ".join(map(str, signed_keys))
+        encrypted_keys_string = ", ".join(map(str, encrypted_keys))
+        if 'invalid' in signed_keys_string or 'invalid' in encrypted_keys_string:
+             new_message_content = form.content.data
+        else:
+               #Replace message content with hashtags
+             key = Fernet.generate_key()
+             fernet = Fernet(key)
+             new_message_content = form.content.data
+
+
+        #create the message and add it to the db
+
+        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
+
+        db.session.add(new_message)
+        db.session.commit()
+        #display success to user
+        flash(f'Your message has been sent!', 'success')
+        return True
+    else: #if someone who isn't a user or adversary manages to call this function, return false
+        return False
 
