@@ -21,6 +21,8 @@ models - imports the models created in models.py so that we can create new db it
 flask_login - different utilities used for loggin the user in, seeing which user is logged in, logging the user out, and requireing login for a page
 """
 from flask_socketio import send, emit, join_room, leave_room
+from flask import render_template, session
+from .models import User
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
@@ -36,6 +38,7 @@ import pytz
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
 #by using the render_template, we are able to pass an html document to flask for it to put on the web server
+
 @app.route('/home') #likewise, this line is for http:/<IP>:5000/home
 def home():
     if current_user.is_anonymous: #ask the user to login or register if they aren't logged in
@@ -57,6 +60,8 @@ def homepage():
 @app.route('/about')
 def about():
     return render_template('about.html', title='About')
+
+
 
 #registration page route
 @app.route('/register', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to register with
@@ -226,9 +231,10 @@ def messages():
     #give the template the vars it needs
 #     html_template =
     return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+
 #     j2_template = render_template('messages.j2', usernames=usernames)
 #     print("hiiiii",usernames)
-#     return f"{html_template} {j2_template}"
+#     return f"{html_template} {j2_template}
 
 # @app.route('/get_usernames')
 # def get_usernames():

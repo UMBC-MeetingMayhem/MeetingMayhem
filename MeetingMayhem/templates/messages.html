@@ -88,14 +88,14 @@
             </ul>
             <p>Select one of the encryption types below:</p>
             <div class="row g-3 align-items-center">
-               <div class="col-auto">
+               <div class="col">
                   <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
                      <option value= "-1" selected>No Encryption</option>
                      <option value="symmetric">Symmetric Encryption</option>
                      <option value="asymmetric">Asymmetric Encryption</option>
                   </select>
                </div>
-               <div class="col-auto">
+               <div class="col">
                   <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                      <option value= "-1" selected>User</option>
                      {% for username in usernames %}
@@ -103,24 +103,24 @@
                      {% endfor %}
                   </select>
                </div>
-               <div class="col-auto">
+               <div class="col">
                   <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                      <option value= "-1" selected>Key Type</option>
                      <option value="public">Public</option>
                      <option value="private">Private</option>
-                     <option value="shared">Shared Key</option>
+                     <option value="key pair">Key pair</option>
                   </select>
                </div>
             </div>
 
             <div class="row g-3 align-items-center">
-               <div class="col-auto">
+               <div class="col">
                   <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                      <option value= "-1" selected>No Signature</option>
                      <option value="signed">Signed</option>
                   </select>
                </div>
-               <div class="col-auto">
+               <div class="col">
                   <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                      <option value= "-1" selected>User</option>
                      {% for username in usernames %}
@@ -128,7 +128,7 @@
                      {% endfor %}
                   </select>
                </div>
-               <div class="col-auto">
+               <div class="col">
                   <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                      <option value= "-1" selected>Key Type</option>
                      <option value="public">Public</option>
@@ -291,6 +291,77 @@
       <legend class="border-bottom mb4">No messages sent</legend>
       {% endif %}
    </div>
+   <script>
+
+const encryptionTypeSelect = document.getElementById("encryption_type_select");
+const encryptionUserSelect = document.getElementById("encryption_user_select");
+const encryptionKeySelect = document.getElementById("encryption_key_select");
+
+encryptionTypeSelect.addEventListener("change", () => {
+  if (encryptionTypeSelect.value === "-1") {
+    encryptionUserSelect.value = "-1";
+    encryptionKeySelect.value = "-1";
+  }
+});
+const signatureTypeSelect = document.getElementById("signature_type_select");
+const signatureUserSelect = document.getElementById("signature_user_select");
+const signatureKeySelect = document.getElementById("signature_key_select");
+
+signatureTypeSelect.addEventListener("change", () => {
+  if (signatureTypeSelect.value === "-1") {
+    signatureUserSelect.value = "-1";
+    signatureKeySelect.value = "-1";
+  }
+});
+
+
+   // Get the current user's username from the backend
+   var current_user_username = "{{ current_user.username }}";
+
+   // Select the dropdowns for the encryption and signature keys
+   var encryption_key_select = document.getElementById("encryption_key_select");
+   var signature_key_select = document.getElementById("signature_key_select");
+
+   // Select the dropdowns for the encryption and signature users
+   var encryption_user_select = document.getElementById("encryption_user_select");
+   var signature_user_select = document.getElementById("signature_user_select");
+
+   // Listen for changes in the encryption user dropdown
+   encryption_user_select.addEventListener("change", function() {
+   // Get the selected user from the dropdown
+   var selected_user = encryption_user_select.value;
+
+   // If the selected user is the current user, enable the private option and disable the other options
+   if (selected_user === current_user_username) {
+   encryption_key_select.querySelector('option[value="private"]').disabled = false;
+   encryption_key_select.querySelector('option[value="public"]').disabled = false;
+   encryption_key_select.querySelector('option[value="key pair"]').disabled = false;
+   }
+   // Otherwise, disable the private option and enable the other options
+   else {
+   encryption_key_select.querySelector('option[value="private"]').disabled = true;
+   encryption_key_select.querySelector('option[value="public"]').disabled = false;
+   encryption_key_select.querySelector('option[value="key pair"]').disabled = false;
+   }
+   });
+
+   // Listen for changes in the signature user dropdown
+   signature_user_select.addEventListener("change", function() {
+   // Get the selected user from the dropdown
+   var selected_user = signature_user_select.value;
+
+   // If the selected user is the current user, enable the private option and disable the other options
+   if (selected_user === current_user_username) {
+   signature_key_select.querySelector('option[value="private"]').disabled = false;
+   signature_key_select.querySelector('option[value="public"]').disabled = false;
+   }
+   // Otherwise, disable the private option and enable the public option
+   else {
+   signature_key_select.querySelector('option[value="private"]').disabled = true;
+   signature_key_select.querySelector('option[value="public"]').disabled = false;
+   }
+   });
+   </script>
 
    <script>
       function special_chars(length) {

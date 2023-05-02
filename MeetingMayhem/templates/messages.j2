@@ -1,8 +1,8 @@
+
 {% macro print_msgs(msgs,usernames) -%}
 {% for msg in msgs %}
 {% if msg[0].is_edited %}
 <!-- if the message has been edited, display the edited parts-->
-
 <article class="media content-section">
     <div class="media-body">
         <div class="article-metadata">
@@ -29,6 +29,9 @@
                 Encrypted For:</div>
             <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
             </div>
+            <div>
+
+            </div>
         </div>
         {% endif %}
         {% if msg[0].is_signed %}
@@ -49,6 +52,7 @@
         <div class="article-metadata">
             <a>Sender: {{ msg[0].sender }} | </a>
             <a>Recipient: {{ msg[0].recipient }}</a>
+            <a>test: {{ msg[0].encryption_details }} </a>
             <a> | Time Received: {{ msg[0].time_received }} </a>
         </div>
 
@@ -83,14 +87,14 @@
 
 
         <div class="row g-3 align-items-center">
-           <div class="col-auto">
+           <div class="col">
               <select id="decryption_type_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>No Encryption</option>
-                 <option value="symmetric">Symmetric Encryption</option>
-                 <option value="asymmetric">Asymmetric Encryption</option>
+                 <option value= "-1" selected>No Decryption</option>
+                 <option value="symmetric">Symmetric Decryption</option>
+                 <option value="asymmetric">Asymmetric Decryption</option>
               </select>
            </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="decryption_user_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
@@ -98,7 +102,7 @@
                  {% endfor %}
               </select>
             </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="decryption_key_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
@@ -109,13 +113,13 @@
         </div>
 
         <div class="row g-3 align-items-center">
-           <div class="col-auto">
+           <div class="col">
               <select id="de_signature_type_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>No Signature</option>
                  <option value="signed">Signed</option>
               </select>
            </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="de_signature_user_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>User</option>
                  {% for username in usernames %}
@@ -123,13 +127,15 @@
                  {% endfor %}
               </select>
            </div>
-           <div class="col-auto">
+           <div class="col">
               <select id="de_signature_key_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                  <option value= "-1" selected>Key Type</option>
                  <option value="public">Public</option>
                  <option value="private">Private</option>
               </select>
            </div>
+
+
         </div>
         <button id="decrypt-{{ msg_id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
         <div id="content-{{ msg_id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
@@ -155,7 +161,6 @@
 {% endfor %}
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function() {
 
   var decrypt_buttons = document.querySelectorAll(".decrypt-button");
