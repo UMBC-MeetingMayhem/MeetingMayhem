@@ -185,10 +185,6 @@ def messages():
                 db.session.commit()
 
     #setup message flag to tell template if it should display messages or not
-    #msg_flag = True
-    #if not msgs_tuple: #if the list of messages is empty, set the flag to false
-    #	msg_flag = False
-
     msg_flag = False
     if msgs_tuple:
         msg_flag = True
@@ -201,48 +197,28 @@ def messages():
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         #capture the list of players from the checkboxes and make it into a string delimited by commas
         checkbox_output_list = request.form.getlist('recipients')
-
-
         #ensure the list isn't empty
         if not checkbox_output_list:
             flash(f'Please select at least one recipient.', 'danger')
-#             html_template =
             return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
-#             j2_template = render_template('messages.j2', usernames=usernames)
-#             return f"{html_template} {j2_template}"
 
         if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
             flash(f'Please select a time and location.', 'danger')
-#             html_template =
             return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
-#             j2_template = render_template('messages.j2', usernames=usernames)
-#             return f"{html_template} {j2_template}"
-#             return render_template('messages.j2', usernames=usernames)
+
         #ensure keys entered are keys of actual recipients chosen
         curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
         create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
         update()
 
-
-
     #sent messages
     sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
     sent_msgs.reverse()
 
-    #give the template the vars it needs
-#     html_template =
     return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+    
 
-#     j2_template = render_template('messages.j2', usernames=usernames)
-#     print("hiiiii",usernames)
-#     return f"{html_template} {j2_template}
 
-# @app.route('/get_usernames')
-# def get_usernames():
-#     usernames = ['adv', 'user1', 'user2']  # Replace with actual list of usernames
-#     return jsonify(usernames)
-#message page
-#TODO: check for duplicate post request when sending messages
 @app.route('/multilevelmessages', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
 @login_required
 def multiLevelMessages():
@@ -297,10 +273,6 @@ def multiLevelMessages():
                 db.session.commit()
 
     #setup message flag to tell template if it should display messages or not
-    #msg_flag = True
-    #if not msgs_tuple: #if the list of messages is empty, set the flag to false
-    #	msg_flag = False
-
     msg_flag = False
     if msgs_tuple:
         msg_flag = True
@@ -318,40 +290,22 @@ def multiLevelMessages():
         #ensure the list isn't empty
         if not checkbox_output_list:
             flash(f'Please select at least one recipient.', 'danger')
-#             html_template =
             return render_template('MultilevelSample.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
-#             j2_template = render_template('messages.j2', usernames=usernames)
-#             return f"{html_template} {j2_template}"
-
         if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
             flash(f'Please select a time and location.', 'danger')
-#             html_template =
             return render_template('MultilevelSample.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
-#             j2_template = render_template('messages.j2', usernames=usernames)
-#             return f"{html_template} {j2_template}"
-#             return render_template('messages.j2', usernames=usernames)
+
         #ensure keys entered are keys of actual recipients chosen
         curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
         create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
         update()
 
-
-
     #sent messages
     sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
     sent_msgs.reverse()
 
-    #give the template the vars it needs
-#     html_template =
     return render_template('MultilevelSample.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
-#     j2_template = render_template('messages.j2', usernames=usernames)
-#     print("hiiiii",usernames)
-#     return f"{html_template} {j2_template}"
 
-# @app.route('/get_usernames')
-# def get_usernames():
-#     usernames = ['adv', 'user1', 'user2']  # Replace with actual list of usernames
-#     return jsonify(usernames)
 
 def adv_messages_page():
         #setup the current_game so that we can pull information from it

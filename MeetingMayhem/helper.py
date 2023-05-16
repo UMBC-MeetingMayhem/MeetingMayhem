@@ -160,8 +160,6 @@ def create_message(user, game, request, form, username, time_stamp):
             else:
                 encrypted_keys.append('invalid encrypted key')
 
-
-
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         #create the message and add it to the db
@@ -201,8 +199,6 @@ def create_message(user, game, request, form, username, time_stamp):
             flash(f'Duplicate message detected. Please create a new message.', 'danger')
             return False
 
-
-
         # Code for determining whether entered keys are valid or not
         for element in encryption_output.split(','):
             if element.split('(')[0].lower() == 'signed':
@@ -211,9 +207,9 @@ def create_message(user, game, request, form, username, time_stamp):
                 else:
                     signed_keys.append('invalid sign key')
             if element.split('(')[0].lower() == 'symmetric':
-            #                 if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and element.split('.')[1] == f"{username}.private)":
-                if element.split('.')[1] == 'shared)':
-                    encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
+                if element.split('.')[1].lower() == 'key pair)':
+                    encrypted_keys.append("Shared key pair of " + user.username + " and "  + element.split('(')[1].split(".")[0])
+                    #print(encrypted_keys)
                 else:
                     encrypted_keys.append('invalid encrypted key')
             elif element.split('(')[0].lower() == 'asymmetric':
@@ -228,12 +224,12 @@ def create_message(user, game, request, form, username, time_stamp):
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         if 'invalid' in signed_keys_string or 'invalid' in encrypted_keys_string:
-             new_message_content = form.content.data
+            new_message_content = form.content.data
         else:
-               #Replace message content with hashtags
-             key = Fernet.generate_key()
-             fernet = Fernet(key)
-             new_message_content = form.content.data
+            #Replace message content with hashtags
+            key = Fernet.generate_key()
+            fernet = Fernet(key)
+            new_message_content = form.content.data
 
 
         #create the message and add it to the db
