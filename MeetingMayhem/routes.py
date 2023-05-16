@@ -133,15 +133,16 @@ def account():
 @app.route('/messages', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
 @login_required
 def messages():
-
+    # -----------------------------------------------------------------------------------------------------------
+    #If current user is a gmaster, send them to the homepage
+    if current_user.role == 2:
+        return render_template('home.html', title='Home')
     #if the current user isn't in a game, send them to the homepage and display message
     if not current_user.game:
         flash(f'You are not currently in a game. Please have your game master put you in a game.', 'danger')
         return render_template('home.html', title='Home')
-
     #set the display_message to None initially so that if there is no message to display it doesn't break the website
     display_message = None
-
     # -----------------------------------------------------------------------------------------------------------
     #if the current_user is of adversary role, then display the adversary version of the page
     if (current_user.role==3):
