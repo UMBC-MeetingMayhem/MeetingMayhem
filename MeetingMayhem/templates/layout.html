@@ -253,8 +253,8 @@
             <div class="collapse navbar-collapse" id="navbarToggle">
                 <div class="navbar-nav mr-auto">
 <!--                <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>-->
-                <a class="nav-item nav-link" href="{{ url_for('homepage') }}">Home</a>
-                <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                    <a class="nav-item nav-link" href="{{ url_for('homepage') }}">Home</a>
+                    <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
                 </div>
 
                 <!-- Navbar Right Side -->
@@ -262,20 +262,23 @@
                     {% if current_user.is_authenticated %}
                         <p class="nav-item nav-link" >{{ current_user.username }}</p>
                         <p class="nav-item nav-link">|</p>
-                    {% if request.path == '/multilevelmessages' %}
-                        <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
-                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
-                    {% endif %} 
-                    {% if current_user.role == 2 %}
-                        <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
-                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
-                    {% endif %}
-                    {% if current_user.game != None %}
-                        <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
-                    {% endif %}
+                        {% if request.path == '/multilevelmessages' %}
+                            <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
+                            <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                        {% endif %} 
+                        {% if current_user.role == 2 %}
+                            <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                            <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                        {% endif %}
+                        {% if current_user.game != None %}
+                            <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
+                        {% endif %}
                         <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
                     {% endif %}
+
                 </div>
             </div>
             </div>
