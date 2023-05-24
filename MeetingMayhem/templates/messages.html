@@ -32,7 +32,7 @@
       {{ form.hidden_tag() }}
       <fieldset class="form-group">
          <div class="form-group">
-            <label class="form-control-label" for="name">Choose who you want to send the message to:</label> <br />
+            <label class="form-control-label" for="name">To:</label> <br />
             {% for username in usernames %}
             <div class="form-check form-check-inline">
                <!-- below line needs the ', ' in value to make processing usernames easier -->
@@ -86,7 +86,7 @@
          <div class="content-section">
             <ul class="select2-selection__rendered" id="cryptography_tags_list">
             </ul>
-            <p>Select one of the encryption types below:</p>
+            <p>Encrypt or Sign Message:</p>
             <div class="row g-3 align-items-center">
                <div class="col">
                   <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
