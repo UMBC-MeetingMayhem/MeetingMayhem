@@ -254,7 +254,11 @@
                 <div class="navbar-nav mr-auto">
 <!--                <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>-->
                     <a class="nav-item nav-link" href="{{ url_for('homepage') }}">Home</a>
-                    <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                    {% if current_user.role == 3 %}
+                        <a class="nav-item nav-link" href="{{ url_for('home') }}">About</a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                    {% endif %}
                 </div>
 
                 <!-- Navbar Right Side -->
