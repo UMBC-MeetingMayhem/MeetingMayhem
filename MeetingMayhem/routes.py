@@ -199,7 +199,7 @@ def messages():
         checkbox_output_list = request.form.getlist('recipients')
         #ensure the list isn't empty
         if not checkbox_output_list:
-            flash(f'Please select at least one recipient.', 'danger')
+            flash(f'Please select one recipient.', 'danger')
             return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 
         if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
@@ -207,7 +207,7 @@ def messages():
             return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
 
         #ensure keys entered are keys of actual recipients chosen
-        curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+        curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
         create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
         update()
 

@@ -75,7 +75,6 @@ function onlyOne(checkbox) {
                style="display:block;margin:20px;">
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
-<!--            {{ form.encryption_type.label(class="form-control-label") }}-->
             {% if form.content.errors %}
             <!-- if there are errors in the form... -->
             {{ form.content(class="form-control form-control-lg is-invalid") }}
@@ -90,11 +89,6 @@ function onlyOne(checkbox) {
             {% endif %}
 <!--            {{ form.encryption_type(class="gray-blue") }}-->
          </div>
-         <br />
-         <div class="form-group">
-            {{ form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }}
-         </div>
-         <br />
       </fieldset>
          <div class="content-section">
             <ul class="select2-selection__rendered" id="cryptography_tags_list">
@@ -103,8 +97,8 @@ function onlyOne(checkbox) {
             
             <div class="row g-2 align-items-center">
                <div class="col">
-                  <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
-                     <option value= "-1" selected>No Encryption/Signature</option>
+                  <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                     <option  value= "-1" selected>No Encryption/Signature</option>
                      <option value="symmetric">Symmetrically Encrypt</option>
                      <option value="asymmetric">Asymmetrically Encrypt</option>
                      <option value="signed">Sign</option>
@@ -113,7 +107,7 @@ function onlyOne(checkbox) {
                with
                <div class="col">
                   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>No Key Selected</option>
+                     <option id='default_key_select' value= "-1" selected>No Key Selected</option>
                      {% set current_user_name =  current_user.username  -%}
                      {% for username in usernames %}
                         {% if current_user_name != username %}
@@ -180,7 +174,7 @@ function onlyOne(checkbox) {
 
             </div> -->
       </div>
-
+      <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
       <div class="form-group">
          {{ form.submit(class="btn btn-outline-info", onclick="addCryptography()", id="submitButton") }}
       </div>
@@ -259,75 +253,58 @@ function onlyOne(checkbox) {
    </div>
 
    
-   <!-- <script>
+<script>
+
    // This script will limit the permission of certain key
-   const encryptionTypeSelect = document.getElementById("encryption_type_select");
-   const encryptionUserSelect = document.getElementById("encryption_user_select");
-   const encryptionKeySelect = document.getElementById("encryption_key_select");
+   const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
+   const encryptionKeySelect = document.getElementById("key_select");
 
    encryptionTypeSelect.addEventListener("change", () => {
    if (encryptionTypeSelect.value === "-1") {
-      encryptionUserSelect.value = "-1";
       encryptionKeySelect.value = "-1";
    }
    });
-   const signatureTypeSelect = document.getElementById("signature_type_select");
-   const signatureUserSelect = document.getElementById("signature_user_select");
-   const signatureKeySelect = document.getElementById("signature_key_select");
 
-   signatureTypeSelect.addEventListener("change", () => {
-   if (signatureTypeSelect.value === "-1") {
-      signatureUserSelect.value = "-1";
-      signatureKeySelect.value = "-1";
-   }
-   });
    // Get the current user's username from the backend
    var current_user_username = "{{ current_user.username }}";
 
    // Select the dropdowns for the encryption and signature keys
-   var encryption_key_select = document.getElementById("encryption_key_select");
-   var signature_key_select = document.getElementById("signature_key_select");
-
-   // Select the dropdowns for the encryption and signature users
-   var encryption_user_select = document.getElementById("encryption_user_select");
-   var signature_user_select = document.getElementById("signature_user_select");
-
+   var key_select = document.getElementById("key_select");
+   var encryption_type_select = document.getElementById("encryption_sign_type_select");
+   var default_key = document.getElementById("default_key_select");
    // Listen for changes in the encryption user dropdown
-   encryption_user_select.addEventListener("change", function() {
-   // Get the selected user from the dropdown
-   var selected_user = encryption_user_select.value;
+   encryption_type_select.addEventListener("change", function() {
+      // Get the selected user from the dropdown
+      let all_options = key_select.querySelectorAll('option');
+      var encrytion_type =  encryption_type_select.value;
+      if (encrytion_type === 'symmetric') {
+         all_options.forEach((single_option) => {
+            single_option.disabled = true;
+         });
+         let shared = key_select.querySelectorAll('option[value^=Shared]');
+         shared.forEach((userItem) => {
+            userItem.disabled = false;
+         });
+         default_key.disabled = false
+      }
+      else if(encrytion_type === 'asymmetric' || encrytion_type === 'signed' ){
+         all_options.forEach((single_option) => {
+            single_option.disabled = false;
+         });
+         let shared = key_select.querySelectorAll('option[value^=Shared]');
+         shared.forEach((userItem) => {
+            userItem.disabled = true;
+         });
+      }
+      else{
+         all_options.forEach((single_option) => {
+            single_option.disabled = true;
+         });
+      }  
 
-   // If the selected user is the current user, enable the private, public option and disable key pair (no one have same key pairs)
-   if (selected_user === current_user_username) {
-   encryption_key_select.querySelector('option[value="private"]').disabled = false;
-   encryption_key_select.querySelector('option[value="public"]').disabled = false;
-   encryption_key_select.querySelector('option[value="key pair"]').disabled = true;
-   }
-   // Otherwise, disable the private option and enable the other options
-   else {
-   encryption_key_select.querySelector('option[value="private"]').disabled = true;
-   encryption_key_select.querySelector('option[value="public"]').disabled = false;
-   encryption_key_select.querySelector('option[value="key pair"]').disabled = false;
-   }
    });
 
-   // Listen for changes in the signature user dropdown
-   signature_user_select.addEventListener("change", function() {
-   // Get the selected user from the dropdown
-   var selected_user = signature_user_select.value;
-
-   // If the selected user is the current user, enable the private option and disable the other options
-   if (selected_user === current_user_username) {
-   signature_key_select.querySelector('option[value="private"]').disabled = false;
-   signature_key_select.querySelector('option[value="public"]').disabled = false;
-   }
-   // Otherwise, disable the private option and enable the public option
-   else {
-   signature_key_select.querySelector('option[value="private"]').disabled = true;
-   signature_key_select.querySelector('option[value="public"]').disabled = false;
-   }
-   });
-   </script> -->
+   </script>
 
    <script>
       function special_chars(length) {
@@ -479,7 +456,7 @@ function onlyOne(checkbox) {
    // START: This part is for controlling sned message button
    // encryption type  keys need to be selcted if encrytion/signature to be selcted
    var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
-
+   
    // Add event listener to all selected elements
    dropboxes.forEach(function(dropbox) {
       dropbox.addEventListener('change', function() {
@@ -497,14 +474,17 @@ function onlyOne(checkbox) {
          });
          //console.log(allSelectedValues);
          var submitButton = document.getElementById('submitButton');
-
-         if(allSelectedValues){
-            // Enable the button
-            submitButton.disabled = false;
+         var error_dis = document.getElementById("error-message");
+         let hidden = error_dis.getAttribute("hidden");
+         if(allSelectedValuesNotMinusOne && !allSelectedValues){
+            // Disable the button
+            error_dis.removeAttribute("hidden");
+            submitButton.disabled = true;
          }
          else{
-            // Disable the button
-            submitButton.disabled = true;
+            // Enable the button
+            error_dis.setAttribute("hidden", "hidden");
+            submitButton.disabled = false;
          }
          
       });
