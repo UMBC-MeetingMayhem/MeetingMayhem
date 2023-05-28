@@ -1,80 +1,80 @@
 
 {% macro print_msgs(msgs,usernames) -%}
 {% for msg in msgs %}
-{% if msg[0].is_edited %}
-<!-- if the message has been edited, display the edited parts-->
-<article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            {% if msg[0].new_sender %}
-            <a>Sender: {{ msg[0].new_sender }} | </a>
+    {% if msg[0].is_edited %}
+    <!-- if the message has been edited, display the edited parts-->
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+                {% if msg[0].new_sender %}
+                <a>Sender: {{ msg[0].new_sender }} | </a>
+                {% else %}
+                <a>Sender: {{ msg[0].sender }} | </a>
+                {% endif %}
+                {% if msg[0].new_recipient %}
+                <a>Recipient: {{ msg[0].new_recipient }} </a>
+                {% else %}
+                <a>Recipient: {{ msg[0].recipient }} </a>
+                {% endif %}
+                <a> | Time Recieved: {{ msg[0].time_recieved }} </a>
+            </div>
+            {% if msg[0].edited_content %}
+            <p class="article-content">{{ msg[0].edited_content }}</p>
             {% else %}
-            <a>Sender: {{ msg[0].sender }} | </a>
+            <p class="article-content">{{ msg[0].content }}</p>
             {% endif %}
-            {% if msg[0].new_recipient %}
-            <a>Recipient: {{ msg[0].new_recipient }} </a>
-            {% else %}
-            <a>Recipient: {{ msg[0].recipient }} </a>
+            {% if msg[0].is_encrypted %}
+            <div class="m-1 row ">
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                    Encrypted With:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
+                </div>
+                <div>
+
+                </div>
+            </div>
             {% endif %}
-            <a> | Time Recieved: {{ msg[0].time_recieved }} </a>
-        </div>
-        {% if msg[0].edited_content %}
-        <p class="article-content">{{ msg[0].edited_content }}</p>
-        {% else %}
-        <p class="article-content">{{ msg[0].content }}</p>
-        {% endif %}
-        {% if msg[0].is_encrypted %}
-        <div class="m-1 row ">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                Encrypted For:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
+            {% if msg[0].is_signed %}
+            <div class="m-1 row">
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed
+                    by:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}
+                </div>
             </div>
-            <div>
+            {% endif %}
+        </div>
+    </article>
+    {% else %}
+    {% set msg_id = msg[0].id %}
+    {% if msg[0].encryption_details == "invalid encrypted key" or msg[0].encryption_details == "invalid sign key" %}
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a>Sender: {{ msg[0].sender }} | </a>
+                <a>Recipient: {{ msg[0].recipient }}</a>
+                <a>test: {{ msg[0].encryption_details }} </a>
+                <a> | Time Received: {{ msg[0].time_received }} </a>
+            </div>
 
+            <p class="article-content">{{ msg[0].content }}</p>
+            {% if msg[0].is_encrypted %}
+            <div class="m-1 row ">
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                    Encrypted For:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
+                </div>
             </div>
-        </div>
-        {% endif %}
-        {% if msg[0].is_signed %}
-        <div class="m-1 row">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed
-                by:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}
+            {% endif %}
+            {% if msg[0].is_signed %}
+            <div class="m-1 row">
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed
+                    by:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}
+                </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
-</article>
-{% else %}
-{% set msg_id = msg[0].id %}
-{% if msg[0].encryption_details == "invalid encrypted key" or msg[0].encryption_details == "invalid sign key" %}
-<article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            <a>Sender: {{ msg[0].sender }} | </a>
-            <a>Recipient: {{ msg[0].recipient }}</a>
-            <a>test: {{ msg[0].encryption_details }} </a>
-            <a> | Time Received: {{ msg[0].time_received }} </a>
-        </div>
-
-        <p class="article-content">{{ msg[0].content }}</p>
-        {% if msg[0].is_encrypted %}
-        <div class="m-1 row ">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                Encrypted For:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
-            </div>
-        </div>
-        {% endif %}
-        {% if msg[0].is_signed %}
-        <div class="m-1 row">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed
-                by:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</article>
+    </article>
 
 {% else %}
 <article class="media content-section">

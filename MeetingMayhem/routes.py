@@ -214,7 +214,6 @@ def messages():
     #sent messages
     sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
     sent_msgs.reverse()
-
     return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
     
 

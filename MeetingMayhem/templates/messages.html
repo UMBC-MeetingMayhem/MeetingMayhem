@@ -76,7 +76,6 @@ function onlyOne(checkbox) {
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
             {% if form.content.errors %}
-            <!-- if there are errors in the form... -->
             {{ form.content(class="form-control form-control-lg is-invalid") }}
             <div class="invalid-feedback">
                {% for errors in form.content.errors %}
@@ -89,15 +88,15 @@ function onlyOne(checkbox) {
             {% endif %}
 <!--            {{ form.encryption_type(class="gray-blue") }}-->
          </div>
+         <div class="form-group">
       </fieldset>
          <div class="content-section">
             <ul class="select2-selection__rendered" id="cryptography_tags_list">
             </ul>
             <p>Encrypt or Sign Message:</p>
-            
             <div class="row g-2 align-items-center">
                <div class="col">
-                  <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                  <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
                      <option  value= "-1" selected>No Encryption/Signature</option>
                      <option value="symmetric">Symmetrically Encrypt</option>
                      <option value="asymmetric">Asymmetrically Encrypt</option>
@@ -106,7 +105,7 @@ function onlyOne(checkbox) {
                </div>
                with
                <div class="col">
-                  <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                  <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
                      <option id='default_key_select' value= "-1" selected>No Key Selected</option>
                      {% set current_user_name =  current_user.username  -%}
                      {% for username in usernames %}
@@ -123,56 +122,6 @@ function onlyOne(checkbox) {
                   </select>
                </div>
             </div>
-            <!-- <div class="row g-3 align-items-center">
-               <div class="col">
-                  <select id="encryption_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
-                     <option value= "-1" selected>No Encryption</option>
-                     <option value="symmetric">Symmetric Encryption</option>
-                     <option value="asymmetric">Asymmetric Encryption</option>
-                  </select>
-               </div>
-               <div class="col">
-                  <select id="encryption_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>User</option>
-                     {% for username in usernames %}
-                     <option value="{{ username }}">{{ username }}</option>
-                     {% endfor %}
-                  </select>
-               </div>
-               <div class="col">
-                  <select id="encryption_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>Key Type</option>
-                     <option value="public">Public</option>
-                     <option value="private">Private</option>
-                     <option value="key pair">Key pair</option>
-                  </select>
-               </div>
-            </div>
-
-            <div class="row g-3 align-items-center">
-               <div class="col">
-                  <select id="signature_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>No Signature</option>
-                     <option value="signed">Signed</option>
-                  </select>
-               </div>
-               <div class="col">
-                  <select id="signature_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>User</option>
-                     {% for username in usernames %}
-                     <option value="{{ username }}">{{ username }}</option>
-                     {% endfor %}
-                  </select>
-               </div>
-               <div class="col">
-                  <select id="signature_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                     <option value= "-1" selected>Key Type</option>
-                     <option value="public">Public</option>
-                     <option value="private">Private</option>
-                  </select>
-               </div>
-
-            </div> -->
       </div>
       <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
       <div class="form-group">
@@ -195,60 +144,60 @@ function onlyOne(checkbox) {
 
    <div id="Sent" class="col">
       {% if sent_msgs %}
-      <legend class="border-bottom mb4">Messages sent by you:</legend>
-      {% for sent_msg in sent_msgs %}
-      {% if not sent_msg.adv_created %}
-      <article class="media content-section">
-         <div class="media-body">
-            <div class="article-metadata">
-               <a>Sender: {{ sent_msg.sender }} | </a>
-               <a>Recipient: {{ sent_msg.recipient }}</a>
-               <a> | Time Sent: {{ sent_msg.time_sent }} </a>
-            </div>
-            {% if (sent_msg.initial_encryption_details != "invalid encrypted key" or sent_msg.initial_signed_details !=
-            "invalid sign key" or sent_msg.initial_asymmetric_details != "invalid asymmetric key") %}
-            <div id="content">
-               <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
-                  sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
-               {% if sent_msg.initial_encryption_details != "invalid encrypted key" %}
+         <legend class="border-bottom mb4">Messages sent by you:</legend>
+         {% for sent_msg in sent_msgs %}
+            {% if not sent_msg.adv_created %}
+            <article class="media content-section">
+               <div class="media-body">
+                  <div class="article-metadata">
+                     <a>Sender: {{ sent_msg.sender }} | </a>
+                     <a>Recipient: {{ sent_msg.recipient }}</a>
+                     <a> | Time Sent: {{ sent_msg.time_sent }} </a>
+                  </div>
+                  <div id="content">
+                     <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
+                        sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+                     {% if sent_msg.initial_is_encrypted or sent_msg.initial_is_signed %}
+                        <p class="article-content"> #######################</p>
+                     {% else %}
+                        <p class="article-content">{{ sent_msg.content }}</p>
+                     {% endif %}
+                  </div>
                   {% if sent_msg.initial_is_encrypted %}
-                  <p class="article-content"> #######################</p>
-                  {% else %}
-                  <p class="article-content">{{ sent_msg.content }}</p>
+                  <div class="m-1 row ">
+                     {% if 'Warning' not in sent_msg.initial_encryption_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                           Encrypted with:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                              sent_msg.initial_encryption_details }}</div>
+                     {% else %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                           sent_msg.initial_encryption_details[9:] }}</div>
+                     {% endif %}  
+                  </div>
                   {% endif %}
-               {% elif sent_msg.initial_signed_details != "invalid sign key" %}
                   {% if sent_msg.initial_is_signed %}
-                  <p class="article-content">#######################</p>
-                  {% else %}
-                  <p class="article-content">{{ sent_msg.content }}</p>
+                  <div class="m-1 row ">
+                     {% if 'Warning' not in sent_msg.initial_signed_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                           Signed by:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                           sent_msg.initial_signed_details }}</div>
+                     {% else %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                           sent_msg.initial_signed_details[9:] }}</div>
+                     {% endif %}
+                  </div>
                   {% endif %}
-               {% else %}
-                  <p class="article-content">hg</p>
-               {% endif %}
-            </div>
+            </article>
             {% endif %}
-
-            {% if sent_msg.initial_is_encrypted %}
-            <div class="m-1 row ">
-               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                  Encrypted For:</div>
-               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                  sent_msg.initial_encryption_details }}</div>
-            </div>
-            {% endif %}
-            {% if sent_msg.initial_is_signed %}
-            <div class="m-1 row">
-               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                  Signed by:</div>
-               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                  sent_msg.initial_signed_details }}</div>
-            </div>
-            {% endif %}
-      </article>
-      {% endif %}
-      {% endfor %}
+         {% endfor %}
       {% else %}
-      <legend class="border-bottom mb4">No messages sent</legend>
+         <legend class="border-bottom mb4">No messages sent</legend>
       {% endif %}
    </div>
 
