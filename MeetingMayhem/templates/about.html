@@ -15,34 +15,32 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 
-<h1 style="text-align:center" >
-    Scenario:
+<h1 style="text-align:left" >
+    Mission:
 </h1>
 
-<p style="text-align:center; font-family:Lucida Console, Courier New, monospace;">
-    You are an agent who need to meet with ONE of your fellows at a secret time and place to exchange information. 
-    However, there is TWO other users besides you in the network and ONE of them is a malicious adversary trying to interrupt your guys meeting. 
-    You and another fellow will vote at the end of game session to decide a time and place to meet based on the conversation.
-</p></br>
-
-<h1 style="text-align:center;">
-    Goal:
-</h1>
-<p style="text-align:center;">
-    <ul>
-        <li>Agree on the time and place with your fellow  AND </li>
-        <li>The time and place need to be different from the adversary</li>
-    </ul>
+<p style="text-align:left; font-family:Lucida Console, Courier New, monospace;">
+    You are an agent who needs to reach agreement on a time and place to meet with your fellow agent, to exchange an essential asset. 
+    However, there is a <b>malicious</b> adversary trying to prevent you from reaching consensus on the time and place.  
+    Your only communication with your fellow agent is over a network, which is controlled by the adversary. 
+    At the end of the game session, you will vote to decide on the meeting time and place.
 </p>
 
-<h1 style="text-align:center;">
-    Powerful Tools:
+<h1 style="text-align:left;">
+    Goal:
 </h1>
-<p style="text-align:center;">
+<p style="text-align:left;">
+    Reach agreement with your fellow agent on the meeting time and place.
+</p>
+
+<h1 style="text-align:left;">
+    Cryptographic Tools:
+</h1>
+<p style="text-align:left;">
 <ul>
-    <li>Symmetric Encryption: Encypting and decrypting your message with Shared Symmetric Key of you and the recipient. </li>
-    <li>Asymmetric Encryption: Encypting your message with Receiver's Public Key and decrypting the message with Reciver's own Private Key. </li>
-    <li>Signature: Signing the your message with Sender's (Your) own Private Key, and the receiver verifies your identity with Sender's (Your) Public Key.</li>
+    <li>Symmetric Encryption: Encrypt or decrypt  your message using a Shared Symmetric Key known by you and the recipient.</li>
+    <li>Asymmetric Encryption: Encrypt messages using the Receiver’s Public Key, or decrypt the message using the Receiver's Private Key. </li>
+    <li>Signature: Sign your message with the Sender’s (Your) Private Key; the receiver can verify your identity with the Sender’s (Your) Public Key.  Here, a valid signature also encrypts and guarantees message integrity (i.e., that the message has not been modified in transit).</li>
 </ul>
 </p>
 <script type="text/javascript" charset="utf-8">

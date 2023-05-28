@@ -11,40 +11,38 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 
-<h1 style="text-align:center" >
-Scenario: 
+<h1 style="text-align:left" >
+Mission:
 </h1>
 
-<p style="text-align:center; font-family:Lucida Console, Courier New, monospace;">
-You are an agent embedded in hostile territory.
-One of your fellow agents has been caught, and your mission is to aid them in their escape.
-You are attempting to arrange a meeting with other allied agents to exchange information critical to this mission.
-However, your only means of communication with your team has been compromised by a hostile Adversary.
-Can you successfully arrange a safe meeting with your team, or will the Adversary trick you into meeting somewhere unsafe?
-</p></br></br>
+<p style="text-align:left; font-family:Lucida Console, Courier New, monospace;">
+    You are a malicious adversary trying to disrupt the agents' plans on when and where they will meet to exchange an essential asset. 
+    To do so, you may insert, block, or modify messages sent over the network, which you control.
+    You, however, cannot defeat encryption and signatures that are properly formed using keys you do not know. 
+    At the end of the game session, the two agents will vote to decide a time and place to meet. 
+    You will try to prevent the agents from reaching consensus on the meeting time and place.
+</p>
 
-<h1 style="text-align:center;">
-Directions: 
+<h1 style="text-align:left;">
+Goal:
+</h1>
+<p style="text-align:left;">
+    Do not allow the agents to agree on the time and place to meet.
+</p>
+
+<h1 style="text-align:left;">
+Cryptographic Tools:
 </h1>
 
-<p style="text-align:center;">
+
+<p style="text-align:left;">
 <ul>
-<li>Send messages to your allies to arrange a meeting time and place.</li>
-<li>The majority of the players need to vote for the same safe location to win.</li>
-<li>The Adversary will also vote for a location, and that location will not be safe.</li>
-<li>Beware of the Adversary attempting to cause confusion or trick you.</li>
-<li>The Adversary is able to create, edit, and delete messages.</li>
-<li>When available, use cryptography primitives to your advantage.</li>
-<li>Encryption: encrypt a message with a recipient's public key.</li>
-<li>Successful encryption will prevent the Adversary from readying your message.</li>
-<li>Signing: sign a message with your private key.</li>
-<li>A successful signature will validate that the message came from you.</li>
-<li>You can also include multiple cryptography primitives in one message.</li>
-<li>This can be useful if you are sending a message to multiple people.</li>
-<li>When you are ready to vote for a meeting time and place, click the "Ready to Vote" button.</li>
-<li>The meeting places are: Park, Alley, Cafe, Parking Garage, Rooftop, Bus stop, Subway station.</li>
-<li>The meeting times are every hour on a 12 hour AM/PM scale.</li>
-<li>Once two players have clicked the "Ready to Vote" button, the game will be brought to a vote.</li>
+<li>Delete Any message.</li>
+<li>Modify any Plaintext (non-encrypted) message that is not signed.</li>
+<li>Send a message to any recipient pretending to be someone else.</li>
+<li>Symmetric Encryption: Symmetrically Encrypt or Symmetrically decrypt any message using keys you know.</li>
+<li>Asymmetric Encryption: Asymmetrically Encrypt any message using the Receiver’s Public Key, or asymmetrically decrypt any message using any Private Key you know.</li>
+<li>Signature: Sign any message with any Sender’s Private Key you know; the receiver can verify the identity the sender's identity using the Sender’s Public Key.  Here, a valid signature also encrypts and guarantees message integrity (i.e., that the message has not been modified in transit).</li>
 </ul>
 </p>
 <script type="text/javascript" charset="utf-8">
