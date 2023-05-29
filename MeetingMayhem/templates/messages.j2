@@ -24,140 +24,107 @@
             <p class="article-content">{{ msg[0].content }}</p>
             {% endif %}
             {% if msg[0].is_encrypted %}
-            <div class="m-1 row ">
-                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                    Encrypted With:</div>
-                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
+                <div class="m-1 row ">
+                     {% if 'Warning' not in msg[0].encryption_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                           Encrypted with:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                              msg[0].encryption_details }}</div>
+                     {% else %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                           msg[0].encryption_details[9:] }}</div>
+                     {% endif %}  
                 </div>
-                <div>
-
-                </div>
-            </div>
             {% endif %}
             {% if msg[0].is_signed %}
-            <div class="m-1 row">
-                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed
-                    by:</div>
-                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}
+                <div class="m-1 row ">
+                     {% if 'Warning' not in msg[0].signed_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                           Signed by:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                           msg[0].signed_details }}</div>
+                     {% else %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                           msg[0].signed_details[9:] }}</div>
+                     {% endif %}
                 </div>
-            </div>
             {% endif %}
         </div>
     </article>
-    {% else %}
-    {% set msg_id = msg[0].id %}
-    {% if msg[0].encryption_details == "invalid encrypted key" or msg[0].encryption_details == "invalid sign key" %}
-    <article class="media content-section">
-        <div class="media-body">
-            <div class="article-metadata">
-                <a>Sender: {{ msg[0].sender }} | </a>
-                <a>Recipient: {{ msg[0].recipient }}</a>
-                <a>test: {{ msg[0].encryption_details }} </a>
-                <a> | Time Received: {{ msg[0].time_received }} </a>
-            </div>
-
-            <p class="article-content">{{ msg[0].content }}</p>
-            {% if msg[0].is_encrypted %}
-            <div class="m-1 row ">
-                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                    Encrypted For:</div>
-                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
-                </div>
-            </div>
-            {% endif %}
-            {% if msg[0].is_signed %}
-            <div class="m-1 row">
-                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed
-                    by:</div>
-                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </article>
-
 {% else %}
-<article class="media content-section">
+    <article class="media content-section">
     <div class="media-body">
         <div class="article-metadata">
             <a>Sender: {{ msg[0].sender }} | </a>
             <a>Recipient: {{ msg[0].recipient }}</a>
             <a> | Time Received: {{ msg[0].time_received }} </a>
         </div>
-
-
-        <div class="row g-3 align-items-center">
+        <div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
            <div class="col">
-              <select id="decryption_type_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>No Decryption</option>
-                 <option value="symmetric">Symmetric Decryption</option>
-                 <option value="asymmetric">Asymmetric Decryption</option>
-              </select>
+                <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                    <option value= "-1" selected>No Encryption/Signature</option>
+                    <option value="symmetric">Symmetrically Encrypt</option>
+                    <option value="asymmetric">Asymmetrically Encrypt</option>
+                    <option value="signed">Sign</option>
+                </select>
            </div>
            <div class="col">
-              <select id="decryption_user_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>User</option>
-                 {% for username in usernames %}
-                 <option value="{{ username }}">{{ username }}</option>
-                 {% endfor %}
-              </select>
+                <select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                    <option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
+                    {% set current_user_name = msg[0].recipient.replace(', ', '') -%}
+                    {% for username in usernames %}
+                        {% if current_user_name != username %}
+                           <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+                        {% endif %}
+                    {% endfor %}
+                    {% for username in usernames %}
+                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                        {% if current_user_name == username %}
+                           <option value="private_{{username}}">{{username}}'s Private Key </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
             </div>
-           <div class="col">
-              <select id="decryption_key_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>Key Type</option>
-                 <option value="public">Public</option>
-                 <option value="private">Private</option>
-                 <option value="shared">Shared Key</option>
-              </select>
-           </div>
         </div>
-
-        <div class="row g-3 align-items-center">
-           <div class="col">
-              <select id="de_signature_type_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>No Signature</option>
-                 <option value="signed">Signed</option>
-              </select>
-           </div>
-           <div class="col">
-              <select id="de_signature_user_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>User</option>
-                 {% for username in usernames %}
-                 <option value="{{ username }}">{{ username }}</option>
-                 {% endfor %}
-              </select>
-           </div>
-           <div class="col">
-              <select id="de_signature_key_select-{{ msg_id }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                 <option value= "-1" selected>Key Type</option>
-                 <option value="public">Public</option>
-                 <option value="private">Private</option>
-              </select>
-           </div>
-
-
-        </div>
-        <button id="decrypt-{{ msg_id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
-        <div id="content-{{ msg_id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
+        <button id="decrypt-{{ msg[0].id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
+        <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
     </div>
     {% if msg[0].is_encrypted %}
-    <div class="m-1 row ">
-        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted
-            For:</div>
-        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}
+        <div class="m-1 row ">
+                {% if 'Warning' not in msg[0].encryption_details %}
+                <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                    Encrypted with:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                        msg[0].encryption_details }}</div>
+                {% else %}
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                    Warning:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                    msg[0].encryption_details[9:] }}</div>
+                {% endif %}  
         </div>
-    </div>
     {% endif %}
     {% if msg[0].is_signed %}
-    <div class="m-1 row">
-        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:
+        <div class="m-1 row ">
+                {% if 'Warning' not in msg[0].signed_details %}
+                <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                    Signed by:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                    msg[0].signed_details }}</div>
+                {% else %}
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                    Warning:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                    msg[0].signed_details[9:] }}</div>
+                {% endif %}
         </div>
-        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}</div>
-    </div>
     {% endif %}
 </article>
 {% endif %}
-{% endif%}
 {% endfor %}
 
 <script>
@@ -171,18 +138,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const msg_id = this.id.split("-")[1];
 
       const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
-      const decryption_user = document.getElementById(`decryption_user_select-${msg_id}`).value;
       const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
-      const signature_type = document.getElementById(`de_signature_type_select-${msg_id}`).value;
-      const signature_user = document.getElementById(`de_signature_user_select-${msg_id}`).value;
-      const signature_key = document.getElementById(`de_signature_key_select-${msg_id}`).value;
-
       //var msg = msgs.find(m => m.id === msg_id);
 
       console.log("im here");
       console.log(msg_id);
 
-          console.log(decryption_type);
+      console.log(decryption_type);
       console.log(decryption_user);
       console.log(decryption_key);
       //console.log(msg.recipient);
@@ -212,9 +174,55 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-
-
 </script>
+
+<script>
+
+    // This script will limit the permission of certain key
+    var options_for_decrypt = document.querySelectorAll('[data-group="decrypt_options"]');
+    for (let i = 0; i < options_for_decrypt.length; i++) {
+        msg_id = options_for_decrypt[i].id.split("-")[1];
+        current_user_username = options_for_decrypt[i].id.split("-")[2].replace(',', '');
+        decryption_type_select = document.getElementById(`decryption_type_select-${msg_id}`);
+        de_key_select = document.getElementById(`decryption_key_select-${msg_id}`);
+       
+        //var decrytion_type = decryption_type_select.value;
+        decryption_type_select.addEventListener("change", function() {
+            msg_id = options_for_decrypt[i].id.split("-")[1];
+            // Get the selected user from the dropdown
+            new_decryption_type_select =  document.getElementById(`decryption_type_select-${msg_id}`);
+            de_default_key = document.getElementById(`default_key_select-${msg_id}`);
+            de_key_select = document.getElementById(`decryption_key_select-${msg_id}`);
+            all_options = de_key_select.querySelectorAll('option');
+            if (new_decryption_type_select.value === "symmetric") {
+                all_options.forEach((single_option) => {
+                    single_option.disabled = true;
+                });
+                let shared = de_key_select.querySelectorAll('option[value^=Shared]');
+                shared.forEach((userItem) => {
+                    userItem.disabled = false;
+                });
+                de_default_key.disabled = false
+            }
+            else if(new_decryption_type_select.value  === 'asymmetric' || new_decryption_type_select.value  === 'signed' ){
+                all_options.forEach((single_option) => {
+                    single_option.disabled = false;
+                });
+                let shared = de_key_select.querySelectorAll('option[value^=Shared]');
+                shared.forEach((userItem) => {
+                    userItem.disabled = true;
+                });
+            }
+            else{
+                all_options.forEach((single_option) => {
+                    single_option.disabled = false;
+                });
+            }  
+
+        });
+    }
+
+   </script>
+
 
 {%- endmacro -%}

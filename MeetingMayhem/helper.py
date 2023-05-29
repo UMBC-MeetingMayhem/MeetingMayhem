@@ -215,7 +215,7 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
         if "invalid encrypted key" in list_of_keys:
             return True
         return False
-    elif user.role == 3:
+    elif user.role == 4:
         # determines if a user can read a message
         if sender == user.username:
             return True
