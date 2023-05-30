@@ -117,6 +117,9 @@ class Message(db.Model):
     time_meet = db.Column(db.String, default="Null") # keeps track of the time user chooses to meet
     location_meet = db.Column(db.String, default="Null") # keeps track of the location user chooses to meet
     time_am_pm = db.Column(db.String, default="Null") # keeps track of the choice between am and pm for time
+    encryption_type = db.Column(db.String, nullable=False) # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
+    key = db.Column(db.String, nullable=False) # Key select
+    is_decrypted = db.Column(db.Boolean, nullable=False) #keeps track of decrypted message
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM={self.time_am_pm})\n"
 
@@ -240,19 +243,22 @@ db.session.add(spc)
 db.session.commit()
 
 Create gm:
-gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+#gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=2)
 db.session.add(gm)
 db.session.commit()
 
 Create adversary:
 adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
+adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
+user3 = User(username='user3', email='user3@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
 db.session.add(adv)
 db.session.commit()
 
 Create test users:
 user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
-user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user5 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 db.session.add(user1)
 db.session.add(user2)

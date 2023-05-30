@@ -19,165 +19,229 @@
                 <a> | Time Recieved: {{ msg[0].time_recieved }} </a>
             </div>
             {% if msg[0].edited_content %}
-            <p class="article-content">{{ msg[0].edited_content }}</p>
+                <p class="article-content">{{ msg[0].edited_content }}</p>
             {% else %}
-            <p class="article-content">{{ msg[0].content }}</p>
+                <p class="article-content">{{ msg[0].content }}</p>
             {% endif %}
-            {% if msg[0].is_encrypted %}
-                <div class="m-1 row ">
-                     {% if 'Warning' not in msg[0].encryption_details %}
-                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                           Encrypted with:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                              msg[0].encryption_details }}</div>
-                     {% else %}
-                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                           Warning:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                           msg[0].encryption_details[9:] }}</div>
-                     {% endif %}  
-                </div>
-            {% endif %}
-            {% if msg[0].is_signed %}
-                <div class="m-1 row ">
-                     {% if 'Warning' not in msg[0].signed_details %}
-                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                           Signed by:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                           msg[0].signed_details }}</div>
-                     {% else %}
-                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                           Warning:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                           msg[0].signed_details[9:] }}</div>
-                     {% endif %}
-                </div>
-            {% endif %}
+            
         </div>
     </article>
-{% else %}
+    {% elif msg[0].is_decrypted %}
+    <!-- if the message has been decrypted, display the original message-->
     <article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            <a>Sender: {{ msg[0].sender }} | </a>
-            <a>Recipient: {{ msg[0].recipient }}</a>
-            <a> | Time Received: {{ msg[0].time_received }} </a>
-        </div>
-        {% if msg[1] %}
-        <div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
-           <div class="col">
-                <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                    <option value= "-1" selected>No Encryption/Signature</option>
-                    <option value="symmetric">Symmetrically Encrypt</option>
-                    <option value="asymmetric">Asymmetrically Encrypt</option>
-                    <option value="signed">Sign</option>
-                </select>
-           </div>
-           <div class="col">
-                <select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                    <option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
-                    {% set current_user_name = msg[0].recipient.replace(', ', '') -%}
-                    {% for username in usernames %}
-                        {% if current_user_name != username %}
-                           <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
-                        {% endif %}
-                    {% endfor %}
-                    {% for username in usernames %}
-                        <option value="public_{{username}}">{{username}}'s Public Key</option>
-                        {% if current_user_name == username %}
-                           <option value="private_{{username}}">{{username}}'s Private Key </option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
+        <div class="media-body">
+            <div class="article-metadata">
+                <a>Sender: {{ msg[0].sender }} | </a>
+                <a>Recipient: {{ msg[0].recipient }}</a>
+                <a> | Time Received: {{ msg[0].time_received }} </a>
             </div>
+            <div id="content-{{ msg[0].id }}" class="content" >{{ msg[0].content }}</div>
         </div>
-        <button id="decrypt-{{ msg[0].id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
-        {% else %}
-           <p class="article-content">--CANNOT DECRYPT--</p>
-        {% endif %}
-        <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
-    </div>
-    {% if msg[0].is_encrypted %}
-        <div class="m-1 row ">
+        {% if msg[0].is_encrypted %}
+            <div class="m-1 row ">
                 {% if 'Warning' not in msg[0].encryption_details %}
                 <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
                     Encrypted with:</div>
                 <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                        msg[0].encryption_details }}</div>
+                    msg[0].encryption_details }}</div>
+                {% elif 'Wrong' in msg[0].encryption_details %}
+                    <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                    Warning:</div>
+                    <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                    Encrypted with: {{msg[0].encryption_details[9:] }}</div>
                 {% else %}
                 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                     Warning:</div>
                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
                     msg[0].encryption_details[9:] }}</div>
                 {% endif %}  
-        </div>
-    {% endif %}
-    {% if msg[0].is_signed %}
-        <div class="m-1 row ">
+            </div>
+        {% elif msg[0].is_signed %}
+            <div class="m-1 row ">
                 {% if 'Warning' not in msg[0].signed_details %}
                 <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
                     Signed by:</div>
                 <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                     msg[0].signed_details }}</div>
+                {% elif 'Wrong' in msg[0].signed_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                           Signed by: {{msg[0].signed_details[9:] }}</div>
                 {% else %}
                 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                     Warning:</div>
                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
                     msg[0].signed_details[9:] }}</div>
                 {% endif %}
+            </div>
+        {% endif %}
+    </article>
+    {% else %}
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a>Sender: {{ msg[0].sender }} | </a>
+                <a>Recipient: {{ msg[0].recipient }}</a>
+                <a> | Time Received: {{ msg[0].time_received }} </a>
+            </div>
         </div>
+        {% if msg[1] %}
+            <div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
+                <div class="col">
+                    <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                        <option value= "-1" selected>No Decryption/Verification of Signature</option>
+                        <option value="symmetric">Symmetrically Decrypt</option>
+                        <option value="asymmetric">Asymmetrically Decrypt</option>
+                        <option value="signed">Verify Signature</option>
+                    </select>
+                </div>
+                with
+                <div class="col">
+                    <select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                        <option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
+                        {% set current_user_name = msg[0].recipient.replace(', ', '') -%}
+                        {% for username in usernames %}
+                            {% if current_user_name != username %}
+                            <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+                            {% endif %}
+                        {% endfor %}
+                        {% for username in usernames %}
+                            <option value="public_{{username}}">{{username}}'s Public Key</option>
+                            {% if current_user_name == username %}
+                            <option value="private_{{username}}">{{username}}'s Private Key </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button id="decrypt-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt(this.id)">Decrypt</button>
+        {% else %}
+            <p class="article-content">--CANNOT DECRYPT--</p>
+        {% endif %}
+        <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
+        {% if msg[0].is_encrypted %}
+            <div class="m-1 row ">
+            {% if 'Warning' not in msg[0].encryption_details %}
+                <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                Encrypted with:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                msg[0].encryption_details }}</div>
+            {% elif 'Wrong' in msg[0].encryption_details %}
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                Warning:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                Encrypted with: {{msg[0].encryption_details[9:] }}</div>
+            {% else %}
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                Warning:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                msg[0].encryption_details[9:] }}</div>
+            {% endif %}  
+            </div>
+        {% elif msg[0].is_signed %}
+            <div class="m-1 row ">
+            {% if 'Warning' not in msg[0].signed_details %}
+                <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                Signed by:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                msg[0].signed_details }}</div>
+            {% elif 'Wrong' in msg[0].signed_details %}
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                        Warning:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                        Signed by: {{msg[0].signed_details[9:] }}</div>
+            {% else %}
+                <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                Warning:</div>
+                <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                msg[0].signed_details[9:] }}</div>
+            {% endif %}
+            </div>
+        {% endif %}
+    </article>
     {% endif %}
-</article>
-{% endif %}
 {% endfor %}
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function(){ 
+    var keys = Object.keys(localStorage);
+    var i =0;
+    for (i=0;i<keys.length; i++) {
+        var key = keys[i];
+        const containerState = localStorage.getItem(key);
+        const item_found = document.getElementById(key);
+        if(!Object.is(item_found, null)){
+            switch (containerState) {
+                case 'visible':
+                item_found.style.display = "";
+                break;
+                case 'hidden':
+                item_found.style.display = "none";
+                break;
+                default:
+            }
+        }
 
-  var decrypt_buttons = document.querySelectorAll(".decrypt-button");
+    }
 
-  for (let i = 0; i < decrypt_buttons.length; i++) {
-    decrypt_buttons[i].addEventListener("click", function() {
-      //const msg_id = decrypt_buttons[i].id.split("-")[1];
-      const msg_id = this.id.split("-")[1];
+});
+</script>
+<script>
+function decrypt(id_button){
+    const msg_id = id_button.split("-")[1];
+    const sender = id_button.split("-")[2];
+    const recipent = id_button.split("-")[3];
+    const encryption_type = id_button.split("-")[4];
+    const encryption_key = id_button.split("-")[5];
+    console.log(msg_id);
+    console.log(sender);
+    console.log(recipent);
+    console.log(encryption_type);
+    console.log(encryption_key);
+    const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
+    const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
+    console.log(decryption_key);
+    console.log(decryption_type);
+    if (document.getElementById(`${id_button}`).style.display !== "none"){
+        if (encryption_type === "symmetric") {
+            console.log("yeshhhhh");
+            if (decryption_type !=="symmetric" ){
+                alert("Please select symmetric decryption for the type!");
+                return;
+            }
+            if (decryption_key === "Shared_".concat(recipent,"_",sender)){
+                document.getElementById(`content-${msg_id}`).style.display = "";
+                document.getElementById(`${id_button}`).style.display = "none";
+                document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
+                localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+        }else{
+            alert("Please select correct Key for symmetric encryption");
+        }
+      } else if (encryption_type === "asymmetric") {
+        if (decryption_type !=="asymmetric" ){
+            alert("Please select asymmetric decryption for the type!");
+            return;
+        }
+        // correct way to do asymmetric encryption : encrypt with Receiver's public key
+        if (recipient in encryption_key){
+            // use reciever's private key
+            if ("private" in decryption_key){
 
-      const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
-      const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
-      //var msg = msgs.find(m => m.id === msg_id);
-
-      console.log("im here");
-      console.log(msg_id);
-
-      console.log(decryption_type);
-      console.log(decryption_user);
-      console.log(decryption_key);
-      //console.log(msg.recipient);
-
-      if (decryption_type === "symmetric" && decryption_key !== "shared") {
-        alert("Please select Shared Key for symmetric encryption");
-        return;
-      } else if (decryption_type === "asymmetric" && decryption_key !== "private") {
+            }
+        }
         alert("Please select Receiver's Private Key for asymmetric encryption");
         return;
-      } else if (signature_type === "signed" && signature_key !== "public") {
-        alert("Please select Sender's Public Key for signed message verification");
-        return;
+      } else if (encryption_type === "signed"){
+
+      } else{
+        alert("Error");
       }
-        else{
-      var clicked = localStorage.getItem("clicked") || "";
-      if (clicked.indexOf("{{ msg_id }}") !== -1) {
-          document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
-          document.getElementById("content-{{ msg_id }}").style.display = "block";
-      }
-      document.getElementById("decrypt-{{ msg_id }}").addEventListener("click", function () {
-          localStorage.setItem("clicked", clicked + "{{ msg_id }}");
-          document.getElementById("decrypt-{{ msg_id }}").style.display = "none";
-          document.getElementById("content-{{ msg_id }}").style.display = "block";
-      });
+    }
+    
 }
-    });
-  }
-});
+
 </script>
 
 <script>

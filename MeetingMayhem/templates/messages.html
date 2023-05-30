@@ -140,8 +140,6 @@ function onlyOne(checkbox) {
       {% endif %}
    </div>
 
-
-
    <div id="Sent" class="col">
       {% if sent_msgs %}
          <legend class="border-bottom mb4">Messages sent by you:</legend>
@@ -170,6 +168,11 @@ function onlyOne(checkbox) {
                            Encrypted with:</div>
                         <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                               sent_msg.initial_encryption_details }}</div>
+                     {% elif 'Wrong' in sent_msg.initial_encryption_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                        Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                        Encrypted with: {{sent_msg.initial_encryption_details[9:] }}</div>
                      {% else %}
                         <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                            Warning:</div>
@@ -177,14 +180,18 @@ function onlyOne(checkbox) {
                            sent_msg.initial_encryption_details[9:] }}</div>
                      {% endif %}  
                   </div>
-                  {% endif %}
-                  {% if sent_msg.initial_is_signed %}
+                  {% elif sent_msg.initial_is_signed %}
                   <div class="m-1 row ">
                      {% if 'Warning' not in sent_msg.initial_signed_details %}
                         <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
                            Signed by:</div>
                         <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                            sent_msg.initial_signed_details }}</div>
+                     {% elif 'Wrong' in sent_msg.initial_signed_details %}
+                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                           Signed by: {{sent_msg.initial_signed_details[9:] }}</div>
                      {% else %}
                         <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                            Warning:</div>
@@ -193,6 +200,7 @@ function onlyOne(checkbox) {
                      {% endif %}
                   </div>
                   {% endif %}
+               </div>
             </article>
             {% endif %}
          {% endfor %}
@@ -200,7 +208,7 @@ function onlyOne(checkbox) {
          <legend class="border-bottom mb4">No messages sent</legend>
       {% endif %}
    </div>
-
+</div>
    
 <script>
 
