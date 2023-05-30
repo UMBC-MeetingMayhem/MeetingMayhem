@@ -63,6 +63,7 @@
             <a>Recipient: {{ msg[0].recipient }}</a>
             <a> | Time Received: {{ msg[0].time_received }} </a>
         </div>
+        {% if msg[1] %}
         <div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
            <div class="col">
                 <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
@@ -91,6 +92,9 @@
             </div>
         </div>
         <button id="decrypt-{{ msg[0].id }}" class="btn btn-secondary decrypt-button">Decrypt</button>
+        {% else %}
+           <p class="article-content">--CANNOT DECRYPT--</p>
+        {% endif %}
         <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
     </div>
     {% if msg[0].is_encrypted %}

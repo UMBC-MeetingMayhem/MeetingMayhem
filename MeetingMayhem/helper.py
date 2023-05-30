@@ -215,18 +215,20 @@ def can_decrypt(user, encryption_keys, is_encrypted, sender):
         if "invalid encrypted key" in list_of_keys:
             return True
         return False
+
     elif user.role == 4:
-        # determines if a user can read a message
-        if sender == user.username:
-            return True
+        # determines a decrypt button is displayed for user
+        # False: Not being displayed
+        # Case 1: No encryption -> No need for decrypt button
         if is_encrypted == False:
+            return False
+        # Case 2: Warning for cannot decrypt (wrong usage in encryption side) ->  No need for decrypt
+        elif "Warning" in encryption_keys and "cannot" in encryption_keys:
+            return False
+        else:
             return True
-        list_of_keys = str_to_list(encryption_keys, [])
-        for element in list_of_keys:
-            if user.username in element:
-                return True
-            if "Warning" in list_of_keys:
-                return True
+    
+    else:
         return False
 
 def decrypt_message(user, game, request, form, username, time_stamp):
