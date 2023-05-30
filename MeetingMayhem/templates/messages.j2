@@ -202,44 +202,104 @@ function decrypt(id_button){
     const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
     console.log(decryption_key);
     console.log(decryption_type);
-    if (document.getElementById(`${id_button}`).style.display !== "none"){
-        if (encryption_type === "symmetric") {
-            console.log("yeshhhhh");
-            if (decryption_type !=="symmetric" ){
-                alert("Please select symmetric decryption for the type!");
-                return;
-            }
-            if (decryption_key === "Shared_".concat(recipent,"_",sender)){
+    if (encryption_type === "symmetric") {
+        // Not select correct decryption type
+        if (decryption_type !=="symmetric" ){
+            alert("Please select symmetric decryption for the type!");
+            return;
+        }
+        // correct Key
+        if (decryption_key === "Shared_".concat(recipent,"_",sender)){
+            document.getElementById(`content-${msg_id}`).style.display = "";
+            document.getElementById(`${id_button}`).style.display = "none";
+            document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
+            localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+            localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+            localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+        }
+        // Wrong key
+        else{
+        alert("Please select correct Key for symmetric encryption");
+        }
+    }
+    else if (encryption_type === "asymmetric") {
+        // Wrong decryption Type
+        if (decryption_type !=="asymmetric" ){
+            alert("Please select asymmetric decryption for the type!");
+            return;
+        }
+        // correct way to do asymmetric encryption : encrypt with Receiver's public key
+        if (encryption_key === "public_".concat(recipent)){
+            // use reciever's private key
+            if (decryption_key === "private_".concat(recipent)){
                 document.getElementById(`content-${msg_id}`).style.display = "";
                 document.getElementById(`${id_button}`).style.display = "none";
                 document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
                 localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
                 localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
                 localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
-        }else{
-            alert("Please select correct Key for symmetric encryption");
-        }
-      } else if (encryption_type === "asymmetric") {
-        if (decryption_type !=="asymmetric" ){
-            alert("Please select asymmetric decryption for the type!");
-            return;
-        }
-        // correct way to do asymmetric encryption : encrypt with Receiver's public key
-        if (recipient in encryption_key){
-            // use reciever's private key
-            if ("private" in decryption_key){
-
+            }
+            else{
+                alert("Please select correct Key for asymmetric encryption");
             }
         }
-        alert("Please select Receiver's Private Key for asymmetric encryption");
-        return;
-      } else if (encryption_type === "signed"){
-
-      } else{
+        // Wrong way to do asymmetric encryption: use sender's public key
+        if (encryption_key === "private_".concat(sender)){
+            // use sender's public key
+            if (decryption_key === "public_".concat(sender)){
+                document.getElementById(`content-${msg_id}`).style.display = "";
+                document.getElementById(`${id_button}`).style.display = "none";
+                document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
+                localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+            }
+            else{
+                alert("Please select correct Key for asymmetric encryption");
+            }
+        }
+    } 
+    else if (encryption_type === "signed"){
+        // Wrong decryption Type
+        if (decryption_type !=="signed" ){
+            alert("Please select Verification of Signature for the type!");
+            return;
+        }
+        // correct way to do signature :sign with sender's private key
+        if (encryption_key === "private_".concat(sender)){
+            // use sender's public key
+            if (decryption_key === "public_".concat(sender)){
+                document.getElementById(`content-${msg_id}`).style.display = "";
+                document.getElementById(`${id_button}`).style.display = "none";
+                document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
+                localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+            }
+            else{
+                alert("Please select correct Key for asymmetric encryption");
+            }
+        }
+        // Wrong way to do signature: use reciever's public key
+        if (encryption_key === "public_".concat(recipent)){
+            // use own private key
+            if (decryption_key === "private_".concat(recipent)){
+                document.getElementById(`content-${msg_id}`).style.display = "";
+                document.getElementById(`${id_button}`).style.display = "none";
+                document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
+                localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+                localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+            }
+            else{
+                alert("Please select correct Key for asymmetric encryption");
+            }
+        }
+    } 
+    else{
         alert("Error");
-      }
     }
-    
+
 }
 
 </script>
