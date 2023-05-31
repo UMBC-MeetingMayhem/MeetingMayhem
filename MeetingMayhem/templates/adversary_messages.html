@@ -439,23 +439,11 @@ function select_msg(ele, num) {
             <fieldset class="form-group">
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Senders</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="new_senders" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
+                	{{messages.user_interface(usernames,"",true)}}
                 </div> <br/>
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Recipients</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="new_recipients" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
+					{{messages.user_interface(usernames,"",true)}}
                 </div> <br/>
                 <div class="form-group">
                     {{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->

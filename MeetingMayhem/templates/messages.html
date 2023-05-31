@@ -44,27 +44,7 @@ function onlyOne(checkbox) {
          <div class="form-group">
             <label class="form-control-label">To:</label> <br />
             {% set current_user_name =  current_user.username  -%}
-            {% for username in usernames %}
-               {% if username !=  current_user_name %}
-                  <div class="form-check form-check-inline">
-                  <!-- below line needs the ', ' in value to make processing usernames easier -->
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}" name="recipients"
-                     value="{{ username }}, " onclick="onlyOne(this)" >
-                  {% if username == 'user1' %}
-                  <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'user2' %}
-                  <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'user3' %}
-                  <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'pat' %}
-                  <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-                  {% elif username == 'adv' %}
-                  <img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
-                  {% endif %}
-                  <label class="form-check-label" for="inlineCheckbox1-{{username}}"> {{ username }}</label>
-                  </div>
-               {% endif %}
-            {% endfor %}
+            {{messages.user_interface(usernames,current_user_name,false)}}
          </div>
          <br />
          <div class="form-group">
