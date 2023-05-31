@@ -148,11 +148,11 @@ function onlyOne(checkbox) {
                            Encrypted with:</div>
                         <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                               sent_msg.initial_encryption_details }}</div>
-                     {% elif 'Wrong' in sent_msg.initial_encryption_details %}
+                     {% elif 'but' in sent_msg.initial_encryption_details %}
                         <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                         Warning:</div>
                         <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                        Encrypted with: {{sent_msg.initial_encryption_details[9:] }}</div>
+                        Encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
                      {% else %}
                         <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                            Warning:</div>
@@ -167,11 +167,11 @@ function onlyOne(checkbox) {
                            Signed by:</div>
                         <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                            sent_msg.initial_signed_details }}</div>
-                     {% elif 'Wrong' in sent_msg.initial_signed_details %}
+                     {% elif 'but' in sent_msg.initial_signed_details %}
                         <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                            Warning:</div>
                         <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                           Signed by: {{sent_msg.initial_signed_details[9:] }}</div>
+                           Signed by {{sent_msg.initial_signed_details[9:] }}</div>
                      {% else %}
                         <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                            Warning:</div>

@@ -284,11 +284,11 @@
 						Encrypted with:</div>
 						<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
 						msg[0].encryption_details }}</div>
-					{% elif 'Wrong' in msg[0].encryption_details %}
+					{% elif 'but' in msg[0].encryption_details %}
 						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
 						Warning:</div>
 						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-						Encrypted with: {{msg[0].encryption_details[9:] }}</div>
+						Encrypted with {{msg[0].encryption_details[9:] }}</div>
 					{% else %}
 						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
 						Warning:</div>
@@ -303,11 +303,11 @@
 						Signed by:</div>
 						<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
 						msg[0].signed_details }}</div>
-					{% elif 'Wrong' in msg[0].signed_details %}
+					{% elif 'but' in msg[0].signed_details %}
 						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
 								Warning:</div>
 						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-								Signed by: {{msg[0].signed_details[9:] }}</div>
+								Signed by {{msg[0].signed_details[9:] }}</div>
 					{% else %}
 						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
 						Warning:</div>

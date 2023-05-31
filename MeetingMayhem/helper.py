@@ -121,21 +121,21 @@ def create_message(user, game, request, form, username, time_stamp):
             if recipients in encrypted_key:
                 encrypted_keys.append(encrypted_key)
             else:
-                encrypted_keys.append('Warning: Recipent cannot decrypt the message with this key.')
+                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
         elif encryption_type  == 'asymmetric':
             if encrypted_key == 'public_' + recipients:
                 encrypted_keys.append(encrypted_key)
             elif encrypted_key == 'private_' + str(senders):
                 encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
             else:
-                encrypted_keys.append('Warning: Recipent cannot decrypt the message with this key.')
+                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
         elif encryption_type  == 'signed':
             if encrypted_key == 'private_' + str(senders):
                 signed_keys.append(encrypted_key)
             elif encrypted_key == 'public_' + recipients:
-                signed_keys.append('Warning: Wrong way to do signature')
+                signed_keys.append("Warning: but a signature usually requires the sender's private key.")
             else:
-                signed_keys.append('Warning: Recipent cannot decrypt the message with this key.')
+                signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
@@ -169,21 +169,21 @@ def create_message(user, game, request, form, username, time_stamp):
             if recipients in encrypted_key:
                 encrypted_keys.append(encrypted_key)
             else:
-                encrypted_keys.append('Warning: Recipent cannot decrypt the message with this key.')
+                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
         elif encryption_type  == 'asymmetric':
             if encrypted_key == 'public_' + recipients:
                 encrypted_keys.append(encrypted_key)
             elif encrypted_key == 'private_' + str(user.username):
-                encrypted_keys.append('Warning: ' + encrypted_key + ' but with Wrong way to execute asymmetric encryption.')
+                encrypted_keys.append('Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key.")
             else:
-                encrypted_keys.append('Warning: Recipent cannot decrypt the message with this key.')
+                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
         elif encryption_type  == 'signed':
             if encrypted_key == 'private_' + str(user.username):
                 signed_keys.append(encrypted_key)
             elif encrypted_key == 'public_' + recipients:
-                signed_keys.append('Warning: ' + encrypted_key + ' but with Wrong way to do signature.')
+                signed_keys.append('Warning: ' + encrypted_key + " but a signature usually requires the sender's private key.")
             else:
-                signed_keys.append('Warning: Recipent cannot decrypt the message with this key.')
+                signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
