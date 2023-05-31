@@ -360,8 +360,8 @@ function decrypt(id_button){
         {% for username in usernames %}
             <div class="form-check form-check-inline">
                 <!-- below line needs the ', ' in value to make processing usernames easier -->
-                <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}" name="recipients"
-                    value="{{ username }}, " onclick="onlyOne(this)" >
+                <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}-{{current_user_name}}" name="{{current_user_name}}"
+                    value="{{ username }}" >
                 {% if username == 'user1' %}
                     <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
                 {% elif username == 'user2' %}
@@ -373,7 +373,7 @@ function decrypt(id_button){
                 {% elif username == 'adv' %}
                     <img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
                 {% endif %}
-                <label class="form-check-label" for="inlineCheckbox1-{{username}}"> {{ username }}</label>
+                <label class="form-check-label" for="inlineCheckbox1-{{username}}-{{current_user_name}}"> {{ username }}</label>
             </div>
         {% endfor %}
     {% else %}

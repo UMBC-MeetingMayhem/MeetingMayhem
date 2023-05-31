@@ -23,45 +23,11 @@
                 <legend class="border-bottom mb4">Create a Message</legend>
                 <div class="form-group">
                 <label class="form-control-label" for="name">Senders</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="senders" value="{{ username }}, ">
-						{% if username == 'user1' %}
-						<img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'user2' %}
-						<img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'sam' %}
-						<img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'pat' %}
-						<img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'adv' %}
-						<img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
-						{% endif %}
-						<label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
+                {{messages.user_interface(usernames,"senders",true)}}
                 </div> <br/>
                 <div class="form-group">
                 <label class="form-control-label" for="name">Recipients</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-						{% if username == 'user1' %}
-						<img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'user2' %}
-						<img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'sam' %}
-						<img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'pat' %}
-						<img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-						{% elif username == 'adv' %}
-						<img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
-						{% endif %}
-						<label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
+                {{messages.user_interface(usernames,"recipents",true)}}
                 </div> <br/>
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
@@ -263,58 +229,7 @@
    });
 </script>
 
-<script>
 
-	// This script will limit the permission of certain key
-	const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
-	const encryptionKeySelect = document.getElementById("key_select");
- 
-	encryptionTypeSelect.addEventListener("change", () => {
-	if (encryptionTypeSelect.value === "-1") {
-	   encryptionKeySelect.value = "-1";
-	}
-	});
- 
-	// Get the current user's username from the backend
-	var current_user_username = "{{ current_user.username }}";
- 
-	// Select the dropdowns for the encryption and signature keys
-	var key_select = document.getElementById("key_select");
-	var encryption_type_select = document.getElementById("encryption_sign_type_select");
-	var default_key = document.getElementById("default_key_select");
-	// Listen for changes in the encryption user dropdown
-	encryption_type_select.addEventListener("change", function() {
-	   // Get the selected user from the dropdown
-	   let all_options = key_select.querySelectorAll('option');
-	   var encrytion_type =  encryption_type_select.value;
-	   if (encrytion_type === 'symmetric') {
-		  all_options.forEach((single_option) => {
-			 single_option.disabled = true;
-		  });
-		  let shared = key_select.querySelectorAll('option[value^=Shared]');
-		  shared.forEach((userItem) => {
-			 userItem.disabled = false;
-		  });
-		  default_key.disabled = false
-	   }
-	   else if(encrytion_type === 'asymmetric' || encrytion_type === 'signed' ){
-		  all_options.forEach((single_option) => {
-			 single_option.disabled = false;
-		  });
-		  let shared = key_select.querySelectorAll('option[value^=Shared]');
-		  shared.forEach((userItem) => {
-			 userItem.disabled = true;
-		  });
-	   }
-	   else{
-		  all_options.forEach((single_option) => {
-			 single_option.disabled = true;
-		  });
-	   }  
- 
-	});
- 
-</script>
 
 <div id="Incoming_Messages">
 	<h2>Incoming Messages</h2>
@@ -439,11 +354,11 @@ function select_msg(ele, num) {
             <fieldset class="form-group">
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Senders</label> <br/>
-                	{{messages.user_interface(usernames,"",true)}}
+                	{{messages.user_interface(usernames,"newsenders",true)}}
                 </div> <br/>
                 <div class="form-group">
                 <label class="form-control-label" for="name">New Recipients</label> <br/>
-					{{messages.user_interface(usernames,"",true)}}
+					{{messages.user_interface(usernames,"newrecipients",true)}}
                 </div> <br/>
                 <div class="form-group">
                     {{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
@@ -474,30 +389,35 @@ function select_msg(ele, num) {
 		  <div class="content-section bg-secondary">
 			 <ul class="select2-selection__rendered" id="adv_cryptography_tags_list">
 			 </ul>
-			 <div class="row g-3 align-items-center">
-				<div class="col-auto">
-				   <select id="adv_cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Cryptography Type</option>
-					  <option value="Signed">Signed</option>
-					  <option value="Encrypted">Encrypted</option>
+			 <div class="row g-2 align-items-center">
+				<div class="col">
+				   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+					  <option  value= "-1" selected>No Encryption/Signature</option>
+					  <option value="symmetric">Symmetrically Encrypt</option>
+					  <option value="asymmetric">Asymmetrically Encrypt</option>
+					  <option value="signed">Sign</option>
 				   </select>
 				</div>
-				<div class="col-auto">
-				   <select id="adv_cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>User</option>
+				with
+				<div class="col">
+				   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
+					  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
+					  {% set current_user_name =  current_user.username  -%}
 					  {% for username in usernames %}
-					  <option value="{{ username }}">{{ username }}</option>
+						 {% if current_user_name != username %}
+							<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+						 {% endif %}
+					  {% endfor %}
+					  {% for username in usernames %}
+						 <option value="public_{{username}}">{{username}}'s Public Key</option>
+						 {% if current_user_name == username %}
+							<option value="private_{{username}}">{{username}}'s Private Key </option>
+						 {% endif %}
 					  {% endfor %}
 				   </select>
 				</div>
-				<div class="col-auto">
-				   <select id="adv_cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Key Type</option>
-					  <option value="public">Public</option>
-					  <option value="private">Private</option>
-				   </select>
-				</div>
 			 </div>
+			 <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
 			 <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptographyADV()">Add Cryptography</button>
 			 <br/><br/>
 		  </div>
@@ -771,4 +691,14 @@ function select_msg(ele, num) {
    });
 
 	</script>
+
+<!-- Sender can ONLY send to ONE recipients at a time -->
+<!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->
+<script>
+	// For onlyOne click
+	$('input[type="checkbox"]').on('change', function() {
+		$('input[name="' + this.name + '"]').not(this).prop('checked', false);
+	});
+</script>
+
 {% endblock content %}

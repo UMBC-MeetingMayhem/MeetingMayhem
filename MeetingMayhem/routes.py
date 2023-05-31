@@ -519,9 +519,6 @@ def adv_messages_page():
                 msgs_tuple = []
                 for element in messages:
                     msgs_tuple.append((element, can_decrypt(current_user, element.encryption_details, element.is_encrypted, element.sender)))
-                #current_game.adv_current_msg = 0
-                #current_game.adv_current_msg_list_size = len(messages)
-                #commit the messages to the database
                 db.session.commit()
 
             is_submit_edits = False
