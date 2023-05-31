@@ -316,85 +316,119 @@
  
 </script>
 
-	<div id="Incoming_Messages">
+<div id="Incoming_Messages">
 	<h2>Incoming Messages</h2>
 	{% if msgs %}
-	{% for msg in msgs%}
-		<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, {{(msg[0]).id}})">
-			<div class="media-body">
-				<div class="article-metadata">
-				{% if msg[0].is_edited %}
-					{% if msg[0].new_sender %}
-					<a>New Sender: {{ msg[0].new_sender }} | </a>
+		{% for msg in msgs%}
+			<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, {{(msg[0]).id}})">
+				<div class="media-body">
+					<div class="article-metadata">
+						{% if msg[0].is_edited %}
+							{% if msg[0].new_sender %}
+								<a>New Sender: {{ msg[0].new_sender }} | </a>
+							{% else %}
+								<a>Sender: {{ msg[0].sender }} | </a>
+							{% endif %}
+							{% if msg[0].new_recipient %}
+								<a>New Recipient: {{ msg[0].new_recipient }}</a>
+							{% else %}
+								<a>Recipient: {{ msg[0].recipient }}</a>
+							{% endif %}
+							<a> | Time Sent: {{ msg[0].time_sent }}</a>
+							{% if msg[0].adv_created %}
+								<a> | This msg was created by the adversary.</a>
+							{% endif %}
+							{% if msg[0].is_deleted %}
+								<a> | This msg has been deleted.</a>
+							{% else %}
+								<a> | This msg has been edited.</a>
+							{% endif %}
+						{% else %}
+							<a>Sender: {{ msg[0].sender }} | </a>
+							<a>Recipient: {{ msg[0].recipient }}</a>
+							<a> | Time Sent: {{ msg[0].time_sent }}</a>
+							{% if msg[0].adv_created %}
+								<a> | This message was created by the adversary.</a>
+							{% endif %}
+						{% endif %}	
+					</div>
+					{% if not msg[1] %}
+						<p id="msg-content-{{msg[0].id}}" class="article-content">--CANNOT DECRYPT--</p>
 					{% else %}
-					<a>Sender: {{ msg[0].sender }} | </a>
+						{% if msg[0].is_edited %}
+							<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].edited_content }}</p>
+						{% else %}
+							<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].content }}</p>
+						{% endif %}
 					{% endif %}
-					{% if msg[0].new_recipient %}
-					<a>New Recipient: {{ msg[0].new_recipient }}</a>
-					{% else %}
-					<a>Recipient: {{ msg[0].recipient }}</a>
-                    {% endif %}
-                    <a> | Time Sent: {{ msg[0].time_sent }}</a>
-					{% if msg[0].adv_created %}
-					<a> | This msg was created by the adversary.</a>
-					{% endif %}
-					{% if msg[0].is_deleted %}
-					<a> | This msg has been deleted.</a>
-					{% else %}
-					<a> | This msg has been edited.</a>
-					{% endif %}
-				{% else %}
-					<a>Sender: {{ msg[0].sender }} | </a>
-					<a>Recipient: {{ msg[0].recipient }}</a>
-                    <a> | Time Sent: {{ msg[0].time_sent }}</a>
-					{% if msg[0].adv_created %}
-					<a> | This message was created by the adversary.</a>
-					{% endif %}
-				{% endif %}	
 				</div>
-				
-				{% if not msg[1] %}
-				<p id="msg-content-{{msg[0].id}}" class="article-content">--CANNOT DECRYPT--</p>
-				{% else %}
-					{% if msg[0].is_edited %}
-					<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].edited_content }}</p>
+				{% if msg[0].is_encrypted %}
+					<div class="m-1 row ">
+					{% if 'Warning' not in msg[0].encryption_details %}
+						<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+						Encrypted with:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+						msg[0].encryption_details }}</div>
+					{% elif 'Wrong' in msg[0].encryption_details %}
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+						Warning:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+						Encrypted with: {{msg[0].encryption_details[9:] }}</div>
 					{% else %}
-					<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].content }}</p>
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+						Warning:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+						msg[0].encryption_details[9:] }}</div>
+					{% endif %}  
+					</div>
+				{% elif msg[0].is_signed %}
+					<div class="m-1 row ">
+					{% if 'Warning' not in msg[0].signed_details %}
+						<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+						Signed by:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+						msg[0].signed_details }}</div>
+					{% elif 'Wrong' in msg[0].signed_details %}
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+								Warning:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+								Signed by: {{msg[0].signed_details[9:] }}</div>
+					{% else %}
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+						Warning:</div>
+						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+						msg[0].signed_details[9:] }}</div>
 					{% endif %}
-				{% endif %}
-			</div>
-                {% if msg[0].is_encrypted %}
-				<div class="m-1 row ">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}</div>
-				</div>
-				{% endif %}
-				{% if msg[0].is_signed %}
-				<div class="m-1 row">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}</div>
-				</div>
+					</div>
 				{% endif %}
 			</article>
-	{% endfor %}
+		{% endfor %}
 	{% else %}
-	<legend class="border-bottom mb4">No messages</legend><br/>
+		<legend class="border-bottom mb4">No messages</legend><br/>
 	{% endif %}
-	<script>
-	function select_msg(ele, num) {
-		document.getElementById('edit_form').scrollIntoView();
-		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
-		
-		id = "msg-content-" + num;
-		console.log(id)
-		text = document.getElementById(id).innerHTML;
-		console.log(text)
-		document.getElementById('adv_msg_edit_form').value = text; 
-		document.getElementById('msg_num').value = num; 
-	}
+</div>
+
+<script>
+function select_msg(ele, num) {
+	document.getElementById('edit_form').scrollIntoView();
+	$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
 	
-	</script>
-	</div>
+	id = "msg-content-" + num;
+	console.log(id)
+	const text = document.getElementById(id).innerHTML;
+	console.log(text)
+	document.getElementById('adv_msg_edit_form').value = text; 
+	if(text == "--CANNOT DECRYPT--"){
+		document.getElementById('adv_msg_edit_form').disabled = true;
+	}
+	else{
+		document.getElementById('adv_msg_edit_form').disabled = false;
+	}
+	document.getElementById('msg_num').value = num; 
+}
+
+</script>
+
 	
 	<div id="edit_form" class="inactive">
 	{% if msgs %}
@@ -434,12 +468,12 @@
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
                         {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
-                        {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
+                        	{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
                         {% else %} <!-- if the message hasn't been edited, display normally -->
                             {% if can_decrypt or message.adv_created %}
-                            {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
+                            	{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
                             {% else %}
-                            {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='--CANNOT DECRYPT --') }}
+                            	{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='--CANNOT DECRYPT --')}}
                             {% endif %}
                         {% endif %}
                     {% endif %}
