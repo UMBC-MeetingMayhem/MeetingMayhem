@@ -85,50 +85,56 @@
 			 </div>
 			 <br/>
 		  </fieldset>
-		  <div class="content-section bg-secondary">
-			 <ul class="select2-selection__rendered" id="cryptography_tags_list">
-			 </ul>
-			 <div class="row g-3 align-items-center">
-				<div class="col-auto">
-				   <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Cryptography Type</option>
-					  <option value="Signed">Signed</option>
-					  <option value="Encrypted">Encrypted</option>
+			 <div class="row g-2 align-items-center">
+				<div class="col">
+				   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+					  <option  value= "-1" selected>No Encryption/Signature</option>
+					  <option value="symmetric">Symmetrically Encrypt</option>
+					  <option value="asymmetric">Asymmetrically Encrypt</option>
+					  <option value="signed">Sign</option>
 				   </select>
 				</div>
-				<div class="col-auto">
-				   <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>User</option>
+				with
+				<div class="col">
+				   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
+					  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
+					  {% set current_user_name =  current_user.username  -%}
 					  {% for username in usernames %}
-					  <option value="{{ username }}">{{ username }}</option>
+						 {% if current_user_name != username %}
+							<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+						 {% endif %}
+					  {% endfor %}
+					  {% for username in usernames %}
+						 <option value="public_{{username}}">{{username}}'s Public Key</option>
+						 {% if current_user_name == username %}
+							<option value="private_{{username}}">{{username}}'s Private Key </option>
+						 {% endif %}
 					  {% endfor %}
 				   </select>
 				</div>
-				<div class="col-auto">
-				   <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Key Type</option>
-					  <option value="public">Public</option>
-					  <option value="private">Private</option>
-				   </select>
-				</div>
 			 </div>
-			 <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
-			 <br/><br/>
+			 <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+			 <div class="form-group">
+				{{ msg_form.submit(class="btn btn-outline-info", onclick="addCryptography()", id="submitButton") }}
+			 </div>
 		  </div>
-		  
-		  <div class="form-group">
-			 {{ msg_form.submit(class="btn btn-outline-info") }}
-		  </div>
+
 	   </form>
 	</div>
 	
-	<script>
-		function addCryptography(){
-		user_select = $( "#cryptography_user_select" ).val();
-		key_select = $( "#cryptography_key_select" ).val();
-		type_select = $( "#cryptography_type_select" ).val();
-			
-		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
+<script>
+	function addCryptography(){
+		var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
+		var submitString = "";
+		key_select = $( "#key_select" ).val();
+		type_select = $( "encryption_sign_type_select" ).val();
+	
+	
+		var allSelectedValues = Array.from(dropboxes).every(function(db) {
+			return db.value !== '-1';
+		});
+		
+		if(allSelectedValues){
 			const listEl = document.createElement('li');
 			const buttonEl = document.createElement('button');
 			const spanEl = document.createElement('span');
@@ -153,9 +159,9 @@
 			
 			var listContainer = $( "#cryptography_tags_list" );
 			listContainer.append(listEl);
-			 
+				
 			var submitString = "";
-			 
+				
 			$('#cryptography_tags_list li').each(function() {
 				var option_all = $(this).children().map(function () {
 					return $(this).text();
@@ -165,12 +171,12 @@
 				
 				submitString += chars[1] + "(" + chars[2] + "),"
 			}) 		
-		}
-		
-		submitString = submitString.slice(0, -1) 
-		console.log(submitString);
-		document.getElementById('encryption_and_signed_keys').value = submitString; 
-   }
+	}
+	
+	submitString = submitString.slice(0, -1) 
+	console.log(submitString);
+	document.getElementById('encryption_and_signed_keys').value = submitString; 
+}
    	
 	function addCryptographyADV(){
 		user_select = $( "#adv_cryptography_user_select" ).val();
@@ -220,7 +226,95 @@
 		console.log(submitString);
 		document.getElementById('adv_encryption_and_signed_keys').value = submitString; 
    }
-	</script>
+   var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
+   
+   // Add event listener to all selected elements
+   dropboxes.forEach(function(dropbox) {
+      dropbox.addEventListener('change', function() {
+    
+         // if one of the value is selected
+         var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
+         return db.value !== '-1';
+         });
+
+         // Check if all selected values are selected
+         //console.log(dropboxes);
+         var allSelectedValues = Array.from(dropboxes).every(function(dbb) {
+            //console.log(dbb.value);
+            return dbb.value !== '-1';
+         });
+         //console.log(allSelectedValues);
+         var submitButton = document.getElementById('submitButton');
+         var error_dis = document.getElementById("error-message");
+         let hidden = error_dis.getAttribute("hidden");
+		 //console.log(allSelectedValues);
+		 //console.log(allSelectedValuesNotMinusOne);
+         if(allSelectedValuesNotMinusOne && !allSelectedValues){
+            error_dis.removeAttribute("hidden");
+            submitButton.disabled = true;
+         }
+         else{
+            // Enable the button
+            error_dis.setAttribute("hidden", "hidden");
+            submitButton.disabled = false;
+         }
+         
+      });
+   });
+</script>
+
+<script>
+
+	// This script will limit the permission of certain key
+	const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
+	const encryptionKeySelect = document.getElementById("key_select");
+ 
+	encryptionTypeSelect.addEventListener("change", () => {
+	if (encryptionTypeSelect.value === "-1") {
+	   encryptionKeySelect.value = "-1";
+	}
+	});
+ 
+	// Get the current user's username from the backend
+	var current_user_username = "{{ current_user.username }}";
+ 
+	// Select the dropdowns for the encryption and signature keys
+	var key_select = document.getElementById("key_select");
+	var encryption_type_select = document.getElementById("encryption_sign_type_select");
+	var default_key = document.getElementById("default_key_select");
+	// Listen for changes in the encryption user dropdown
+	encryption_type_select.addEventListener("change", function() {
+	   // Get the selected user from the dropdown
+	   let all_options = key_select.querySelectorAll('option');
+	   var encrytion_type =  encryption_type_select.value;
+	   if (encrytion_type === 'symmetric') {
+		  all_options.forEach((single_option) => {
+			 single_option.disabled = true;
+		  });
+		  let shared = key_select.querySelectorAll('option[value^=Shared]');
+		  shared.forEach((userItem) => {
+			 userItem.disabled = false;
+		  });
+		  default_key.disabled = false
+	   }
+	   else if(encrytion_type === 'asymmetric' || encrytion_type === 'signed' ){
+		  all_options.forEach((single_option) => {
+			 single_option.disabled = false;
+		  });
+		  let shared = key_select.querySelectorAll('option[value^=Shared]');
+		  shared.forEach((userItem) => {
+			 userItem.disabled = true;
+		  });
+	   }
+	   else{
+		  all_options.forEach((single_option) => {
+			 single_option.disabled = true;
+		  });
+	   }  
+ 
+	});
+ 
+</script>
 
 	<div id="Incoming_Messages">
 	<h2>Incoming Messages</h2>
