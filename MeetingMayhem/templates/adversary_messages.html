@@ -87,7 +87,58 @@
 
 	   </form>
 	</div>
-	
+	<script>
+
+		// This script will limit the permission of certain key
+		const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
+		const encryptionKeySelect = document.getElementById("key_select");
+	 
+		encryptionTypeSelect.addEventListener("change", () => {
+		if (encryptionTypeSelect.value === "-1") {
+		   encryptionKeySelect.value = "-1";
+		}
+		});
+	 
+		// Get the current user's username from the backend
+		var current_user_username = "{{ current_user.username }}";
+	 
+		// Select the dropdowns for the encryption and signature keys
+		var key_select = document.getElementById("key_select");
+		var encryption_type_select = document.getElementById("encryption_sign_type_select");
+		var default_key = document.getElementById("default_key_select");
+		// Listen for changes in the encryption user dropdown
+		encryption_type_select.addEventListener("change", function() {
+		   // Get the selected user from the dropdown
+		   let all_options = key_select.querySelectorAll('option');
+		   var encrytion_type =  encryption_type_select.value;
+		   if (encrytion_type === 'symmetric') {
+			  all_options.forEach((single_option) => {
+				 single_option.disabled = true;
+			  });
+			  let shared = key_select.querySelectorAll('option[value^=Shared]');
+			  shared.forEach((userItem) => {
+				 userItem.disabled = false;
+			  });
+			  default_key.disabled = false
+		   }
+		   else if(encrytion_type === 'asymmetric' || encrytion_type === 'signed' ){
+			  all_options.forEach((single_option) => {
+				 single_option.disabled = false;
+			  });
+			  let shared = key_select.querySelectorAll('option[value^=Shared]');
+			  shared.forEach((userItem) => {
+				 userItem.disabled = true;
+			  });
+		   }
+		   else{
+			  all_options.forEach((single_option) => {
+				 single_option.disabled = true;
+			  });
+		   }  
+	 
+		});
+	 
+</script>	
 <script>
 	function addCryptography(){
 		var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
@@ -391,7 +442,7 @@ function select_msg(ele, num) {
 			 </ul>
 			 <div class="row g-2 align-items-center">
 				<div class="col">
-				   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+				   <select id="encryption_sign_type_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select2">
 					  <option  value= "-1" selected>No Encryption/Signature</option>
 					  <option value="symmetric">Symmetrically Encrypt</option>
 					  <option value="asymmetric">Asymmetrically Encrypt</option>
@@ -400,8 +451,8 @@ function select_msg(ele, num) {
 				</div>
 				with
 				<div class="col">
-				   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
-					  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
+				   <select id="key_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key2">
+					  <option id='default_key_select2' value= "-1" selected>No Key Selected</option>
 					  {% set current_user_name =  current_user.username  -%}
 					  {% for username in usernames %}
 						 {% if current_user_name != username %}
@@ -432,7 +483,6 @@ function select_msg(ele, num) {
     </div>
 	{% endif %}
 	</div> 
-	
     <!-- advance round button 
     <div class="content-section">
         <form method="POST" action="">
@@ -701,4 +751,54 @@ function select_msg(ele, num) {
 	});
 </script>
 
+<script>
+	// This script will limit the permission of certain key
+	const encryptionTypeSelect2 = document.getElementById("encryption_sign_type_select2");
+	const encryptionKeySelect2 = document.getElementById("key_select2");
+ 
+	encryptionTypeSelect2.addEventListener("change", () => {
+	if (encryptionTypeSelect2.value === "-1") {
+	   encryptionKeySelect2.value = "-1";
+	}
+	});
+ 
+	// Get the current user's username from the backend
+	var current_user_username2 = "{{ current_user.username }}";
+ 
+	// Select the dropdowns for the encryption and signature keys
+	var key_select2 = document.getElementById("key_select2");
+	var encryption_type_select2 = document.getElementById("encryption_sign_type_select2");
+	var default_key2 = document.getElementById("default_key_select2");
+	// Listen for changes in the encryption user dropdown
+	encryption_type_select2.addEventListener("change", function() {
+	   // Get the selected user from the dropdown
+	   let all_options2 = key_select2.querySelectorAll('option');
+	   var encrytion_type2 =  encryption_type_select2.value;
+	   if (encrytion_type2 === 'symmetric') {
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = true;
+		  });
+		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
+		  shared2.forEach((userItem2) => {
+			 userItem2.disabled = false;
+		  });
+		  default_key2.disabled = false
+	   }
+	   else if(encrytion_type2 === 'asymmetric' || encrytion_type2 === 'signed' ){
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = false;
+		  });
+		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
+		  shared2.forEach((userItem2) => {
+			 userItem2.disabled = true;
+		  });
+	   }
+	   else{
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = true;
+		  });
+	   }  
+ 
+	});	 
+</script>
 {% endblock content %}
