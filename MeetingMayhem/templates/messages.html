@@ -125,63 +125,63 @@ function onlyOne(checkbox) {
          <legend class="border-bottom mb4">Messages sent by you:</legend>
          {% for sent_msg in sent_msgs %}
             {% if not sent_msg.adv_created %}
-            <article class="media content-section">
-               <div class="media-body">
-                  <div class="article-metadata">
-                     <a>Sender: {{ sent_msg.sender }} | </a>
-                     <a>Recipient: {{ sent_msg.recipient }}</a>
-                     <a> | Time Sent: {{ sent_msg.time_sent }} </a>
-                  </div>
-                  <div id="content-{{ sent_msg.id }}">
-                     <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
-                        sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
-                     {% if sent_msg.initial_is_encrypted or sent_msg.initial_is_signed %}
-                        <p class="article-content"> #######################</p>
-                     {% else %}
-                        <p class="article-content">{{ sent_msg.content }}</p>
+               <article class="media content-section">
+                  <div class="media-body">
+                     <div class="article-metadata">
+                        <a>Sender: {{ sent_msg.sender }} | </a>
+                        <a>Recipient: {{ sent_msg.recipient }}</a>
+                        <a> | Time Sent: {{ sent_msg.time_sent }} </a>
+                     </div>
+                     <div id="content-{{ sent_msg.id }}">
+                        <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
+                           sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+                        {% if sent_msg.initial_is_encrypted or sent_msg.initial_is_signed %}
+                           <p class="article-content"> #######################</p>
+                        {% else %}
+                           <p class="article-content">{{ sent_msg.content }}</p>
+                        {% endif %}
+                     </div>
+                     {% if sent_msg.initial_is_encrypted %}
+                     <div class="m-1 row ">
+                        {% if 'Warning' not in sent_msg.initial_encryption_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                              Encrypted with:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                                 sent_msg.initial_encryption_details }}</div>
+                        {% elif 'but' in sent_msg.initial_encryption_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                           Encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                        {% else %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                              sent_msg.initial_encryption_details[9:] }}</div>
+                        {% endif %}  
+                     </div>
+                     {% elif sent_msg.initial_is_signed %}
+                     <div class="m-1 row ">
+                        {% if 'Warning' not in sent_msg.initial_signed_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                              Signed by:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                              sent_msg.initial_signed_details }}</div>
+                        {% elif 'but' in sent_msg.initial_signed_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                              Signed by {{sent_msg.initial_signed_details[9:] }}</div>
+                        {% else %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                              sent_msg.initial_signed_details[9:] }}</div>
+                        {% endif %}
+                     </div>
                      {% endif %}
                   </div>
-                  {% if sent_msg.initial_is_encrypted %}
-                  <div class="m-1 row ">
-                     {% if 'Warning' not in sent_msg.initial_encryption_details %}
-                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                           Encrypted with:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                              sent_msg.initial_encryption_details }}</div>
-                     {% elif 'but' in sent_msg.initial_encryption_details %}
-                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                        Warning:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                        Encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
-                     {% else %}
-                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                           Warning:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                           sent_msg.initial_encryption_details[9:] }}</div>
-                     {% endif %}  
-                  </div>
-                  {% elif sent_msg.initial_is_signed %}
-                  <div class="m-1 row ">
-                     {% if 'Warning' not in sent_msg.initial_signed_details %}
-                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                           Signed by:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                           sent_msg.initial_signed_details }}</div>
-                     {% elif 'but' in sent_msg.initial_signed_details %}
-                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                           Warning:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                           Signed by {{sent_msg.initial_signed_details[9:] }}</div>
-                     {% else %}
-                        <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                           Warning:</div>
-                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                           sent_msg.initial_signed_details[9:] }}</div>
-                     {% endif %}
-                  </div>
-                  {% endif %}
-               </div>
-            </article>
+               </article>
             {% endif %}
          {% endfor %}
       {% else %}
@@ -563,13 +563,4 @@ function onlyOne(checkbox) {
    });
    </script>
 
-<script>
-   $('[id]').each(function(){
-  var id = $('[id="'+this.id+'"]');
-  if(id.length>1 && id[0]==this) {
-    console.log('Duplicate id '+this.id);
-    alert('duplicate found');
-  }
-});
-</script>
    {% endblock content %}

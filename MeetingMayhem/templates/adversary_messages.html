@@ -27,7 +27,7 @@
                 </div> <br/>
                 <div class="form-group">
                 <label class="form-control-label" for="name">Recipients</label> <br/>
-                {{messages.user_interface(usernames,"recipents",true)}}
+                {{messages.user_interface(usernames,"recipients",true)}}
                 </div> <br/>
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
@@ -281,99 +281,87 @@
 </script>
 
 
-
-<div id="Incoming_Messages">
-	<h2>Incoming Messages</h2>
-	{% if msgs %}
-		{% for msg in msgs%}
-			<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, {{(msg[0]).id}})">
-				<div class="media-body">
-					<div class="article-metadata">
-						{% if msg[0].is_edited %}
-							{% if msg[0].new_sender %}
-								<a>New Sender: {{ msg[0].new_sender }} | </a>
-							{% else %}
-								<a>Sender: {{ msg[0].sender }} | </a>
-							{% endif %}
-							{% if msg[0].new_recipient %}
-								<a>New Recipient: {{ msg[0].new_recipient }}</a>
-							{% else %}
-								<a>Recipient: {{ msg[0].recipient }}</a>
-							{% endif %}
-							<a> | Time Sent: {{ msg[0].time_sent }}</a>
-							{% if msg[0].adv_created %}
-								<a> | This msg was created by the adversary.</a>
-							{% endif %}
-							{% if msg[0].is_deleted %}
-								<a> | This msg has been deleted.</a>
-							{% else %}
-								<a> | This msg has been edited.</a>
-							{% endif %}
-						{% else %}
+<div class="row ">
+	<div id="Incoming_Messages" class="col">
+		<h2>Messages to be Edited</h2>
+		{% if msgs %}
+			{% for msg in msgs%}
+				<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, {{(msg[0]).id}})">
+					<div class="media-body">
+						<div class="article-metadata">
 							<a>Sender: {{ msg[0].sender }} | </a>
 							<a>Recipient: {{ msg[0].recipient }}</a>
 							<a> | Time Sent: {{ msg[0].time_sent }}</a>
-							{% if msg[0].adv_created %}
-								<a> | This message was created by the adversary.</a>
-							{% endif %}
-						{% endif %}	
-					</div>
-					{% if not msg[1] %}
-						<p id="msg-content-{{msg[0].id}}" class="article-content">--CANNOT DECRYPT--</p>
-					{% else %}
-						{% if msg[0].is_edited %}
-							<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].edited_content }}</p>
+						</div>
+						<div id="content-{{ msg[0].id }}">
+							<p style="margin: 0; display:inline; color:#0dcaf0;">@{{ msg[0].location_meet }} {{
+								msg[0].time_meet}}{{ msg[0].time_am_pm }}</p>
+						</div>
+						{% if not msg[1] %}
+							<p id="msg-content-{{msg[0].id}}" class="article-content">--CANNOT DECRYPT--</p>
 						{% else %}
-							<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].content }}</p>
+							{% if msg[0].is_edited %}
+								<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].edited_content }}</p>
+							{% else %}
+								<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].content }}</p>
+							{% endif %}
 						{% endif %}
-					{% endif %}
-				</div>
-				{% if msg[0].is_encrypted %}
-					<div class="m-1 row ">
-					{% if 'Warning' not in msg[0].encryption_details %}
-						<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-						Encrypted with:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-						msg[0].encryption_details }}</div>
-					{% elif 'but' in msg[0].encryption_details %}
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-						Warning:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-						Encrypted with {{msg[0].encryption_details[9:] }}</div>
-					{% else %}
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-						Warning:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-						msg[0].encryption_details[9:] }}</div>
-					{% endif %}  
 					</div>
-				{% elif msg[0].is_signed %}
-					<div class="m-1 row ">
-					{% if 'Warning' not in msg[0].signed_details %}
-						<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-						Signed by:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-						msg[0].signed_details }}</div>
-					{% elif 'but' in msg[0].signed_details %}
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-								Warning:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-								Signed by {{msg[0].signed_details[9:] }}</div>
-					{% else %}
-						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-						Warning:</div>
-						<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-						msg[0].signed_details[9:] }}</div>
+					{% if msg[0].is_encrypted %}
+						<div class="m-1 row ">
+						{% if 'Warning' not in msg[0].encryption_details %}
+							<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+							Encrypted with:</div>
+							<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+							msg[0].encryption_details }}</div>
+						{% elif 'but' in msg[0].encryption_details %}
+							<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+							Encrypted with {{msg[0].encryption_details[9:] }}</div>
+						{% else %}
+							<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+							msg[0].encryption_details[9:] }}</div>
+						{% endif %}  
+						</div>
+					{% elif msg[0].is_signed %}
+						<div class="m-1 row ">
+						{% if 'Warning' not in msg[0].signed_details %}
+							<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+							Signed by:</div>
+							<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+							msg[0].signed_details }}</div>
+						{% elif 'but' in msg[0].signed_details %}
+							<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+									Signed by {{msg[0].signed_details[9:] }}</div>
+						{% else %}
+							<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+							msg[0].signed_details[9:] }}</div>
+						{% endif %}
+						</div>
 					{% endif %}
-					</div>
-				{% endif %}
-			</article>
-		{% endfor %}
-	{% else %}
-		<legend class="border-bottom mb4">No messages</legend><br/>
-	{% endif %}
+				</article>
+			{% endfor %}
+		{% else %}
+			<legend class="border-bottom mb4">No messages</legend><br/>
+		{% endif %}
+	</div>
+	<div id="Sent_Messages_by_you" class="col">
+		<h2>Message Sent by you:</h2>
+		{% if sent_flag %} <!-- this checks if the passed message var has content in it -->
+      		<legend class="border-bottom mb4">Received messages:</legend>
+      		{{ messages.print_msgs(sent_msgs,usernames) }}
+      	{% else %}
+      		<legend class="border-bottom mb4">No messages</legend>
+      	{% endif %}
+	</div>
 </div>
-
 <script>
 function select_msg(ele, num) {
 	document.getElementById('edit_form').scrollIntoView();
@@ -494,7 +482,7 @@ function select_msg(ele, num) {
 
 	<div id="sent_msgs">
     {% if prev_msgs %}
-    <legend class="border-bottom mb4">Sent Messages:</legend>
+    <legend class="border-bottom mb4">Messages Edited by you:</legend>
     {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
         <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
         {% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->

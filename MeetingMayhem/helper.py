@@ -102,6 +102,7 @@ def create_message(user, game, request, form, username, time_stamp):
         #get the list of the recipients and senders
         recipients = request.get('recipients')
         senders = request.get('senders')
+        print(recipients,senders)
         #if one of those lists are empty, display an error, return false
         if not recipients or not senders:
             flash(f'Please select one sender and one recipient.', 'danger')
@@ -140,7 +141,7 @@ def create_message(user, game, request, form, username, time_stamp):
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         #create the message and add it to the db
-        new_message = Message(round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
+        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         db.session.add(new_message)
         db.session.commit()
         #display success to user
@@ -198,38 +199,22 @@ def create_message(user, game, request, form, username, time_stamp):
         return False
 
 
-def can_decrypt(user, encryption_keys, is_encrypted, sender):
-    """Decides who can or cannot read an encrypted message.
+def decrypt_button_show(encryption_keys, is_encrypted):
+    """Decides if decrypt button will show
     Args:
         user(User): the current_user object of the user creating a message.
         encryption_keys(Message): the encryption keys associated with a message
         is_encrypted(Message): a boolean value that determines if message is encrypted or not.
     Returns:
-        bool: whether or not the user can decrypt message
+        bool: whether or not decrypt button will show
     """
-    # determines if adversary can read a message
-    if user.role == 3:
-        if is_encrypted == False:
-            return True
-        list_of_keys = str_to_list(encryption_keys, [])
-        if "invalid encrypted key" in list_of_keys:
-            return True
+    if is_encrypted == False:
         return False
-
-    elif user.role == 4:
-        # determines a decrypt button is displayed for user
-        # False: Not being displayed
-        # Case 1: No encryption -> No need for decrypt button
-        if is_encrypted == False:
-            return False
-        # Case 2: Warning for cannot decrypt (wrong usage in encryption side) ->  No need for decrypt
-        elif "Warning" in encryption_keys and "cannot" in encryption_keys:
-            return False
-        else:
-            return True
-    
+    # Case 2: Warning for cannot decrypt (wrong usage in encryption side) ->  No need for decrypt
+    elif "Warning" in encryption_keys and "cannot" in encryption_keys:
+        return False
     else:
-        return False
+        return True
 
 # def decrypt_message(user, game, request, form, username, time_stamp):
 #     if user.role == 4: #if the user is a user
