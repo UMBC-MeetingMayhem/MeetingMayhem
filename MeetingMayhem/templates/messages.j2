@@ -8,12 +8,16 @@
                 <a>Recipient: {{ msg[0].recipient }}</a>
                 <a> | Time Received: {{ msg[0].time_received }} </a>
             </div>
-            <div id="content-{{ msg[0].id }}">
+            <div>
                 <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ msg[0].location_meet }} {{msg[0].time_meet}}{{ msg[0].time_am_pm }}</p>
 		    </div>
             <!-- if the message has been decrypted or not be decrypted at all, display the original message-->
-            {% if msg[0].is_decrypted or (not msg[0].is_encrypted and not msg[0].is_signed) %}
-                <div id="content-{{ msg[0].id }}" class="content" >{{ msg[0].content }}</div>
+            {% if (not msg[0].is_encrypted) and (not msg[0].is_signed) %}
+                {% if msg[0].is_edited %}
+                    <div id="content-{{ msg[0].id }}" class="content" >{{ msg[0].edited_content }}</div>
+                {% else %}
+                    <div id="content-{{ msg[0].id }}" class="content" >{{ msg[0].content }}</div>
+                {% endif %}
             {% else %}
                 <!-- Show decrypt button -->
                 {% if msg[1] %}
@@ -45,6 +49,11 @@
                         </select>
                     </div>
                 </div>
+                {% if msg[0].is_edited %}
+                    <div id="content-{{ msg[0].id }}" class="content" style="display:none;" >{{ msg[0].edited_content }}</div>
+                {% else %}
+                    <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
+                {% endif %}
                 <button id="decrypt-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt(this.id)">Decrypt</button>
                 {% else %}
                     <p class="article-content">--CANNOT DECRYPT--</p>
@@ -285,26 +294,28 @@ function decrypt(id_button){
 
 {%- endmacro -%}
 
-{% macro user_interface(usernames,current_user_name,include) -%}
+{% macro user_interface(usernames,current_user_name,include,name) -%}
     {% if include %}
         {% for username in usernames %}
-            <div class="form-check form-check-inline">
-                <!-- below line needs the ', ' in value to make processing usernames easier -->
-                <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}-{{current_user_name}}" name="{{current_user_name}}"
-                    value="{{ username }}" >
-                {% if username == 'user1' %}
-                    <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'user2' %}
-                    <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'user3' %}
-                    <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'pat' %}
-                    <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'adv' %}
-                    <img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
-                {% endif %}
-                <label class="form-check-label" for="inlineCheckbox1-{{username}}-{{current_user_name}}"> {{ username }}</label>
-            </div>
+            {% if username !=  name %}
+                <div class="form-check form-check-inline">
+                    <!-- below line needs the ', ' in value to make processing usernames easier -->
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}-{{current_user_name}}" name="{{current_user_name}}"
+                        value="{{ username }}" >
+                    {% if username == 'user1' %}
+                        <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
+                    {% elif username == 'user2' %}
+                        <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
+                    {% elif username == 'user3' %}
+                        <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
+                    {% elif username == 'pat' %}
+                        <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
+                    {% elif username == 'adv' %}
+                        <img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
+                    {% endif %}
+                    <label class="form-check-label" for="inlineCheckbox1-{{username}}-{{current_user_name}}"> {{ username }}</label>
+                </div>
+             {% endif %}
         {% endfor %}
     {% else %}
         {% for username in usernames %}

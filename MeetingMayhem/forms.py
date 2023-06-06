@@ -82,6 +82,7 @@ class AdversaryMessageEditForm(FlaskForm):
 	send_no_change = SubmitField('Forward Message (no changes)')
 	delete_msg = SubmitField('Delete Message')
 	encryption_and_signed_keys = StringField('Key(s)')
+	not_editable = BooleanField()
 	
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')

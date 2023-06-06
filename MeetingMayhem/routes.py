@@ -29,7 +29,7 @@ from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt, socketio
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, GameSelectForm
 from MeetingMayhem.models import User, Message, Game
-from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, decrypt_button_show
+from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, decrypt_button_show,decrypt_button_show_for_adv
 from datetime import datetime
 from collections import Counter
 from flask import Flask, send_from_directory
@@ -225,7 +225,7 @@ def messages():
 def multiLevelMessages():
     pass
 
-def adv_messages_page():
+def adv_messages_page():    
     #setup the current_game so that we can pull information from it
     current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
 
@@ -247,8 +247,9 @@ def adv_messages_page():
     #messages not being processed yet
     messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
     msgs_tuple = []
-    for element in messages:
-        msgs_tuple.append((element, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
+    for message in messages:
+        #print(message)
+        msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
     
     # Message sent by adv
     sent_msgs = []
@@ -256,13 +257,9 @@ def adv_messages_page():
         #pull messages from current_round where the message isn't deleted
         sent_messages = Message.query.filter_by(adv_created=True, game=current_game.id).all()
         #msgs = [] #create a list to store the messages to dispay to pass to the template
-        print(sent_messages)
         for message in sent_messages: #for each message
-            message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
-            sent_msgs.append((message, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
+            sent_msgs.append(message)
             db.session.commit() 
-
-    #setup message flag to tell template if it should display messages or not
     sent_flag = False
     if sent_msgs:
         sent_flag = True
@@ -273,28 +270,65 @@ def adv_messages_page():
 
     display_message = None
     can_decrypt_curr_message = None
-    prev_msgs_tuple = None
     #create variables for the edit message box buttons so that we only check their state once
     is_submit_edits = adv_msg_edit_form.submit_edits.data
     is_delete_msg = adv_msg_edit_form.delete_msg.data
-    is_send_no_change = adv_msg_edit_form.send_no_change.data
-
+    #print(display_message)
     #adversary message creation
+    # display normally
+    # Message_edited_by_you
+    prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True,adv_created=False).all() #grab all the previous messages for this game
+
+    #reset prev msgs tuple before filling it with new messages
+    prev_msgs_tuple = []
+
+    for message in prev_messages:
+        prev_msgs_tuple.append((message, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed))) # append it to the tuple
+
+    prev_msgs_tuple.reverse()
     if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        sender = request.form.getlist('senders')
+        #ensure the list isn't empty
+        #print(sender)
+        if not sender:
+            flash(f'Please One sender.', 'danger')
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+        
+        recipient = request.form.getlist('recipients')
+        #ensure the list isn't empty
+        #print(recipient)
+        if not recipient:
+            flash(f'Please One recipient.', 'danger')
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
 
-        curr_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
-        create_message(current_user, current_game, request.form, msg_form, current_user.username, curr_time)
-
+        if msg_form.data["meet_time"] == "Time" or msg_form.data["meet_location"] == "Locations":
+            flash(f'Please select a time and location.', 'danger')
+            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+            adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+        
+        #ensure keys entered are keys of actual recipients chosen
+        curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+        flag,new_message = create_message(current_user, current_game, request.form, msg_form, current_user.username, curr_time)
+        update()
+        if flag:
+            sent_msgs.insert(0,new_message)
+            sent_flag = True if sent_msgs else False
         #pull the messages again since the messages we want to display has changed
         messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
         msgs_tuple = []
-        for element in messages:
-            msgs_tuple.append((element, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
+        for message in messages:
+            msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
         current_game.adv_current_msg = 0
         current_game.adv_current_msg_list_size = len(messages)
         #commit the messages to the database
         db.session.commit()
-        update()
+        
         # #render the webpage
         return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
         adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
@@ -302,109 +336,72 @@ def adv_messages_page():
 
 
     #adversary message editing
-    elif (is_submit_edits or is_delete_msg or is_send_no_change): #if any of the prev/next/submit buttons are clicked
+    elif (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
-        print(display_message)
-
-        if display_message == None:
-            flash(f'Please make sure to select a message for editing.', 'danger')
-            return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-            adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-            current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0, usernames=usernames, msgs=msgs_tuple)
-
-        if display_message != None:
-            can_decrypt_curr_message = decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)
-        else:
-            can_decrypt_curr_message = 1
-
+        can_decrypt_curr_message = decrypt_button_show_for_adv(display_message,current_user.username,display_message.encryption_details, display_message.is_encrypted or display_message.is_signed)
         #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        new_recipients = request.form.getlist('newrecipients')
+        new_senders= request.form.getlist('newsenders')
+        #ensure the lists aren't empty
+        
         #if is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
         if is_submit_edits:
-            #capture the list of players from the checkboxes and make it into a string delimited by commas
-            checkbox_output_list_new_recipients = request.form.getlist('new_recipients')
-            checkbox_output_list_new_senders = request.form.getlist('new_senders')
-
-            #ensure the lists aren't empty
-            if not checkbox_output_list_new_recipients or not checkbox_output_list_new_senders:
-                flash(f'Please select at least one sender and one recipient.', 'danger')
+            if not new_recipients :
+                flash(f'Please select one recipient.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+            if not new_senders:
+                flash(f'Please select one sender.', 'danger')
                 return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
                 adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
                 current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
 
-            checkbox_output_str_new_recipients = ''.join(map(str, checkbox_output_list_new_recipients))
-            checkbox_output_str_new_senders = ''.join(map(str, checkbox_output_list_new_senders))
-            new_recipients = checkbox_output_str_new_recipients[:len(checkbox_output_str_new_recipients)-2]
-            new_senders = checkbox_output_str_new_senders[:len(checkbox_output_str_new_senders)-2]
-            new_keys = request.form.get('encryption_and_signed_keys')
-
-            signed_keys = [] # list to keep track of digital signatures
-            encrypted_keys = [] # list to keep track of encryption keys
-
-            dict_of_recipients = {} # Dictionary to allow for quick look up times when seeing if recipient among encryption/sign keys
-            dict_of_senders = {} # Dictionary to allow for quick look up times when seeing if sender among encryption/sign keys
-
-            # Code to remove wierd commas from get request
-            for i in range(len(checkbox_output_list_new_recipients)):
-                checkbox_output_list_new_recipients[i] = checkbox_output_list_new_recipients[i].split(',')[0]
-
-            for i in range(len(checkbox_output_list_new_senders)):
-                checkbox_output_list_new_senders[i] = checkbox_output_list_new_senders[i].split(',')[0]
-
-            for element in checkbox_output_list_new_recipients: #populates dict with recipients chosen
-                dict_of_recipients[element] = 0
-
-            for element in checkbox_output_list_new_senders: #populates dict with recipients chosen
-                dict_of_senders[element] = 0
-
-            # Code for determining whether entered keys are valid or not
-            for element in new_keys.split(','):
-                if element.split('(')[0].lower() == 'signed':
-                    if element.split('(')[1] == f"{current_user.username}.private)":
-                        signed_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-                    else:
-                        signed_keys.append('invalid sign key')
-                if element.split('(')[0].lower() == 'encrypted':
-                    if (element.split('.')[0].split('(')[1] in dict_of_recipients or element.split('.')[0].split('(')[1] in dict_of_senders) and (element.split('.')[1] == 'public)' or element.split('(')[1] == f"{current_user.username}.private)"):
-                        encrypted_keys.append(element.split('(')[1][0:len(element.split('(')[1]) - 1])
-                    else:
-                        encrypted_keys.append('invalid encrypted key')
-
-            signed_keys_string = ", ".join(map(str, signed_keys))
-            encrypted_keys_string = ", ".join(map(str, encrypted_keys))
+            new_recipients = new_recipients[0]
+            new_senders = new_senders[0]
+            print(new_senders,new_recipients)
 
             #setup the changes to be made to the current message
-            display_message.is_signed = False
-            display_message.signed_details = ""
-            display_message.is_encrypted = False
-            display_message.encryption_details = ""
-            display_message.is_edited = True
+            encryption_type = request.form.get("encryption_type_select2")
+            encrypted_key = request.form.get("encryption_key2")
             display_message.new_sender = new_senders
             display_message.new_recipient = new_recipients
-            display_message.edited_content = adv_msg_edit_form.edited_content.data
-
-            if len(signed_keys) > 0:
-                display_message.is_signed = True
-                display_message.signed_details = signed_keys_string
-            if len(encrypted_keys) > 0:
-                display_message.is_encrypted = True
-                display_message.encryption_details = encrypted_keys_string
-
-            #pull the messages again since the messages we want to display has changed
-            messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
-            msgs_tuple = []
-            for element in messages:
-                msgs_tuple.append((element, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
-            #current_game.adv_current_msg = 0
-            #current_game.adv_current_msg_list_size = len(messages)
-            #commit the messages to the database
+            print(adv_msg_edit_form.not_editable.data)
+            if not adv_msg_edit_form.not_editable.data:
+                display_message.is_edited = True
+                display_message.edited_content = adv_msg_edit_form.edited_content.data
+                encrypted_keys = []
+                signed_keys = []
+                if  encryption_type == 'symmetric':
+                    if new_senders in encrypted_key and new_recipients in encrypted_key:
+                        encrypted_keys.append(encrypted_key)
+                    else:
+                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                elif encryption_type  == 'asymmetric':
+                    if encrypted_key == 'public_' + new_recipients:
+                        encrypted_keys.append(encrypted_key)
+                    elif encrypted_key == 'private_' + str(new_senders):
+                        encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
+                    else:
+                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                elif encryption_type  == 'signed':
+                    if encrypted_key == 'private_' + str(new_senders):
+                        signed_keys.append(encrypted_key)
+                    elif encrypted_key == 'public_' + new_recipients:
+                        signed_keys.append("Warning: but a signature usually requires the sender's private key.")
+                    else:
+                        signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+            
+                display_message.is_signed = len(signed_keys) > 0
+                display_message.is_encrypted = len(encrypted_key) > 0
             display_message.adv_submitted = True
             print(display_message)
             messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
             msgs_tuple = []
-            for element in messages:
-                msgs_tuple.append((element, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
+            for message in messages:
+                msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
             db.session.commit()
-
         elif is_delete_msg: #if the delete message button is clicked
             #flag the message as edited and deleted
             display_message.adv_submitted = True
@@ -414,28 +411,16 @@ def adv_messages_page():
             #pull the messages again since the messages we want to display has changed
             messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
             msgs_tuple = []
-            for element in messages:
-                msgs_tuple.append((element, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
+            for message in messages:
+                msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
             #current_game.adv_current_msg = 0
             #current_game.adv_current_msg_list_size = len(messages)
             #commit the messages to the database
             db.session.commit()
 
-        elif is_send_no_change:
-            #flash(display_message.content)
-            display_message.adv_submitted = True
-            db.session.commit()
-            messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
-            msgs_tuple = []
-            for element in messages:
-                msgs_tuple.append((element, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
-            db.session.commit()
-
         is_submit_edits = False
         is_delete_msg = False
-        is_send_no_change = False
-
-        prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True).all() #grab all the previous messages for this game
+        prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True,adv_created=False).all() #grab all the previous messages for this game
 
         #reset prev msgs tuple before filling it with new messages
         prev_msgs_tuple = []
@@ -448,10 +433,9 @@ def adv_messages_page():
 
         update()
         return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-        adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, prev_msg_flag=0,usernames=usernames, msgs=msgs_tuple)
+        adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple,  sent_msgs=sent_msgs,sent_flag=sent_flag,usernames=usernames, msgs=msgs_tuple)
 
     else:
-        # display normally
         return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
         adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
 

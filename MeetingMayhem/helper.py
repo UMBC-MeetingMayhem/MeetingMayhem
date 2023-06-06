@@ -97,7 +97,7 @@ def create_message(user, game, request, form, username, time_stamp):
     """
     if not form.content.data: #if there is no message content, display an error, return false
         flash(f'There was an error in creating your message. Please try again.', 'danger')
-        return False
+        return False,None
     if user.role == 3: #if the user is an adversary
         #get the list of the recipients and senders
         recipients = request.get('recipients')
@@ -106,12 +106,12 @@ def create_message(user, game, request, form, username, time_stamp):
         #if one of those lists are empty, display an error, return false
         if not recipients or not senders:
             flash(f'Please select one sender and one recipient.', 'danger')
-            return False
+            return False,None
         # TODO: change to duplicate message for time and place
         #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=senders, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
             flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-            return False
+            return False,None
 
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
@@ -146,19 +146,19 @@ def create_message(user, game, request, form, username, time_stamp):
         db.session.commit()
         #display success to user
         flash(f'Your message has been sent!', 'success')
-        return True
+        return True, new_message
     elif user.role == 4: #if the user is a user
         #get the list of the recipient
         recipients = request.get('recipients').strip(", ")
         #if one of those lists are empty, display an error, return false
         if not recipients:
             flash(f'Please select one recipient.', 'danger')
-            return False
+            return False,None
         # TODO: change to duplicate message for time and place
         #check if the message is a duplicate, and if it is, display an error, return false
         if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
             flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-            return False
+            return False,None
 
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
@@ -194,9 +194,9 @@ def create_message(user, game, request, form, username, time_stamp):
         db.session.commit()
         #display success to user
         flash(f'Your message has been sent!', 'success')
-        return True
+        return True, new_message
     else: #if someone who isn't a user or adversary manages to call this function, return false
-        return False
+        return False,None
 
 
 def decrypt_button_show(encryption_keys, is_encrypted):
@@ -215,6 +215,35 @@ def decrypt_button_show(encryption_keys, is_encrypted):
         return False
     else:
         return True
+
+def decrypt_button_show_for_adv(message, adv_name, encryption_keys, is_encrypted):
+    #print(recipent,adv_name)
+    show_result = False
+    if message.recipient == adv_name:
+        return decrypt_button_show(encryption_keys=encryption_keys,is_encrypted=is_encrypted)
+    else:
+        # Case 1: Use sender_adv_symmetric key
+        if message.encryption_type == "symmetric" and adv_name in message.key: 
+            show_result = True
+        # Case 2: Use adv_public key, asymmetric
+        elif message.encryption_type == "asymmetric" and adv_name in message.key:
+            show_result = True
+        # Case 3: Use sender private key, asymmetric
+        elif message.encryption_type == "asymmetric" and "private" in message.key:
+            show_result = True
+        # Case 3: Use sender private key, sign
+        elif  message.encryption_type == "sign" and "private" in message.key:
+            show_result = True
+        # Case 4: Use adv_public key, sign
+        elif  message.encryption_type == "sign" and adv_name in message.key:
+            show_result = True
+        else:
+            show_result = False
+
+    message.initial_encryption_details = "You could decrypt this message because sender's incorrect usage of key!" + message.key if show_result else "You could not decrypt this message!"
+    #message.initial_signed_details = "You could decrypt this message because sender's incorrect usage of key!" if show_result else "You could not decrypt this message!"
+    #print(message.id,show_result)
+    return show_result
 
 # def decrypt_message(user, game, request, form, username, time_stamp):
 #     if user.role == 4: #if the user is a user
