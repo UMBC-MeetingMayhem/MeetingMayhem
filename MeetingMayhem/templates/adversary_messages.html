@@ -753,24 +753,52 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 								<a> | This message has been forwarded.</a>
 							{% endif %}
 						</div>
-						{% if prev_msg[0].edited_content %}
-							<p class="article-content">{{ prev_msg[0].edited_content }}</p>
-						{% elif prev_msg[0].is_encrypted or prev_msg[0].is_signed %}
+						{% if prev_msg[0].is_encrypted or prev_msg[0].is_signed %}
 							<p class="article-content"> #######################</p>
+						{% elif prev_msg[0].edited_content %}
+							<p class="article-content">{{ prev_msg[0].edited_content }}</p>
 						{% else %}
 							<p class="article-content">{{ prev_msg[0].content }}</p>
 						{% endif %}
            			</div>
 					{% if prev_msg[0].is_encrypted %}
 						<div class="m-1 row ">
-							<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
+							{% if 'Warning' not in prev_msg[0].encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Encrypted with:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									prev_msg[0].encryption_details }}</div>
+							{% elif 'but' in prev_msg[0].encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+								Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+								Encrypted with {{prev_msg[0].encryption_details[9:] }}</div>
+							{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									prev_msg[0].encryption_details[9:] }}</div>
+							{% endif %}  
 						</div>
 					{% endif %}
 					{% if prev_msg[0].is_signed %}
-						<div class="m-1 row">
-							<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
+						<div class="m-1 row ">
+							{% if 'Warning' not in prev_msg[0].signed_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Signed by:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									prev_msg[0].signed_details }}</div>
+							{% elif 'but' in prev_msg[0].signed_details %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+									Signed by {{prev_msg[0].signed_details[9:] }}</div>
+							{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									prev_msg[0].signed_details[9:] }}</div>
+							{% endif %}
 						</div>
 					{% endif %}
 				</article>

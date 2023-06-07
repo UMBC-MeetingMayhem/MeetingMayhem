@@ -368,13 +368,14 @@ def adv_messages_page():
             display_message.new_sender = new_senders
             display_message.new_recipient = new_recipients
             print(adv_msg_edit_form.not_editable.data)
+            print(encrypted_key,encryption_type)
             if not adv_msg_edit_form.not_editable.data:
                 display_message.is_edited = True
                 display_message.edited_content = adv_msg_edit_form.edited_content.data
                 encrypted_keys = []
                 signed_keys = []
                 if  encryption_type == 'symmetric':
-                    if new_senders in encrypted_key and new_recipients in encrypted_key:
+                    if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
                         encrypted_keys.append(encrypted_key)
                     else:
                         encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
@@ -394,7 +395,9 @@ def adv_messages_page():
                         signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
             
                 display_message.is_signed = len(signed_keys) > 0
-                display_message.is_encrypted = len(encrypted_key) > 0
+                display_message.is_encrypted = len(encrypted_keys) > 0
+                display_message.encryption_details = ", ".join(map(str, encrypted_keys))
+                display_message.signed_details = ", ".join(map(str, signed_keys))
             display_message.adv_submitted = True
             print(display_message)
             messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
