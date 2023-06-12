@@ -76,7 +76,7 @@ def register():
         db.session.commit() #commit new user to db
         flash(f'Your account has been created! Please login.', 'success') #flash a success message to let the user know the account was made
 
-        socketio.emit('new_player',broadcast=True)
+        socketio.emit('new_player')
 
         return redirect(url_for('login')) #redir the user to the login page
     return render_template('register.html', title='Register', form=form)
@@ -499,7 +499,7 @@ def game_setup():
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
-        socketio.emit('ingame',broadcast=True)
+        socketio.emit('ingame')
 
     #game management
     if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
@@ -525,7 +525,7 @@ def game_setup():
         game = Game.query.filter_by(name=mng_form.game.data.name).first()
         game.end_result = "testing"
         db.session.commit()
-        socketio.emit('end_game',broadcast=True)
+        socketio.emit('end_game')
         flash(f'The game has been brought to the end game page.', 'success')
 
     #user management
@@ -622,7 +622,7 @@ def game_setup_multi():
             user.game = game.id #set their game to this game
             db.session.commit()
         flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
-        socketio.emit('ingame',broadcast=True)
+        socketio.emit('ingame')
 
     #game management
     if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
@@ -648,7 +648,7 @@ def game_setup_multi():
         game = Game.query.filter_by(name=mng_form.game.data.name).first()
         game.end_result = "testing"
         db.session.commit()
-        socketio.emit('end_game',broadcast=True)
+        socketio.emit('end_game')
         flash(f'The game has been brought to the end game page.', 'success')
 
     #user management
@@ -788,7 +788,7 @@ def end_of_game():
 
 def update():
     #print("update")
-    socketio.emit('update',broadcast=True)
+    socketio.emit('update')
 
 @socketio.on('cast_vote')
 @app.route('/messages', methods=['GET', 'POST'])
@@ -841,7 +841,7 @@ def cast_vote(json):
 @socketio.on('ready_to_vote')
 def ready_to_vote(json):
     game = Game.query.filter_by(id=json['game_id']).first()
-    socketio.emit('start_vote',broadcast=True)
+    socketio.emit('start_vote')
 
 @app.route('/images/<path:filename>')
 def serve_images(filename):
