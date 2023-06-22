@@ -382,14 +382,26 @@
 						{% endif %}
 					{% else %}
 						<div class="m-1 row ">
-							{% if 'not' not in msg[0].initial_encryption_details[0] %}
-								<div class="rounded-start d-inline col-md-auto border border-3 border-success">
-								{{msg[0].initial_encryption_details[:71] }}</div>
-								<div class="rounded-start d-inline col-md-auto border border-3 border-success">
-									{{msg[0].initial_encryption_details[71:] }}</div>
+							{% if msg[1] %}
+								{% if msg[0].encryption_type == 'symmetric' %}
+									<div class="rounded-start d-inline col-md-auto border border-3 bg-success border-success">
+									Symmetrically encrypted with: </div>
+							 	{% elif msg[0].encryption_type == 'asymmetric' %}
+								   	<div class="rounded-start d-inline col-md-auto border border-3 bg-success border-success">
+									  Asymmetrically encrypted with: </div>
+								{% else %}
+									<div class="rounded-start d-inline col-md-auto border border-3 bg-success border-success">
+										Signed by:</div>
+							 	{% endif %}
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">
+									{{msg[0].key }}</div>
 							{% else %}
-								<div class="rounded-start d-inline col-md-auto  border border-3 border-warning">
-								{msg[0].initial_encryption_details }}</div>
+								<div class="rounded-start d-inline col-md-auto bg-danger text-dark border border-3 border-danger">
+								</div>
+								<div class="d-inline col-md-auto  border border-3 border-danger">
+									You could not decrypt this message because you do not have the key!</div>
+								<div class="d-inline col-md-auto bg-danger text-dark border border-3 border-danger rounded-end">
+								</div>
 							{% endif %}  
 						</div>
 					{% endif %}

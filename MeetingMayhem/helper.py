@@ -240,7 +240,7 @@ def decrypt_button_show_for_adv(message, adv_name, encryption_keys, is_encrypted
         else:
             show_result = False
 
-    message.initial_encryption_details = "You could decrypt this message because sender's incorrect usage of key!" + message.key if show_result else "You could not decrypt this message!"
+    #message.adv_details = "You could decrypt this message because sender's incorrect usage of key!" + message.key if show_result else "You could not decrypt this message!"
     #message.initial_signed_details = "You could decrypt this message because sender's incorrect usage of key!" if show_result else "You could not decrypt this message!"
     #print(message.id,show_result)
     return show_result

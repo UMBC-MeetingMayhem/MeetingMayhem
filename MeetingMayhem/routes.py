@@ -193,7 +193,7 @@ def messages():
         msgs_tuple.reverse()
 
     #sent messages
-    sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
+    sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id,adv_submitted=False).all()
     sent_msgs.reverse()
 
     if form.validate_on_submit(): #when the user submits the message form and it is valid

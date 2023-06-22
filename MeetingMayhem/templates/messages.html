@@ -144,15 +144,25 @@ function onlyOne(checkbox) {
                      {% if sent_msg.initial_is_encrypted %}
                      <div class="m-1 row ">
                         {% if 'Warning' not in sent_msg.initial_encryption_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                              Encrypted with:</div>
+                           {% if sent_msg.encryption_type == 'symmetric' %}
+                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                 Symmetrically encrypted with:</div>
+                           {% elif sent_msg.encryption_type == 'asymmetric' %}
+                                 <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                    Asymmetrically encrypted with:</div>
+                           {% endif %}
                            <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                                  sent_msg.initial_encryption_details }}</div>
                         {% elif 'but' in sent_msg.initial_encryption_details %}
                            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                            Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                           Encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                           {% if sent_msg.encryption_type == 'symmetric' %}
+                              <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                 Symmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                           {% elif sent_msg.encryption_type == 'asymmetric' %}
+                                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                    Asymmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                           {% endif %}
                         {% else %}
                            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                               Warning:</div>
