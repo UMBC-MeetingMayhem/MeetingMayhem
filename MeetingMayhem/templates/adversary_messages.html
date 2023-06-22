@@ -33,7 +33,7 @@
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     {{ msg_form.meet_location (class="gray-blue",id="locations") }}
-					<img id="location-image" width="250px" height="180px" src="/images/cafe.png" style="display:block;margin:20px;">
+					<img id="location-image" width="250px" height="180px" src="/images/Cafe_new.png" style="display:block;margin:20px;">
 					{{ msg_form.meet_time (class="gray-blue")}}
                     {{ msg_form.meet_am_pm (class="gray-blue") }}
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
@@ -885,14 +885,14 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 		  </div>
 		  <div class="modal-body">
 			<select id="places_select" class="form-select" aria-label="Default select example">
-			  <option selected>Select Location</option>
-			  <option value="1">Park</option>
-			  <option value="2">Alley</option>
-			  <option value="3">Cafe</option>
-			  <option value="4">Parking Garage</option>
-			  <option value="5">Rooftop</option>
-			  <option value="6">Bus stop</option>
-			  <option value="7">Subway station</option>
+			<option selected>Select Location</option>
+			<option value="1">Cafe</option>
+			<option value="2">Track</option>
+			<option value="3">Alley</option>
+			<option value="4">Dorm</option>
+			<option value="5">Garage</option>
+			<option value="6">Lab</option>
+			<option value="7">Park</option>
 			</select>
 			
 			<div class="row">
@@ -990,29 +990,29 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 
    select.addEventListener("change", function() {
      switch (select.value) {
-        case "Park":
-          image.src = "/images/park.png";
-          break;
-        case "Parking Garage":
-          image.src = "/images/garage.png";
-          break;
-        case "Alley":
-          image.src = "/images/alley.png";
-          break;
         case "Cafe":
-          image.src = "/images/cafe.png";
-          break;
-        case "Rooftop":
-          image.src = "/images/rooftop.png";
-          break;
-        case "Bus Stop":
-          image.src = "/images/busstop.png";
-          break;
-        case "Subway Station":
-          image.src = "/images/subway.png";
-          break;
-        default:
-          image.src = "/images/cafe.png";
+            image.src = "/images/Cafe_new.png";
+            break;
+         case "Track":
+            image.src = "/images/Track_new.png";
+            break;
+         case "Alley":
+            image.src = "/images/Alley_new.png";
+            break;
+         case "Dorm":
+            image.src = "/images/Dorm_new.png";
+            break;
+         case "Garage":
+            image.src = "/images/Garage_new.png";
+            break;
+         case "Lab":
+            image.src = "/images/Lab_new.png";
+            break;
+         case "Park":
+            image.src = "/images/Park_new.png";
+            break;
+         default:
+            image.src = "/images/Cafe_new.png";
      }
    });
 
