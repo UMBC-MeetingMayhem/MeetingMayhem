@@ -51,7 +51,7 @@ function onlyOne(checkbox) {
             {{ form.content.label(class="form-control-label") }}
             <!-- i think this tells jinja to put a form box in here -->
             {{ form.meet_location (class="gray-blue",id="locations")}}
-            <img id="location-image" width="250px" height="180px" src="/images/Cafe_new.png"
+            <img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
                style="display:block;margin:20px;">
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
@@ -301,7 +301,7 @@ function onlyOne(checkbox) {
             <button id="close-button" class="btn btn-danger">X</button>
          </div>
          <div class="modal-body">
-            <img id="displayedImage" src="/images/Cafe_new.png" width="450px" height="200px" alt="Image description">
+            <img id="displayedImage" src="/images/Arts/Locations/Cafe_new.png" width="450px" height="200px" alt="Image description">
             <select id="places_select" class="form-select" aria-label="Default select example">
                <option selected>Select Location</option>
                <option value="Cafe_new">Cafe</option>
@@ -523,14 +523,6 @@ function onlyOne(checkbox) {
    }
    content(0)
 
-   var dropdown = document.getElementById("places_select");
-   var displayedImage = document.getElementById("displayedImage");
-
-   dropdown.addEventListener("change", function () {
-      var selectedOption = dropdown.options[dropdown.selectedIndex].value;
-      displayedImage.src = "/images/" + selectedOption + ".png";
-   });
-
    var dialogBox = document.getElementById("dialog-box");
    var closeButton = document.getElementById("close-button");
    var body = document.getElementById("body");
@@ -547,28 +539,28 @@ function onlyOne(checkbox) {
    select.addEventListener("change", function () {
       switch (select.value) {
          case "Cafe":
-            image.src = "/images/Cafe_new.png";
+            image.src = "/images/Arts/Locations/Cafe_new.png";
             break;
          case "Track":
-            image.src = "/images/Track_new.png";
+            image.src = "/images/Arts/Locations/Track_new.png";
             break;
          case "Alley":
-            image.src = "/images/Alley_new.png";
+            image.src = "/images/Arts/Locations/Alley_new.png";
             break;
          case "Dorm":
-            image.src = "/images/Dorm_new.png";
+            image.src = "/images/Arts/Locations/Dorm_new.png";
             break;
          case "Garage":
-            image.src = "/images/Garage_new.png";
+            image.src = "/images/Arts/Locations/Garage_new.png";
             break;
          case "Lab":
-            image.src = "/images/Lab_new.png";
+            image.src = "/images/Arts/Locations/Lab_new.png";
             break;
          case "Park":
-            image.src = "/images/Park_new.png";
+            image.src = "/images/Arts/Locations/Park_new.png";
             break;
          default:
-            image.src = "/images/Cafe_new.png";
+            image.src = "/images/Arts/Locations/Cafe_new.png";
       }
    });
    </script>

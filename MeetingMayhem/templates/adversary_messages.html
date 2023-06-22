@@ -33,7 +33,7 @@
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
                     {{ msg_form.meet_location (class="gray-blue",id="locations") }}
-					<img id="location-image" width="250px" height="180px" src="/images/Cafe_new.png" style="display:block;margin:20px;">
+					<img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png" style="display:block;margin:20px;">
 					{{ msg_form.meet_time (class="gray-blue")}}
                     {{ msg_form.meet_am_pm (class="gray-blue") }}
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
@@ -1003,25 +1003,25 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
    select.addEventListener("change", function() {
      switch (select.value) {
         case "Cafe":
-            image.src = "/images/Cafe_new.png";
+            image.src = "/images/Arts/Locations/Cafe_new.png";
             break;
          case "Track":
-            image.src = "/images/Track_new.png";
+            image.src = "/images/Arts/Locations/Track_new.png";
             break;
          case "Alley":
-            image.src = "/images/Alley_new.png";
+            image.src = "/images/Arts/Locations/Alley_new.png";
             break;
          case "Dorm":
-            image.src = "/images/Dorm_new.png";
+            image.src = "/images/Arts/Locations/Dorm_new.png";
             break;
          case "Garage":
-            image.src = "/images/Garage_new.png";
+            image.src = "/images/Arts/Locations/Garage_new.png";
             break;
          case "Lab":
-            image.src = "/images/Lab_new.png";
+            image.src = "/images/Arts/Locations/Lab_new.png";
             break;
          case "Park":
-            image.src = "/images/Park_new.png";
+            image.src = "/images/Arts/Locations/Park_new.png";
             break;
          default:
             image.src = "/images/Cafe_new.png";
