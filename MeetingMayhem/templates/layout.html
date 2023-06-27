@@ -221,7 +221,7 @@
 			background-color: hsla(var(--cd-color-3-h), var(--cd-color-3-s), var(--cd-color-3-l), 0.8)
 		}
 		body {
-            background-image: url("/images/Arts/BackGround/TitleScreen.png");
+            background-image: url("/images/Arts/BackGround/TitlePoster_BG_Only.png");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -245,6 +245,7 @@
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
     <header class="site-header">
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+            <img src="/images/Arts/Logo/Logo_Logo_Simple.png" style="position:relative; left:30px;width:50px; height:50px;text-align:center;display:block;">
             <div class="container">
             <a class="navbar-brand mr-4" href="/">MeetingMayhem</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
@@ -262,9 +263,9 @@
                 </div>
 
                 <!-- Navbar Right Side -->
-                <div class="navbar-nav ms-auto">
+                <div class="navbar-nav ms-auto ">
                     {% if current_user.is_authenticated %}
-                        <p class="nav-item nav-link" >{{ current_user.username }}</p>
+                        <p class="nav-item nav-link ">{{ current_user.username }}</p>
                         <p class="nav-item nav-link">|</p>
                         {% if request.path == '/multilevelmessages' %}
                             <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
