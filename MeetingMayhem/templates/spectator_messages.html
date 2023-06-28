@@ -58,8 +58,10 @@
 		</div>
 
 		<!-- Add a legend article here or in the about page to explain game infomation to spectator -->
-
 		<h1>Messages</h1>
+		<div class="m-1 row ">
+			<button type="button" class="btn btn-primary" onclick="GenerateText()"> Generate Log</button>
+		</div>
 		<article class="media content-section bg-dark">
 			<div style="margin:auto;width:100%;display:flex; flex-direction:row;">
 				<div class="media-body" style="width:50%; text-align: center;" >
@@ -108,7 +110,7 @@
 		
 				{% endif %}		
 			{% else %}
-				{% if message.is_edited %}
+				{% if message.is_edited or message.is_decrypted%}
 					{% if message.is_deleted %}
 					<!-- Orignal message and deleted status -->
 					
@@ -135,7 +137,13 @@
 								<p class="article-content"> {{message.content}} </p>
 							</div>
 							<div class="media-body" style="width:50%;">
-								<h5> Modified: </h5>
+								{% if message.is_edited and message.is_decrypted %}
+									<h5> Decrypted and Modified: </h5>
+								{% elif message.is_decrypted %}
+									<h5> Decrypted: </h5>
+								{% else %}
+									<h5> Modified: </h5>
+								{% endif %}
 								<div class="article-metadata">
 								{% if message.new_sender %}
 								<a>Sender: {{ message.new_sender }} | </a>
@@ -147,7 +155,7 @@
 								{% else %}
 								<a>Recipient: {{ message.recipient }}</a>
 								{% endif %}
-								<small class="text-muted">Round:  {{message.round}} </small>
+								<!-- <small class="text-muted">Round:  {{message.round}} </small> -->
 								</div>
 								<p class="article-content"> {{message.edited_content}} </p>
 							</div>
@@ -170,15 +178,21 @@
 			{% endif %}
 			</div>
 			{% if message.is_encrypted %}
-			<div class="m-1 row ">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.encryption_details }}</div>
+				<div class="m-1 row ">
+				{% if message.encryption_type == 'symmetric' %}
+					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+						Symmetrically encrypted with:</div>
+				{% elif message.encryption_type == 'asymmetric' %}
+						<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+						Asymmetrically encrypted with:</div>
+				{% endif %}
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.key}}</div>
 			</div>
 			{% endif %}
 			{% if message.is_signed %}
 			<div class="m-1 row">
 				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.signed_details }}</div>
+				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ message.key}}</div>
 			</div>
 			{% endif %}
 			</article>
@@ -205,5 +219,11 @@
         });
 	});
 	
+	</script>
+	<script>
+		function GenerateText(){
+			var socket = io();
+			socket.emit('Generate_Log');
+		}
 	</script>
 {% endblock content %}

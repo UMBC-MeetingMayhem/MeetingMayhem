@@ -283,7 +283,12 @@
 </script>
 
 
-
+<!-- <button onclick="clear_all()"> Clear Cache</button>
+<script>
+function clear_all(){
+    localStorage.clear();
+}
+	</script> -->
 <div id="Incoming_Messages" class="col">
 	<h2>Messages to be Edited</h2>
 	{% if msgs %}
@@ -495,6 +500,7 @@ function decrypt_adv(id_button){
 	const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
 	console.log(decryption_key);
 	console.log(decryption_type);
+	var socket = io();
 	if (encryption_type === "symmetric") {
 		// Not select correct decryption type
 		if (decryption_type !=="symmetric" ){
@@ -510,6 +516,7 @@ function decrypt_adv(id_button){
 			localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
 			localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
 			localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+			socket.emit('decrypted', { message: msg_id });
 		}
 		// Wrong key
 		else{
@@ -532,6 +539,7 @@ function decrypt_adv(id_button){
 				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
 				alert("Please select correct Key for asymmetric encryption");
@@ -547,6 +555,7 @@ function decrypt_adv(id_button){
 				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
 				alert("Please select correct Key for asymmetric encryption");
@@ -569,6 +578,7 @@ function decrypt_adv(id_button){
 				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
 				alert("Please select correct Key for asymmetric encryption");
@@ -584,6 +594,7 @@ function decrypt_adv(id_button){
 				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
 				alert("Please select correct Key for asymmetric encryption");

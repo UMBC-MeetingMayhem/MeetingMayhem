@@ -58,11 +58,11 @@
              <div class="form-group">
                 <!-- {{ setup_form.create_game(class="btn btn-outline-info") }} -->
             
-            <button type="submit" id="submit-button" {% if disabled %}disabled{% endif %} {{ setup_form.create_game(class="btn btn-outline-info") }} Submit </button>
+            <button type="submit" id="submit-button"  {% if disabled %}disabled{% endif %} {{ setup_form.create_game(class="btn btn-outline-info") }} Submit </button>
             </div>
         </form>
     </div>
-
+    <button onclick="clear_all()"> Clear Cache</button>
     <div class="content-section">
         <form method="POST" action="">        
             {{ mng_form.hidden_tag() }}
@@ -169,5 +169,8 @@ checkboxes.forEach((checkbox) => {
 
 updateSubmitButtonState();
 
+function clear_all(){
+    localStorage.clear();
+}
 	</script>
 {% endblock content %}

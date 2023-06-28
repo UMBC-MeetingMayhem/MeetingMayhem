@@ -118,9 +118,9 @@ def account():
     #create a button in the account page that can decrement the round for testing purposes, will only be displayed for adversary user
     form = AdversaryAdvanceRoundForm()
     current_game = Game.query.filter_by(is_running=True).first()
-    print(current_game.votes)
-    print(current_game.who_voted)
-    print("!!!!")
+    # print(current_game.votes)
+    # print(current_game.who_voted)
+    # print("!!!!")
     if form.advance_round.data and current_game:
         current_game.current_round -= 1
         current_game.adv_current_msg = 0
@@ -182,9 +182,9 @@ def messages():
                 message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
                 msgs_tuple.append((message, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
                 db.session.commit() 
-        print(msgs_tuple)     
-        print(display_message)
-        print(Message.query.filter_by(game=current_game.id).all())  
+        # print(msgs_tuple)     
+        # print(display_message)
+        # print(Message.query.filter_by(game=current_game.id).all())  
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = False
@@ -360,17 +360,18 @@ def adv_messages_page():
 
             new_recipients = new_recipients[0]
             new_senders = new_senders[0]
-            print(new_senders,new_recipients)
+            #print(new_senders,new_recipients)
 
             #setup the changes to be made to the current message
             encryption_type = request.form.get("encryption_type_select2")
             encrypted_key = request.form.get("encryption_key2")
             display_message.new_sender = new_senders
             display_message.new_recipient = new_recipients
-            print(adv_msg_edit_form.not_editable.data)
-            print(encrypted_key,encryption_type)
+
+            #print(adv_msg_edit_form.not_editable.data)
+            #print(encrypted_key,encryption_type)
             if not adv_msg_edit_form.not_editable.data:
-                display_message.is_edited = True
+                #display_message.is_edited = True
                 display_message.edited_content = adv_msg_edit_form.edited_content.data
                 encrypted_keys = []
                 signed_keys = []
@@ -393,13 +394,19 @@ def adv_messages_page():
                         signed_keys.append("Warning: but a signature usually requires the sender's private key.")
                     else:
                         signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-            
+                else:
+                    # no-add on: not edited
+                    display_message.is_edited = False
+                if display_message.edited_content != display_message.content:
+                    display_message.is_edited = True
                 display_message.is_signed = len(signed_keys) > 0
                 display_message.is_encrypted = len(encrypted_keys) > 0
                 display_message.encryption_details = ", ".join(map(str, encrypted_keys))
                 display_message.signed_details = ", ".join(map(str, signed_keys))
+            if display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
+                display_message.is_edited = True
             display_message.adv_submitted = True
-            print(display_message)
+            #print(display_message)
             messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
             msgs_tuple = []
             for message in messages:
@@ -699,7 +706,8 @@ def spectate_game():
         game = Game.query.filter_by(id=game_id).first()
         messages = Message.query.filter_by(game=game_id).all()
         msg_count = len(Message.query.filter_by(game=game.id).all())
-
+        for msg in messages:
+            print(msg)
         return render_template('spectator_messages.html', title='Spectating', game=game, message=messages, msg_count=msg_count)
 
     # If the user is not a spectator, flash a warning and send back to home
@@ -715,6 +723,8 @@ def spectate_game():
             game = select_game_form.running_games.data
             msg_count = len(Message.query.filter_by(game=game.id).all())
             messages = Message.query.filter_by(game=game.id).all()
+            for msg in messages:
+                print(msg)
             return render_template('spectator_messages.html', title='Spectating '+game.name, game=game, message=messages, sg_form=select_game_form, msg_count=msg_count)
         else:
             # Send list of games to template
@@ -826,13 +836,13 @@ def cast_vote(json):
         if len(c) == 1:
             current_game.vote_ready = "PlayerWin"
             db.session.commit()
-            print(current_game.votes)
-            print(current_game.vote_ready)
+            # print(current_game.votes)
+            # print(current_game.vote_ready)
         else:
             current_game.vote_ready = "PlayerLose"
             db.session.commit()
-            print(current_game.votes)
-            print(current_game.vote_ready)
+            # print(current_game.votes)
+            # print(current_game.vote_ready)
     socketio.emit("return_result",current_game.vote_ready)
     return
 
@@ -846,3 +856,52 @@ def ready_to_vote(json):
 @app.route('/images/<path:filename>')
 def serve_images(filename):
     return send_from_directory('images', filename)
+
+@socketio.on('decrypted')
+def decrypted(json):
+    display_message =  Message.query.filter_by(id=json["message"]).first()
+    display_message.is_decrypted = True
+    display_message.is_edited = True
+    db.session.commit()
+    # print("*******************************************")
+    # print(display_message)
+    # print("*******************************************")
+
+@socketio.on('Generate_Log')
+def Generate_Log():
+    import xlsxwriter
+    current_game = Game.query.filter_by(is_running=True).first()
+    messages = Message.query.filter_by(game=current_game.id).all()
+    time_generated= datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+    workbook = xlsxwriter.Workbook('./Data/'+time_generated+".xlsx")
+    worksheet = workbook.add_worksheet()
+
+    header = ["Sender","Recipient","Content","Meet Time and Location","Time Sent","Time Recieved","Initial_is_encrypted","Initial_encryption_details","Initial_is_signed","Initial_signed_details","Adv_Created","Is Edited","Is Decrypted","New Sender","New Recipient","Edited Content","Is_encrypted","Encryption_details","Is_signed","Signed_details"]
+    col = 0
+    for item in header:
+        worksheet.write(0, col, item)
+        col += 1
+    row = 1
+    for msg in messages:
+        worksheet.write(row, 0, msg.sender)
+        worksheet.write(row, 1, msg.recipient)
+        worksheet.write(row, 2, msg.content)
+        worksheet.write(row, 3, msg.location_meet + " " + msg.time_meet + msg.time_am_pm)
+        worksheet.write(row, 4, msg.time_sent)
+        worksheet.write(row, 5, msg.time_recieved)
+        worksheet.write(row, 6, str(msg.initial_is_encrypted))
+        worksheet.write(row, 7, str(msg.initial_encryption_details))
+        worksheet.write(row, 8, str(msg.initial_is_signed))
+        worksheet.write(row, 9, str(msg.initial_signed_details))
+        worksheet.write(row, 10, str(msg.adv_created))
+        worksheet.write(row, 11, str(msg.is_edited))
+        worksheet.write(row, 12, str(msg.is_decrypted))
+        worksheet.write(row, 13, msg.new_sender)
+        worksheet.write(row, 14, msg.new_recipient)
+        worksheet.write(row, 15, msg.edited_content)
+        worksheet.write(row, 16, str(msg.is_encrypted))
+        worksheet.write(row, 17, str(msg.encryption_details))
+        worksheet.write(row, 18, str(msg.is_signed))
+        worksheet.write(row, 19, str(msg.signed_details))
+        row +=1
+    workbook.close()
