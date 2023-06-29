@@ -11,7 +11,7 @@
 <!-- this tells jinja that we are using a template -->
 {% block content %}
 <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<h1 class="float-start">Messages</h1>
+<h1 class="float-start" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages</h1>
 <button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue"
    data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 <script>
@@ -36,7 +36,7 @@ function onlyOne(checkbox) {
   }
 </script>
 
-<legend class="border-bottom mb4">Send a Message</legend>
+<legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Send a Message</legend>
 <div class="content-section" id="body">
    <form method="POST" action="">
       {{ form.hidden_tag() }}
@@ -113,16 +113,16 @@ function onlyOne(checkbox) {
 <div class="row ">
    <div id="Received" class="col">
       {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-      <legend class="border-bottom mb4">Received messages:</legend>
+      <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Received messages:</legend>
       {{ messages.print_msgs(msgs,usernames) }}
       {% else %}
-      <legend class="border-bottom mb4">No messages</legend>
+      <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages</legend>
       {% endif %}
    </div>
 
    <div id="Sent" class="col">
       {% if sent_msgs %}
-         <legend class="border-bottom mb4">Messages sent by you:</legend>
+         <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages sent by you:</legend>
          {% for sent_msg in sent_msgs %}
             {% if not sent_msg.adv_created %}
                <article class="media content-section">
@@ -195,7 +195,7 @@ function onlyOne(checkbox) {
             {% endif %}
          {% endfor %}
       {% else %}
-         <legend class="border-bottom mb4">No messages sent</legend>
+         <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages sent</legend>
       {% endif %}
    </div>
 </div>
