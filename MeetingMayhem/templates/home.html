@@ -11,7 +11,35 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 
-<h1 style="text-align:left" >
+<div class="container" >
+  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm;">
+    <h1 style="text-align:left" >
+      Mission:
+      </h1>
+      
+      <p style="text-align:left; font-family:Lucida Console, Courier New, monospace;">
+          You are a malicious adversary trying to disrupt the agents' plans on when and where they will meet to exchange an essential asset. 
+          To do so, you may insert, block, or modify messages sent over the network, which you control.
+          You, however, cannot defeat encryption and signatures that are properly formed using keys you do not know. 
+          At the end of the game session, the two agents will vote to decide a time and place to meet. 
+          You will try to prevent the agents from reaching consensus on the meeting time and place.
+      </p>
+  </div>
+</div>
+
+<div class="container" >
+  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm;">      
+      <h1 style="text-align:left;">
+      Goal:
+      </h1>
+      <p style="text-align:left;">
+          Do not allow the agents to agree on the time and place to meet.
+      </p>
+      
+  </div>
+</div>
+
+<!-- <h1 style="text-align:left" >
 Mission:
 </h1>
 
@@ -28,9 +56,48 @@ Goal:
 </h1>
 <p style="text-align:left;">
     Do not allow the agents to agree on the time and place to meet.
-</p>
+</p> -->
 
-<h1 style="text-align:left;">
+
+
+<div class="container" >
+  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm;">
+    <h1 style="text-align:left;">
+      Cryptographic Tools:
+      </h1>
+      
+      
+      <p style="text-align:left;">
+      <ul>
+      <li>Delete Any message.</li>
+      <li>Modify any Plaintext (non-encrypted) message that is not signed.</li>
+      <li>Send a message to any recipient pretending to be someone else.</li>
+      <li>Symmetric Encryption: Encrypt or decrypt  your message using a Shared Symmetric Key known by you and the recipient.<br>
+          <span id="more_symmetric_encryption" style="display:none" ><img src="/images/Lectures/Symmetric_Encryption.png" alt="Avatar" width="700px" height="300px">
+          <br>
+          Consider that Alice wants to send a confidential message to Bob. One way would be to have a key that is only known to Alice and Bob and encrypt and decrypt the message with that key. We call that key the Shared Symmetric Key of Alice and Bob. Alice would encrypt the message with the key, and Bob would decrypt with that same key. When the same key is used in both encryption and decryption, we call the method symmetric encryption.</span>
+          <a href="#" onclick="ReadMoreForSymmetricEncryption()" id="read_more_symmetric_encryption">Read more</a>
+      </li>
+      <li>Asymmetric Encryption: Encrypt messages using the Receiver’s Public Key, or decrypt the message using the Receiver's Private Key. <br>
+          <span id="more_asymmetric_encryption" style="display:none" ><img src="/images/Lectures/Asymmetric_Encryption.png" alt="Avatar" width="700px" height="300px">
+              <br>
+              Consider that Alice wants to send a confidential message to Bob. Another method can be useful called asymmetric encryption. Each user locally generates a pair of keys (public key, private key) with a key-generation algorithm. Then, the public keys are shared with all users on the network, and each person keeps their private key to themself. For Alice to send a message to Bob, Alice encrypts the message with Bob’s public key, and Bob decrypts the message using his own private key. 
+          </span>
+              <a href="#" onclick="ReadMoreForAsymmetricEncryption()" id="read_more_asymmetric_encryption">Read more</a></li>
+      </li>
+      <li>Signature: Sign your message with the Sender’s (Your) Private Key; the receiver can verify your identity with the Sender’s (Your) Public Key.  Here, a valid signature also encrypts and guarantees message integrity (i.e., that the message has not been modified in transit).<br>
+          <span id="more_signature" style="display:none" ><img src="/images/Lectures/Signature.png" alt="Avatar" width="700px" height="300px">
+              <br>
+              Whereas encryption protects the confidentiality of the message, signatures help the receiver verify that the message actually came from the purported sender. For signatures in this game, we use the same public-private key pairs generated for asymmetric encryption. Alice can sign a message with her private key, and Bob can verify the signature with Alice’s public key, verifying that the message actually came from Alice.
+          </span>
+              <a href="#" onclick="ReadMoreForSignature()" id="read_more_signature">Read more</a></li>
+      </li>
+      </ul>
+      </p>
+      
+  </div>
+</div>
+<!-- <h1 style="text-align:left;">
 Cryptographic Tools:
 </h1>
 
@@ -61,7 +128,7 @@ Cryptographic Tools:
         <a href="#" onclick="ReadMoreForSignature()" id="read_more_signature">Read more</a></li>
 </li>
 </ul>
-</p>
+</p> -->
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
 		// Connect to the Socket.IO server.
