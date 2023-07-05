@@ -467,6 +467,7 @@ def game_setup():
     is_end_game_page_submit = mng_form.end_game_page.data
     is_setup_submit = setup_form.create_game.data
     is_usr_form = usr_form.update.data
+    is_random_adv = mng_form.random.data
 
     #create list of usernames for checkboxes
     users = User.query.filter_by(role=4).all()
@@ -569,6 +570,29 @@ def game_setup():
         db.session.commit()
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
         update()
+    
+    if is_random_adv and mng_form.validate():
+        game = Game.query.filter_by(name=mng_form.game.data.name).first()
+        adv = User.query.filter_by(username=game.adversary).first()
+        adv.role = 4
+        player_list = []
+        player_list = str_to_list(game.players, player_list) #grab a list of players from the game
+        player_list.append(game.adversary)
+        import random
+        random_adv = random.randint(0, 2)
+        selected_adv = User.query.filter_by(username=player_list[random_adv]).first()
+        selected_adv.role = 3
+        game.adversary = selected_adv.username
+        del player_list[random_adv]
+        game.players = ", ".join(player_list)
+        db.session.commit()
+        # print(selected_adv)
+        # print(User.query.filter_by(username=player_list[0]).first())
+        # print(User.query.filter_by(username=player_list[1]).first())
+        # print(game.players)
+        # flash(f'The user ' + selected_adv.username + ' has been selected as adv', 'success')
+        update()
+
 
     #display webpage normally
     return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
