@@ -55,7 +55,7 @@ class LoginForm(FlaskForm):
 
 #Message form for users and adversary to construct messages with
 class MessageForm(FlaskForm):
-	content = StringField('Message', validators=[DataRequired()])
+	content = StringField('', validators=[DataRequired()])
 	submit = SubmitField('Send Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
