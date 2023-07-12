@@ -11,7 +11,7 @@
 <!-- this tells jinja that we are using a template -->
 {% block content %}
 <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<h1 class="float-start" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages</h1>
+<h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33);">Messages</h1>
 <button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue"
    data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 <script>
@@ -36,7 +36,7 @@ function onlyOne(checkbox) {
   }
 </script>
 
-<legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Send a Message</legend>
+<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33);">Send a Message</legend>
 <div class="content-section" id="body">
    <form method="POST" action="">
       {{ form.hidden_tag() }}
@@ -70,10 +70,11 @@ function onlyOne(checkbox) {
          </div>
          <div class="form-group">
       </fieldset>
-         <div class="content-section">
+         <div class="content-section" style="color: #0dcaf0">
             <ul class="select2-selection__rendered" id="cryptography_tags_list">
             </ul>
-            <p>Encrypt or Sign Message:</p>
+            <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+            <p style="color:aliceblue">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
             <div class="row g-2 align-items-center">
                <div class="col">
                   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
