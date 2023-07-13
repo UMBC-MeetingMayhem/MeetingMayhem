@@ -36,7 +36,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.Integer, nullable=False) #dictates what role the account is
+    image_url = db.Column(db.String(255), nullable=True)
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
+
 
     """
     roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator, 6 - inactive

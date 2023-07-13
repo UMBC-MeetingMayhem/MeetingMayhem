@@ -243,52 +243,56 @@
 
     <!-- navigation bar, shamelessly stolen from the below repo -->
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
+    <!-- navigation bar, shamelessly stolen from the below repo -->
+    <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
     <header class="site-header">
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
             <img src="/images/Arts/Logo/Logo_Logo_Simple.png" style="position:relative; left:30px;width:50px; height:50px;text-align:center;display:block;">
             <div class="container" style="padding-left: 1cm;">
-            <a class="navbar-brand mr-4" href="/">MeetingMayhem</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarToggle">
-                <div class="navbar-nav mr-auto">
-<!--                <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>-->
-                    <a class="nav-item nav-link" href="{{ url_for('homepage') }}">Home</a>
-                    {% if current_user.role == 3 %}
+                <a class="navbar-brand mr-4" href="/">MeetingMayhem</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarToggle">
+                    <div class="navbar-nav mr-auto">
+                        <a class="nav-item nav-link" href="{{ url_for('homepage') }}">Home</a>
+                        {% if current_user.role == 3 %}
                         <a class="nav-item nav-link" href="{{ url_for('home') }}">About</a>
-                    {% else %}
+                        {% else %}
                         <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
-                    {% endif %}
-                </div>
+                        {% endif %}
+                    </div>
 
-                <!-- Navbar Right Side -->
-                <div class="navbar-nav ms-auto ">
-                    {% if current_user.is_authenticated %}
-                        <p class="nav-item nav-link ">{{ current_user.username }}</p>
+                    <!-- Navbar Right Side -->
+                    <div class="navbar-nav ms-auto">
+                        {% if current_user.is_authenticated %}
+                        <div class="nav-item">
+                            <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-right: 10px; ">
+                        </div>
+                        <p class="nav-item nav-link">{{ current_user.username }}</p>
                         <p class="nav-item nav-link">|</p>
                         {% if request.path == '/multilevelmessages' %}
-                            <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
-                            <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
-                        {% endif %} 
+                        <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
+                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                        {% endif %}
                         {% if current_user.role == 2 %}
-                            <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
-                            <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                        <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
                         {% endif %}
                         {% if current_user.game != None %}
-                            <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
+                        <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
                         {% endif %}
                         <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    {% else %}
+                        {% else %}
                         <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-                    {% endif %}
-
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
             </div>
         </nav>
     </header>
+
 
     <!-- use the container class from bootstrap for fancy -->
     <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/main.html -->

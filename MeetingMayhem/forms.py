@@ -17,7 +17,7 @@ getUserFactory - used to pull the usernames for the recipient selection
 """
 import re
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, HiddenField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -31,7 +31,10 @@ class RegistrationForm(FlaskForm):
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	password = PasswordField('Password', validators=[DataRequired()])
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+	selected_image = HiddenField('Selected Image')
 	submit = SubmitField('Sign Up')
+
+
 	
 	def validate_username(self, username):
 		user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
@@ -52,6 +55,7 @@ class LoginForm(FlaskForm):
 	password = PasswordField('Password', validators=[DataRequired()])
 	remember = BooleanField('Remember Me')
 	submit = SubmitField('Login')
+
 
 #Message form for users and adversary to construct messages with
 class MessageForm(FlaskForm):
