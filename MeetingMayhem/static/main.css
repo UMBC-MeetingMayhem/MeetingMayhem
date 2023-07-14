@@ -47,7 +47,12 @@ body {
 .gray-blue{
     background-color: #333333;
     color: #0dcaf0;
+    font-size: 15px;
     border-color:#0dcaf0;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    border-width: 2px;
 }
 
 .modal-footer{
