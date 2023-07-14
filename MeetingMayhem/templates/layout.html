@@ -226,6 +226,20 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+          .nav-item1 {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-image1 {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+        background-color: yellow; /* Set the background color to yellow */
+        padding: 5px; /* Optional: Add padding to create some spacing between the image and the circle */
+    }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
@@ -266,8 +280,8 @@
                 <!-- Navbar Right Side -->
                 <div class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
-                    <div class="nav-item">
-                        <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-right: 10px; ">
+                    <div class="nav-item1">
+                        <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image1" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; ">
                     </div>
                     <p class="nav-item nav-link">{{ current_user.username }}</p>
                     <p class="nav-item nav-link">|</p>
