@@ -35,14 +35,14 @@ class RegistrationForm(FlaskForm):
 	submit = SubmitField('Sign Up')
 
 
-	
+
 	def validate_username(self, username):
 		user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
 		if user: #if there is, throw an error
 			raise ValidationError('That username is already in use. Please choose a different one.')
 		if re.compile("[A-Za-z0-9]+").fullmatch(username.data) is None: #check if the username only has letters and numbers, if not, throw an error
 			raise ValidationError('Please only use letters and numbers for your username.')
-	
+
 	def validate_email(self, email):
 		email = User.query.filter_by(email=email.data).first() #check if there is already a user with the passed email in the db
 		if email: #if there is, throw an error
@@ -87,7 +87,7 @@ class AdversaryMessageEditForm(FlaskForm):
 	delete_msg = SubmitField('Delete Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	not_editable = BooleanField()
-	
+
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':
@@ -111,7 +111,7 @@ class GMSetupGameForm(FlaskForm):
 		game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
 		if game: #if there is, throw an error
 			raise ValidationError('That name is already in use. Please choose a different one.')
-	
+
 	def validate_adversary(self, adversary): #check if the adversary is already in a game
 		game = Game.query.filter_by(adversary=adversary.data.username, is_running=True).first()
 		if game:
@@ -154,5 +154,5 @@ class GameSelectForm(FlaskForm):
 
 # Form for game master to get game info
 #class GMSelectForm(FlaskForm):
-	#running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-	#select_game = SubmitField('Select Game')
+#running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
+#select_game = SubmitField('Select Game')
