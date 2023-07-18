@@ -410,6 +410,26 @@ function onlyOne(checkbox) {
          game_id: "{{game.id}}",
          vote: vote
       });
+      //Atmika - disable button and change images upon selected location
+      document.getElementById('#submt_vote').style.visibility='hidden';
+      document.getElementById('places_select').style.visibility='hidden';
+      document.getElementById('time_s1').style.visibility='hidden';
+      document.getElementById('time_s2').style.visibility='hidden';
+     
+      if (place == "Track") {
+         document.getElementById('displayedImage').src = "/images/Arts/Locations/Track_new.png";
+      }else if (place == "Alley") {
+         document.getElementById('displayedImage').src = "/images/Arts/Locations/Alley_new.png";
+      }else if (place == "Dorm") {
+         document.getElementById('displayedImage').src = "/images/Arts/Locations/Dorm_new.png";
+      }else if (place == "Garage") {
+         document.getElementById('displayedImage').src = "/images/Arts/Locations/Garage_new.png";
+      }else if (place == "Lab") {
+         document.getElementById('displayedImage').src = "/images/Arts/Locations/Lab_new.png";
+      }else if (place == "Park") {
+         document.getElementById('displayedImage').src = "/images/Arts/Locations/Park_new.png";
+      }
+      
       socket.on('return_result', function (msg) {
          switch (msg) {
             case "PlayerWin":
