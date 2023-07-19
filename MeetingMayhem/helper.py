@@ -10,7 +10,6 @@ Docstring info: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_
 from flask import flash
 from MeetingMayhem import db
 from MeetingMayhem.models import Message
-from cryptography.fernet import Fernet
 
 #recursivley parse the given string for usernames, return true if the given username is found
 def check_for_str(str, check):

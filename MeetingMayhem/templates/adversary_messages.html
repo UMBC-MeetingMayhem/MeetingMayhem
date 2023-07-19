@@ -66,12 +66,12 @@
 				   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
 					  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
 					  {% set current_user_name =  current_user.username  -%}
-					  {% for username in usernames %}
+					  {% for username,_ in usernames %}
 						 {% if current_user_name != username %}
 							<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
 						 {% endif %}
 					  {% endfor %}
-					  {% for username in usernames %}
+					  {% for username,_ in usernames %}
 						 <option value="public_{{username}}">{{username}}'s Public Key</option>
 						 {% if current_user_name == username %}
 							<option value="private_{{username}}">{{username}}'s Private Key </option>
@@ -323,12 +323,12 @@ function clear_all(){
 									<select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 										<option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
 										{% set current_user_name = current_user.username -%}
-										{% for username in usernames %}
+										{% for username,_ in usernames %}
 											{% if current_user_name != username %}
 											<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
 											{% endif %}
 										{% endfor %}
-										{% for username in usernames %}
+										{% for username,_ in usernames %}
 											<option value="public_{{username}}">{{username}}'s Public Key</option>
 											{% if current_user_name == username %}
 											<option value="private_{{username}}">{{username}}'s Private Key </option>
@@ -716,12 +716,12 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 				<select id="key_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key2">
 					<option id='default_key_select2' value= "-1" selected>No Key Selected</option>
 					{% set current_user_name =  current_user.username  -%}
-					{% for username in usernames %}
+					{% for username,_ in usernames %}
 						{% if current_user_name != username %}
 						<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
 						{% endif %}
 					{% endfor %}
-					{% for username in usernames %}
+					{% for username,_ in usernames %}
 						<option value="public_{{username}}">{{username}}'s Public Key</option>
 						{% if current_user_name == username %}
 						<option value="private_{{username}}">{{username}}'s Private Key </option>
@@ -898,7 +898,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 	</div>
 </div>
 	
-	<!-- Modal -->
+	<!-- Modal
 	<div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 		<div class="modal-content">
@@ -948,10 +948,10 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 		  </div>
 		</div>
 	  </div>
-	</div>
+	</div> -->
 	
 	
-	<script type="text/javascript" charset="utf-8">
+	<!-- <script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
 	
 		// Connect to the Socket.IO server.
@@ -1039,7 +1039,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
      }
    });
 
-	</script>
+	</script> -->
 
 <!-- Sender can ONLY send to ONE recipients at a time -->
 <!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->

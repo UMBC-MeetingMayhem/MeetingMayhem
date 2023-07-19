@@ -48,7 +48,7 @@
                                 <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
                                 {% endif %}
                             {% endfor %}
-                            {% for username,_in usernames %}
+                            {% for username,_ in usernames %}
                                 <option value="public_{{username}}">{{username}}'s Public Key</option>
                                 {% if current_user_name == username %}
                                 <option value="private_{{username}}">{{username}}'s Private Key </option>
