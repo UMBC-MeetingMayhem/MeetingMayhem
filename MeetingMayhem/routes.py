@@ -935,4 +935,14 @@ def Generate_Log():
         worksheet.write(row, 18, str(msg.is_signed))
         worksheet.write(row, 19, str(msg.signed_details))
         row +=1
+    worksheet.write(row,0, "GAME INFO")
+    row += 1
+    worksheet.write(row, 0, str(current_game.id))
+    worksheet.write(row, 1, str(current_game.name))
+    worksheet.write(row, 2, str(current_game.adversary))
+    worksheet.write(row, 3, str(current_game.players))
+    worksheet.write(row, 4, str(current_game.vote_ready))
+    worksheet.write(row, 5, str(current_game.votes))
+    worksheet.write(row, 6, str(current_game.who_voted))
+    worksheet.write(row, 7, str(current_game.end_result))
     workbook.close()
