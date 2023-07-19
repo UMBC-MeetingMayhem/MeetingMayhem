@@ -97,12 +97,12 @@ function onlyOne(checkbox) {
                <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
                   <option id='default_key_select' value="-1" selected>No Key Selected</option>
                   {% set current_user_name =  current_user.username  -%}
-                  {% for username in usernames %}
+                  {% for username,_ in usernames %}
                   {% if current_user_name != username %}
                   <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
                   {% endif %}
                   {% endfor %}
-                  {% for username in usernames %}
+                  {% for username,_ in usernames %}
                   <option value="public_{{username}}">{{username}}'s Public Key</option>
                   {% if current_user_name == username %}
                   <option value="private_{{username}}">{{username}}'s Private Key</option>

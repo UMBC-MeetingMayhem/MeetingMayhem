@@ -310,45 +310,25 @@ function decrypt(id_button){
 
 {% macro user_interface(usernames,current_user_name,include,name) -%}
     {% if include %}
-        {% for username in usernames %}
+        {% for username,img_url in usernames %}
             {% if username !=  name %}
                 <div class="form-check form-check-inline">
                     <!-- below line needs the ', ' in value to make processing usernames easier -->
                     <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}-{{current_user_name}}" name="{{current_user_name}}"
                         value="{{ username }}" >
-                    {% if username == 'user1' %}
-                        <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-                    {% elif username == 'user2' %}
-                        <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-                    {% elif username == 'user3' %}
-                        <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-                    {% elif username == 'pat' %}
-                        <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-                    {% elif username == 'adv' %}
-                        <img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
-                    {% endif %}
+                    <img src="{{img_url}}" alt="Avatar" width="50px" height="50px">
                     <label class="form-check-label" for="inlineCheckbox1-{{username}}-{{current_user_name}}"> {{ username }}</label>
                 </div>
              {% endif %}
         {% endfor %}
     {% else %}
-        {% for username in usernames %}
+        {% for username,img_url in usernames %}
             {% if username !=  current_user_name %}
                 <div class="form-check form-check-inline">
                 <!-- below line needs the ', ' in value to make processing usernames easier -->
                 <input class="form-check-input" type="checkbox" id="inlineCheckbox1-{{username}}" name="recipients"
                     value="{{ username }}, " onclick="onlyOne(this)" >
-                {% if username == 'user1' %}
-                <img src="/images/user1.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'user2' %}
-                <img src="/images/user2.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'user3' %}
-                <img src="/images/user3.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'pat' %}
-                <img src="/images/user4.png" alt="Avatar" width="30px" height="30px">
-                {% elif username == 'adv' %}
-                <img src="/images/adversary.png" alt="Avatar" width="30px" height="30px">
-                {% endif %}
+                <img src="{{img_url}}" alt="Avatar" width="50px" height="50px">
                 <label class="form-check-label" for="inlineCheckbox1-{{username}}"> {{ username }}</label>
                 </div>
             {% endif %}

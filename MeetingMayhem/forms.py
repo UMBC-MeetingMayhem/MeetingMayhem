@@ -145,7 +145,9 @@ class GMManageGameForm(FlaskForm):
 class GMManageUserForm(FlaskForm):
 	user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
 	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator'), ('inac', 'Inactive')], validators=[DataRequired()])
+	profile = SelectField(u'Role', choices=[('/images/Arts/Characters/1-Jordan/1-Jordan_Profile.png', 'Jordan'), ('/images/Arts/Characters/2-Dakota/2-Dakota_Profile.png', 'Dakota'), ('/images/Arts/Characters/3-Yasmin/3-Yasmin_Profile.png', 'Yasmin'), ('/images/Arts/Characters/4-Derek/4-Derek_Profile.png', 'Derek'),('/images/Arts/Characters/5-Kaede/5-Kaede_Profile.png','Kaede'),('/images/Arts/Characters/6-Manuel/6-Manuel_Profile.png','Manuel'),('/images/Arts/Characters/7-Spy/7-Spy_Profile.png','Spy'),('/images/Arts/Characters/8-Spyess/8-Spyess_Profile.png','Spyess'),('/images/Arts/Characters/9-Kody/9-Kody_Profile.png','Kody')], validators=[DataRequired()])
 	update = SubmitField('Update User')
+	update_profile  = SubmitField('Update Profile')
 
 # Form for a user to select a game
 class GameSelectForm(FlaskForm):

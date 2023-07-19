@@ -124,9 +124,24 @@
                         {{ usr_form.role(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> <br/>
+                <div class="form-group">
+                    {{ usr_form.profile.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if usr_form.profile.errors %} <!-- if there are errors in the form... -->
+                        {{ usr_form.profile(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in usr_form.profile.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ usr_form.profile(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div> <br/>
             </fieldset>
             <div class="form-group">
                 {{ usr_form.update(class="btn btn-outline-info") }}
+                {{ usr_form.update_profile(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>

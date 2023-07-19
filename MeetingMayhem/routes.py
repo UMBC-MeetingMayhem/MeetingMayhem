@@ -163,10 +163,10 @@ def messages():
     adversaries = User.query.filter_by(role=3, game=current_game.id).all()
     usernames = []
     for user in users:
-        usernames.append(user.username)
+        usernames.append((user.username,user.image_url))
     for adversary in adversaries:
-        usernames.append(adversary.username)
-
+        usernames.append((adversary.username,user.image_url))
+    
     #usernames = random.sample(usernames, len(usernames)) # randomizes usernames
     usernames = sorted(usernames)
     form = MessageForm() #use the standard message form
@@ -239,9 +239,9 @@ def adv_messages_page():
     usernames = []
     adversaries = User.query.filter_by(role=3, game=current_game.id).all()
     for user in users:
-        usernames.append(user.username)
+        usernames.append((user.username,user.image_url))
     for adversary in adversaries:
-        usernames.append(adversary.username)
+        usernames.append((adversary.username,adversary.image_url))
     usernames = sorted(usernames)
 
     #messages not being processed yet
@@ -467,6 +467,7 @@ def game_setup():
     is_end_game_page_submit = mng_form.end_game_page.data
     is_setup_submit = setup_form.create_game.data
     is_usr_form = usr_form.update.data
+    is_usr_profile = usr_form.update_profile.data
     is_random_adv = mng_form.random.data
 
     #create list of usernames for checkboxes
@@ -570,7 +571,13 @@ def game_setup():
         db.session.commit()
         flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
         update()
-
+    # Manage Profile
+    if is_usr_profile and usr_form.validate():
+        user = User.query.filter_by(username=usr_form.user.data.username).first()
+        user.image_url = usr_form.profile.data
+        db.session.commit()
+        flash(f'The user ' + usr_form.user.data.username + ' profile has been updated.', 'success') #flash success message
+        update()
     if is_random_adv and mng_form.validate():
         game = Game.query.filter_by(name=mng_form.game.data.name).first()
         adv = User.query.filter_by(username=game.adversary).first()

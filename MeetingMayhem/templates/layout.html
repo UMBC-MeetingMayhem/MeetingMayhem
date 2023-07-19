@@ -296,7 +296,7 @@
                     {% if current_user.game != None %}
                     <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
                     {% endif %}
-                    <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
+                    <!-- <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a> -->
                     <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% else %}
                     <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
