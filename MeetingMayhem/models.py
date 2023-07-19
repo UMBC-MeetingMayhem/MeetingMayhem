@@ -119,8 +119,8 @@ class Message(db.Model):
     time_meet = db.Column(db.String, default="Null") # keeps track of the time user chooses to meet
     location_meet = db.Column(db.String, default="Null") # keeps track of the location user chooses to meet
     time_am_pm = db.Column(db.String, default="Null") # keeps track of the choice between am and pm for time
-    encryption_type = db.Column(db.String, nullable=False) # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
-    key = db.Column(db.String, nullable=False) # Key select
+    encryption_type = db.Column(db.String, nullable=False,default="Null") # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
+    key = db.Column(db.String, nullable=False,default="Null") # Key select
     is_decrypted = db.Column(db.Boolean, nullable=False) #keeps track of decrypted message
     #adv_details = db.Column(db.String, nullable=False, default="Null") #kepp track of adv
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
