@@ -165,7 +165,7 @@ def messages():
     for user in users:
         usernames.append((user.username,user.image_url))
     for adversary in adversaries:
-        usernames.append((adversary.username,user.image_url))
+        usernames.append((adversary.username,adversary.image_url))
     
     #usernames = random.sample(usernames, len(usernames)) # randomizes usernames
     usernames = sorted(usernames)
