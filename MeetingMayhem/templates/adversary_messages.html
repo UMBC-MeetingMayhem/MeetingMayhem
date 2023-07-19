@@ -12,7 +12,7 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <h1>Messages</h1>
+<legend class="border-bottom mb4" style="color: black; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.08in; padding-bottom: 5px">Messages</legend>
 
     <!-- this part here is just copied from messages.html -->
     <div class="content-section">
@@ -20,7 +20,7 @@
             {{ msg_form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
-                <legend class="border-bottom mb4">Create a Message</legend>
+                <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black" >Create a Message</legend>
                 <div class="form-group">
                 <label class="form-control-label" for="name">From: </label> <br/>
                 	{{messages.user_interface(usernames,"senders",true,"")}}
@@ -290,7 +290,7 @@ function clear_all(){
 }
 	</script> -->
 <div id="Incoming_Messages" class="col">
-	<h2>Messages to be Edited</h2>
+	<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 8px">Create a Message</legend>
 	{% if msgs %}
 		{% for msg in msgs %}
 			<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(msg[0]).id}}')">
@@ -659,7 +659,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 	
 <div id="edit_form" class="inactive">
 	{% if msgs %}
-		<h2>Edit a Message</h2>
+		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Edit a Message</legend>
 		<div class="content-section">
 		<form method="POST" action="">
 			{{ adv_msg_edit_form.hidden_tag() }}
@@ -750,7 +750,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 <div class="row ">
 	<div id="sent_msgs" class="col">
     	{% if prev_msgs %}
-    		<legend class="border-bottom mb4">Messages Edited by you:</legend>
+    		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Messages Edited by you:</legend>
 			{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
 				<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
 				<article class="media content-section" {% if prev_msg[0].is_deleted %} style="background: rgb(75, 20, 20);" {% else %} style="background: rgb(20, 20, 75);" {% endif %}>
@@ -831,7 +831,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
     	{% endif %}
 	</div>
 	<div id="Sent_Messages_by_you" class="col">
-		<h2>Message Sent by you:</h2>
+		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Message Sent by you:</legend>
 		{% if sent_flag %} <!-- this checks if the passed message var has content in it -->
 			{% for sent_msg in sent_msgs %}
       			<article class="media content-section">
@@ -893,7 +893,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 			 	</article>
 			{% endfor %}
       	{% else %}
-      		<legend class="border-bottom mb4">No messages</legend>
+      		<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px" >No messages</legend>
       	{% endif %}
 	</div>
 </div>
