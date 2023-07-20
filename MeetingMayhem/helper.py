@@ -231,10 +231,10 @@ def decrypt_button_show_for_adv(message, adv_name, encryption_keys, is_encrypted
         elif message.encryption_type == "asymmetric" and "private" in message.key:
             show_result = True
         # Case 3: Use sender private key, sign
-        elif  message.encryption_type == "sign" and "private" in message.key:
+        elif  message.encryption_type == "signed" and "private" in message.key:
             show_result = True
         # Case 4: Use adv_public key, sign
-        elif  message.encryption_type == "sign" and adv_name in message.key:
+        elif  message.encryption_type == "signed" and adv_name in message.key:
             show_result = True
         else:
             show_result = False

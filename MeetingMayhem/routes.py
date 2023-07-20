@@ -248,7 +248,7 @@ def adv_messages_page():
     messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
     msgs_tuple = []
     for message in messages:
-        #print(message)
+        print(message)
         msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
 
     # Message sent by adv
