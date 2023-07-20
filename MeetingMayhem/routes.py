@@ -860,6 +860,7 @@ def cast_vote(json):
     player_list = []
     str_to_list(current_game.players, player_list)
     current_game.vote_ready = ""
+    print(votes_list)
     if len(votes_list) == len(player_list):
         c = Counter(votes_list)
         # The most common result
@@ -877,7 +878,13 @@ def cast_vote(json):
     socketio.emit("return_result",current_game.vote_ready)
     return
 
-
+@socketio.on('adv_result')
+def adv_result(json):
+    socketio.emit("adv_show")
+    current_game = Game.query.filter_by(id=json['game_id']).first()
+    socketio.emit("return_result_for_adv",current_game.vote_ready)
+    print(current_game.vote_ready)
+    return
 
 @socketio.on('ready_to_vote')
 def ready_to_vote(json):

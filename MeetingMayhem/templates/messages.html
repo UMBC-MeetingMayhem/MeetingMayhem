@@ -12,12 +12,10 @@
 {% block content %}
 <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 <h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
-<button id="vote_bt" style="box-shadow: none; font-size: 20px; padding: 13px !important" class="btn btn-primary btn-lg float-end gray-blue"
+<button id="vote_bt-{{current_user.username}}" style="box-shadow: none; font-size: 20px; padding: 13px !important" class="btn btn-primary btn-lg float-end gray-blue"
    data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 <script>
-   $("#vote_bt").on("click", function () {
-      $(this).prop("disabled", true);
-
+   $("#vote_bt-{{current_user.username}}").on("click", function () {
       var socket = io();
       socket.on('connect', function () {
          socket.emit('ready_to_vote', { game_id: "{{game.id}}", player: "{{current_user.username}}" });
@@ -316,54 +314,54 @@ function onlyOne(checkbox) {
 </script>
 
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-   aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="staticBackdrop-{{current_user.username}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+   aria-labelledby="staticBackdropLabel-{{current_user.username}}" aria-hidden="true">
    <div class="modal-dialog" id="dialog-box">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
+            <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel-{{current_user.username}}">Please vote</h5>
             <button id="close-button" class="btn btn-danger">X</button>
          </div>
          <div class="modal-body">
-            <img id="displayedImage" src="/images/Arts/Locations/Cafe_new.png" width="450px" height="200px" alt="Image description">
-            <select id="places_select" class="form-select" aria-label="Default select example">
+            <img id="displayedImage-{{current_user.username}}" src="/images/Arts/Locations/Cafe_new.png" width="450px" height="200px" alt="Image description">
+            <select id="places_select-{{current_user.username}}" class="form-select" aria-label="Default select example">
                <option selected>Select Location</option>
-               <option value="Cafe_new">Cafe</option>
-               <option value="Track_new">Track</option>
-               <option value="Alley_new">Alley</option>
-               <option value="Dorm_new">Dorm</option>
-               <option value="Garage_new">Garage</option>
-               <option value="Lab_new">Lab</option>
-               <option value="Park_new">Park</option>
+               <option value="Cafe">Cafe</option>
+               <option value="Track">Track</option>
+               <option value="Alley">Alley</option>
+               <option value="Dorm">Dorm</option>
+               <option value="Garage">Garage</option>
+               <option value="Lab">Lab</option>
+               <option value="Park">Park</option>
             </select>
             <br>
             <div class="row">
                <div class="col-sm-6">
-                  <select id="time_s1" class="form-select" aria-label="Default select example">
+                  <select id="time_s1-{{current_user.username}}" class="form-select" aria-label="Default select example">
                      <option selected>Select Time</option>
-                     <option value="1">1:00</option>
-                     <option value="2">2:00</option>
-                     <option value="3">3:00</option>
-                     <option value="4">4:00</option>
-                     <option value="5">5:00</option>
-                     <option value="6">6:00</option>
-                     <option value="7">7:00</option>
-                     <option value="8">8:00</option>
-                     <option value="9">9:00</option>
-                     <option value="10">10:00</option>
-                     <option value="11">11:00</option>
-                     <option value="12">12:00</option>
+                     <option value="1:00">1:00</option>
+                     <option value="2:00">2:00</option>
+                     <option value="3:00">3:00</option>
+                     <option value="4:00">4:00</option>
+                     <option value="5:00">5:00</option>
+                     <option value="6:00">6:00</option>
+                     <option value="7:00">7:00</option>
+                     <option value="8:00">8:00</option>
+                     <option value="9:00">9:00</option>
+                     <option value="10:00">10:00</option>
+                     <option value="11:00">11:00</option>
+                     <option value="12:00">12:00</option>
                   </select>
                </div>
                <div class="col-sm-6">
-                  <select id="time_s2" class="form-select" aria-label="Default select example">
-                     <option value="1">PM</option>
-                     <option value="2">AM</option>
+                  <select id="time_s2-{{current_user.username}}" class="form-select" aria-label="Default select example">
+                     <option value="PM">PM</option>
+                     <option value="AM">AM</option>
                   </select>
                </div>
             </div>
             <div class="modal-footer">
-               <button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
+               <button id="submt_vote-{{current_user.username}}" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
             </div>
          </div>
       </div>
@@ -372,7 +370,8 @@ function onlyOne(checkbox) {
 
    <script type="text/javascript" charset="utf-8">
       $(document).ready(function () {
-         var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
+         var username = "{{ current_user.username }}";
+         var myModal = new bootstrap.Modal(document.getElementById(`staticBackdrop-${username}`), {});
          // Connect to the Socket.IO server.
          // The connection URL has the following format, relative to the current page:
          //     http[s]://<domain>:<port>[/<namespace>]
@@ -393,17 +392,44 @@ function onlyOne(checkbox) {
          });
 
       });
-
+         $(document).ready(function(){ 
+             var keys = Object.keys(localStorage);
+             var i =0;
+             for (i=0;i<keys.length; i++) {
+                 var key = keys[i];
+                 const containerState = localStorage.getItem(key);
+                 const item_found = document.getElementById(key);
+                 if(!Object.is(item_found, null)){
+                     // Save for showing and not showing button(decrypt and vote)
+                     if (containerState == "visible") {
+                        item_found.style.display = "";
+                     }
+                     else if(containerState =='hidden'){
+                        item_found.style.display = "none";
+                     }
+                     // Save for image src of voting system
+                     else if(containerState.startsWith("/images/Arts/Locations/")){
+                        item_found.src = containerState;
+                     }
+                     // Save for wining condition
+                     else{
+                        item_found.textContent = containerState;
+                     }
+                 }
+         
+             }
+         
+         });
    function submitVote() {
       var socket = io();
-      place = $("#places_select").find(':selected').text();
-      time = $("#time_s1").find(':selected').text();
-
+      var username = "{{ current_user.username }}";
+      place = document.getElementById(`places_select-${username}`).value;
+      time = document.getElementById(`time_s1-${username}`).value;
+      console.log(username)
       if (place == "Select Location" || time == "Select Time") {
          return;
       }
-      $("#submt_vote").prop("disabled", true);
-      time = time + ' ' + $("#time_s2").find(':selected').text();
+      time = time + ' ' + document.getElementById(`time_s2-${username}`).value;
       vote = place + ' ' + time;
 
       socket.emit('cast_vote', {
@@ -411,34 +437,48 @@ function onlyOne(checkbox) {
          vote: vote
       });
       //Atmika - disable button and change images upon selected location
-      document.getElementById('#submt_vote').style.visibility='hidden';
-      document.getElementById('places_select').style.visibility='hidden';
-      document.getElementById('time_s1').style.visibility='hidden';
-      document.getElementById('time_s2').style.visibility='hidden';
-     
+      document.getElementById(`submt_vote-${username}`).style.display="none";
+      document.getElementById(`places_select-${username}`).style.display="none";
+      document.getElementById(`time_s1-${username}`).style.display="none";
+      document.getElementById(`time_s2-${username}`).style.display="none";
+      localStorage.setItem(`submt_vote-${username}`, document.getElementById(`submt_vote-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      localStorage.setItem(`places_select-${username}`, document.getElementById(`places_select-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      localStorage.setItem(`time_s1-${username}`, document.getElementById(`time_s1-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      localStorage.setItem(`time_s2-${username}`, document.getElementById(`time_s2-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      console.log(place);
       if (place == "Track") {
-         document.getElementById('displayedImage').src = "/images/Arts/Locations/Track_new.png";
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Track_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Track_new.png");
       }else if (place == "Alley") {
-         document.getElementById('displayedImage').src = "/images/Arts/Locations/Alley_new.png";
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Alley_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Alley_new.png");
       }else if (place == "Dorm") {
-         document.getElementById('displayedImage').src = "/images/Arts/Locations/Dorm_new.png";
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Dorm_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Dorm_new.png");
       }else if (place == "Garage") {
-         document.getElementById('displayedImage').src = "/images/Arts/Locations/Garage_new.png";
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Garage_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Garage_new.png");
       }else if (place == "Lab") {
-         document.getElementById('displayedImage').src = "/images/Arts/Locations/Lab_new.png";
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Lab_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Lab_new.png");
       }else if (place == "Park") {
-         document.getElementById('displayedImage').src = "/images/Arts/Locations/Park_new.png";
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Park_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Park_new.png");
       }
       
       socket.on('return_result', function (msg) {
          switch (msg) {
             case "PlayerWin":
-               $("#staticBackdropLabel").text("You won. The players successfully met in a safe location!");
+               document.getElementById(`staticBackdropLabel-${username}`).textContent = "You won. The players successfully met in a safe location!";
+               localStorage.setItem(`staticBackdropLabel-${username}`,"You won. The players successfully met in a safe location!");
                break;
             case "PlayerLose":
-               $("#staticBackdropLabel").text("You Lost. The Adversary was able to thwart the player's meeting.");
+               document.getElementById(`staticBackdropLabel-${username}`).textContent = "You Lost. The Adversary was able to thwart the player's meeting.";
+               localStorage.setItem(`staticBackdropLabel-${username}`,"You Lost. The Adversary was able to thwart the player's meeting.");
                break;
-            default: $("#staticBackdropLabel").text("Thank you for voting: Please Wait");
+            default:  
+               document.getElementById(`staticBackdropLabel-${username}`).textContent = "Thank you for voting: Please Wait";
+               localStorage.setItem(`staticBackdropLabel-${username}`,"Thank you for voting: Please Wait");
          }
       });
    }

@@ -12,21 +12,46 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<legend class="border-bottom mb4" style="color: black; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.08in; padding-bottom: 5px">Messages</legend>
-
+<h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
+<button id="vote_bt-adv" style="box-shadow: none; font-size: 20px; padding: 13px !important" class="btn btn-primary btn-lg float-end gray-blue"
+   data-bs-toggle="button" autocomplete="off">Result</button>
+<script>
+	$("#vote_bt-adv").on("click", function () {
+	   var socket = io();
+       socket.emit('adv_result', {
+		game_id: "{{game.id}}"
+	 });
+	});	
+ </script>
+<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px">Create a Message</legend>
     <!-- this part here is just copied from messages.html -->
     <div class="content-section">
         <form method="POST" action="">
             {{ msg_form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
-                <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black" >Create a Message</legend>
                 <div class="form-group">
-                <label class="form-control-label" for="name">From: </label> <br/>
+					<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">From:</label>  <br />
                 	{{messages.user_interface(usernames,"senders",true,"")}}
                 </div> <br/>
                 <div class="form-group">
-                <label class="form-control-label" for="name">To: </label> <br/>
+					<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
 					{% set current_user_name =  current_user.username  -%}
                 	{{messages.user_interface(usernames,"recipients",true,current_user_name)}}
                 </div> <br/>
@@ -44,7 +69,7 @@
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ msg_form.content(class="form-control form-control-lg", style="margin:10px;") }}
+                        {{ msg_form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
                     {% endif %}
                 </div> <br>
 				<div class="form-group">
@@ -493,13 +518,13 @@ function decrypt_adv(id_button){
 	const encryption_type = id_button.split("-")[4];
 	const encryption_key = id_button.split("-")[5];
 	var current_user_username = "{{ current_user.username }}";
-	console.log(msg_id);
-	console.log(sender);
-	console.log(recipent);
-	console.log(encryption_type);
-	console.log(encryption_key);
-	console.log("aaaa")
-	console.log(current_user_username);
+	//console.log(msg_id);
+	//console.log(sender);
+	//console.log(recipent);
+	//console.log(encryption_type);
+	//console.log(encryption_key);
+	//console.log("aaaa")
+	//console.log(current_user_username);
 	const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
 	const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
 	console.log(decryption_key);
@@ -669,11 +694,27 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 			{{ adv_msg_edit_form.hidden_tag() }}
 			<fieldset class="form-group">
 			<div class="form-group">
-				<label class="form-control-label" for="name">New Senders</label> <br/>
+				<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">New Sender:</label>  <br />
 					{{messages.user_interface(usernames,"newsenders",true,"")}}
 			</div> <br/>
 			<div class="form-group">
-				<label class="form-control-label" for="name">New Recipients</label> <br/>
+				<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">New Recipient:</label>  <br />
 					{% set current_user_name =  current_user.username  -%}
 					{{messages.user_interface(usernames,"newrecipients",true,current_user_name)}}
 			</div> <br/>
@@ -905,61 +946,23 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
       	{% endif %}
 	</div>
 </div>
-	
-	<!-- Modal
-	<div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-		<div class="modal-content">
-		  <div class="modal-header">
-			<h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please Vote</h5>
-		  	<button id="#close" onclick="submitVote()" type="button" class="btn btn-primary">X</button>
-		  </div>
-		  <div class="modal-body">
-			<select id="places_select" class="form-select" aria-label="Default select example">
-			<option selected>Select Location</option>
-			<option value="1">Cafe</option>
-			<option value="2">Track</option>
-			<option value="3">Alley</option>
-			<option value="4">Dorm</option>
-			<option value="5">Garage</option>
-			<option value="6">Lab</option>
-			<option value="7">Park</option>
-			</select>
-			
-			<div class="row">
-				<div class="col-sm-6">
-					<select id="time_s1" class="form-select" aria-label="Default select example">
-					  <option selected>Select Time</option>
-					  <option value="1">1:00</option>
-					  <option value="2">2:00</option>
-					  <option value="3">3:00</option>
-					  <option value="4">4:00</option>
-					  <option value="5">5:00</option>
-					  <option value="6">6:00</option>
-					  <option value="7">7:00</option>
-					  <option value="8">8:00</option>
-					  <option value="9">9:00</option>
-					  <option value="10">10:00</option>
-					  <option value="11">11:00</option>
-					  <option value="12">12:00</option>
-					</select>
-				</div>
-				<div class="col-sm-6">
-					<select id="time_s2" class="form-select" aria-label="Default select example">
-					<option value="1">PM</option>
-					<option value="2">AM</option>
-					</select>
-				</div>
+
+<div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabeladv" aria-hidden="true">
+	<div class="modal-dialog">
+	  	<div class="modal-content">
+			<div class="modal-header">
+				<button id="close-button" class="btn btn-danger" data-bs-dismiss="modal">X</button>
 			</div>
-		  <div class="modal-footer">
-			<button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
-		  </div>
+			<div class="modal-body">
+				<h5 class="modal-title" style="color:darkgray" id="staticBackdropLabeladv">Please Vote</h5>
+			</div>
+			<div class="modal-footer"></div>
 		</div>
-	  </div>
-	</div> -->
+  	</div>
+</div> 
 	
 	
-	<!-- <script type="text/javascript" charset="utf-8">
+	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
 	
 		// Connect to the Socket.IO server.
@@ -968,54 +971,36 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 		var advVoteModal = new bootstrap.Modal(document.getElementById("advVoteModal"), {});
 		
         var socket = io();
+		socket.on('update', function () {
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Received');
+               $('#Received').replaceWith(elem);
+            });
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Sent');
+               $('#Sent').replaceWith(elem);
+            });
+         });
+
+		socket.on('adv_show', function () {
+            advVoteModal.show();
+         });
 		
-		socket.on('update', function() {			
-			if ( document.getElementById("edit_form").classList.contains('inactive') ){
-				document.getElementById("edit_form").classList.remove('inactive');
-				$.get(document.URL, function(data) {
-					var elem = $(data).find('#edit_form');
-					 $('#edit_form').replaceWith(elem);
-				});
+		socket.on('return_result_for_adv', function (msg) {
+			switch (msg) {
+			   case "PlayerWin":
+				  $("#staticBackdropLabeladv").text("You Lost. The agents successfully met in a safe location and time!");
+				  break;
+			   case "PlayerLose":
+				  $("#staticBackdropLabeladv").text("You Won. You were able to thwart the player's meeting.");
+				  break;
+			   default: $("#staticBackdropLabeladv").text("Wait for agents to vote!");
 			}
-			$.get(document.URL, function(data) {
-				var elem = $(data).find('#Incoming_Messages');
-				 $('#Incoming_Messages').replaceWith(elem);
-			});
-			$.get(document.URL, function(data) {
-				var elem = $(data).find('#sent_msgs');
-				 $('#sent_msgs').replaceWith(elem);
-			});
-        });
-		
-		socket.on('start_vote', function() {
-			advVoteModal.show();
-		});
+		 });
 		
 	});
-	
-	function submitVote(){
-		var socket = io();
-		
-		place = $( "#places_select" ).find(':selected').text();
-		time = $( "#time_s1" ).find(':selected').text();
-		
-		if(place == "Select Location" || time == "Select Time"){
-			return;
-		}
-		$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
-		$("#submt_vote").prop("disabled",true);
-		
-		time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-		
-		vote = place + ' ' + time;
-		
-		socket.emit('cast_vote', {
-		game_id: "{{game.id}}",
-		vote: vote
-		});
 
-	}
-</script> -->
+</script> 
 <script>
 	var select = document.getElementById("locations");
    	var image = document.getElementById("location-image");
