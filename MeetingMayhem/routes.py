@@ -376,11 +376,15 @@ def adv_messages_page():
                 encrypted_keys = []
                 signed_keys = []
                 if  encryption_type == 'symmetric':
+                    display_message.encryption_type = encryption_type
+                    display_message.key = encrypted_key
                     if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
                         encrypted_keys.append(encrypted_key)
                     else:
                         encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
                 elif encryption_type  == 'asymmetric':
+                    display_message.encryption_type = encryption_type
+                    display_message.key = encrypted_key
                     if encrypted_key == 'public_' + new_recipients:
                         encrypted_keys.append(encrypted_key)
                     elif encrypted_key == 'private_' + str(new_senders):
@@ -388,6 +392,8 @@ def adv_messages_page():
                     else:
                         encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
                 elif encryption_type  == 'signed':
+                    display_message.encryption_type = encryption_type
+                    display_message.key = encrypted_key
                     if encrypted_key == 'private_' + str(new_senders):
                         signed_keys.append(encrypted_key)
                     elif encrypted_key == 'public_' + new_recipients:
@@ -406,6 +412,7 @@ def adv_messages_page():
             if display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
                 display_message.is_edited = True
             display_message.adv_submitted = True
+            
             #print(display_message)
             messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
             msgs_tuple = []
