@@ -155,9 +155,9 @@ def create_message(user, game, request, form, username, time_stamp):
             return False,None
         # TODO: change to duplicate message for time and place
         #check if the message is a duplicate, and if it is, display an error, return false
-        if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
-            flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-            return False,None
+        # if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
+        #     flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
+        #     return False,None
 
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
