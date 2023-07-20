@@ -52,6 +52,10 @@
 			 </div>
 			 <br/>
 		  </fieldset>
+		  <div class="content-section" style="color: #0dcaf0">
+			<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+			<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+			<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
 			 <div class="row g-2 align-items-center">
 				<div class="col">
 				   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
@@ -699,9 +703,13 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 			</div>
 			<br/>
 		</fieldset>
-		<div id="encryption-panel" class="content-section bg-secondary">
+
+		<div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0">
 			<ul class="select2-selection__rendered" id="adv_cryptography_tags_list">
 			</ul>
+				<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+				<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+				<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
 			<div class="row g-2 align-items-center">
 			<div class="col">
 				<select id="encryption_sign_type_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select2">

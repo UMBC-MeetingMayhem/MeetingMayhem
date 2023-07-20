@@ -182,7 +182,7 @@ def messages():
                 message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
                 msgs_tuple.append((message, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
                 db.session.commit()
-                # print(msgs_tuple)
+                #print(message)
         # print(display_message)
         # print(Message.query.filter_by(game=current_game.id).all())
 
@@ -367,7 +367,7 @@ def adv_messages_page():
             encrypted_key = request.form.get("encryption_key2")
             display_message.new_sender = new_senders
             display_message.new_recipient = new_recipients
-
+            display_message.edited_content = display_message.content
             #print(adv_msg_edit_form.not_editable.data)
             #print(encrypted_key,encryption_type)
             if not adv_msg_edit_form.not_editable.data:
