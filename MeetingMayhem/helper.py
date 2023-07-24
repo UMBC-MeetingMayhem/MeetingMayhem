@@ -101,7 +101,7 @@ def create_message(user, game, request, form, username, time_stamp):
         #get the list of the recipients and senders
         recipients = request.get('recipients')
         senders = request.get('senders')
-        print(recipients,senders)
+        #print(recipients,senders)
         #if one of those lists are empty, display an error, return false
         if not recipients or not senders:
             flash(f'Please select one sender and one recipient.', 'danger')
@@ -140,7 +140,7 @@ def create_message(user, game, request, form, username, time_stamp):
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         #create the message and add it to the db
-        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
+        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=form.content.data, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         db.session.add(new_message)
         db.session.commit()
         #display success to user
