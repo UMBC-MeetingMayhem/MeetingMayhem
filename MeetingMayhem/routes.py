@@ -179,7 +179,8 @@ def messages():
 
         for message in display_message: #for each message
             if check_for_str(message.new_recipient, current_user.username) or (check_for_str(message.recipient, current_user.username) and not message.is_edited):
-                message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+                if not message.time_recieved :
+                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
                 msgs_tuple.append((message, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
                 db.session.commit()
                 #print(message)
@@ -917,7 +918,7 @@ def Generate_Log():
     import xlsxwriter
     current_game = Game.query.filter_by(is_running=True).first()
     messages = Message.query.filter_by(game=current_game.id).all()
-    time_generated= datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
+    time_generated= datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
     workbook = xlsxwriter.Workbook('./Data/'+time_generated+".xlsx")
     worksheet = workbook.add_worksheet()
 
@@ -933,7 +934,7 @@ def Generate_Log():
         worksheet.write(row, 2, msg.content)
         worksheet.write(row, 3, msg.location_meet + " " + msg.time_meet + msg.time_am_pm)
         worksheet.write(row, 4, msg.time_sent)
-        worksheet.write(row, 5, msg.time_recieved)
+        worksheet.write(row, 5, msg.time_recieved )
         worksheet.write(row, 6, str(msg.initial_is_encrypted))
         worksheet.write(row, 7, str(msg.initial_encryption_details))
         worksheet.write(row, 8, str(msg.initial_is_signed))
