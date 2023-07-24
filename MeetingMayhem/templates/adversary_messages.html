@@ -61,6 +61,39 @@
 					<img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png" style="display:block;margin:20px;">
 					{{ msg_form.meet_time (class="gray-blue")}}
                     {{ msg_form.meet_am_pm (class="gray-blue") }}
+					<div class="content-section" style="color: #0dcaf0">
+						<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+						<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+						<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+						 <div class="row g-2 align-items-center">
+							<div class="col">
+							   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+								  <option  value= "-1" selected>No Encryption/Signature</option>
+								  <option value="symmetric">Symmetrically Encrypt</option>
+								  <option value="asymmetric">Asymmetrically Encrypt</option>
+								  <option value="signed">Sign</option>
+							   </select>
+							</div>
+							with
+							<div class="col">
+							   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
+								  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
+								  {% set current_user_name =  current_user.username  -%}
+								  {% for username,_ in usernames %}
+									 {% if current_user_name != username %}
+										<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+									 {% endif %}
+								  {% endfor %}
+								  {% for username,_ in usernames %}
+									 <option value="public_{{username}}">{{username}}'s Public Key</option>
+									 {% if current_user_name == username %}
+										<option value="private_{{username}}">{{username}}'s Private Key </option>
+									 {% endif %}
+								  {% endfor %}
+							   </select>
+							</div>
+						 </div>
+						 <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
                         {{ msg_form.content(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -75,46 +108,11 @@
 				<div class="form-group">
 				{{ msg_form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }} 
 			 </div>
-			 <br/>
 		  </fieldset>
-		  <div class="content-section" style="color: #0dcaf0">
-			<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
-			<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
-			<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
-			 <div class="row g-2 align-items-center">
-				<div class="col">
-				   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
-					  <option  value= "-1" selected>No Encryption/Signature</option>
-					  <option value="symmetric">Symmetrically Encrypt</option>
-					  <option value="asymmetric">Asymmetrically Encrypt</option>
-					  <option value="signed">Sign</option>
-				   </select>
-				</div>
-				with
-				<div class="col">
-				   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
-					  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
-					  {% set current_user_name =  current_user.username  -%}
-					  {% for username,_ in usernames %}
-						 {% if current_user_name != username %}
-							<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
-						 {% endif %}
-					  {% endfor %}
-					  {% for username,_ in usernames %}
-						 <option value="public_{{username}}">{{username}}'s Public Key</option>
-						 {% if current_user_name == username %}
-							<option value="private_{{username}}">{{username}}'s Private Key </option>
-						 {% endif %}
-					  {% endfor %}
-				   </select>
-				</div>
-			 </div>
-			 <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
 			 <div class="form-group">
 				{{ msg_form.submit(class="btn btn-outline-info", onclick="addCryptography()", id="submitButton") }}
 			 </div>
 		  </div>
-
 	   </form>
 	</div>
 	<script>
