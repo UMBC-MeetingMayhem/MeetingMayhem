@@ -109,7 +109,7 @@ function onlyOne(checkbox) {
          </div>
       </fieldset>
       <div class="form-group">
-         {{ form.submit(class="btn btn-outline-info", onclick="addCryptography()", id="submitButton") }}
+         {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
       </div>
    </form>
 </div>
@@ -517,66 +517,6 @@ function onlyOne(checkbox) {
          
       });
    });
-
-   function addCryptography(){
-
-      var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
-      var submitString = "";
-      key_select = $( "#key_select" ).val();
-      type_select = $( "encryption_sign_type_select" ).val();
-
-
-      var allSelectedValues = Array.from(dropboxes).every(function(db) {
-      return db.value !== '-1';
-      });
-
-      if(allSelectedValues)
-      {
-         //console.log("doneeeee");
-         const listEl = document.createElement('li');
-         const buttonEl = document.createElement('button');
-         const spanEl = document.createElement('span');
-         const spanEl2 = document.createElement('span');
-
-         listEl.classList.add("select2-selection__choice");
-
-         buttonEl.setAttribute("type", "button");
-         buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-         //console.log(this.parentNode);
-
-         buttonEl.classList.add("select2-selection__choice__remove");
-         buttonEl.textContent = "×";
-
-         listEl.appendChild(buttonEl);
-
-         spanEl.classList.add("select2-selection__choice__display");
-         spanEl.textContent = encryption_type_select;
-         listEl.appendChild(spanEl);
-
-         spanEl2.classList.add("select2-selection__choice__display");
-         spanEl2.textContent = encryption_user_select + "." + encryption_key_select;
-         listEl.appendChild(spanEl2);
-
-         var listContainer = $( "#cryptography_tags_list" );
-         listContainer.append(listEl);
-
-         $('#cryptography_tags_list li').each(function() {
-            var option_all = $(this).children().map(function () {
-                  return $(this).text();
-            }).get().join(',');
-
-            var chars = option_all.split(',');
-
-            submitString += chars[1] + "(" + chars[2] + "),"
-         })
-
-         submitString = submitString.slice(0, -1);
-         console.log(submitString);
-         document.getElementById('encryption_and_signed_keys').value = submitString;
-         //console.log(encryption_and_signed_keys.value);
-      }
-   }  
-
    // START - This is for set color of username
    function setRandomColor(obj, color) {
       obj.css("color", color);

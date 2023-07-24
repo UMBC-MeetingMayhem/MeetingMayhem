@@ -111,7 +111,9 @@ def create_message(user, game, request, form, username, time_stamp):
         # if Message.query.filter_by(sender=senders, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
         #     flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
         #     return False,None
-
+        if senders == recipients:
+            flash(f'Please do not select same sender and recipient!', 'danger')
+            return False,None
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
 
@@ -125,22 +127,24 @@ def create_message(user, game, request, form, username, time_stamp):
         elif encryption_type  == 'asymmetric':
             if encrypted_key == 'public_' + recipients:
                 encrypted_keys.append(encrypted_key)
-            elif encrypted_key == 'private_' + str(senders):
-                encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
+            #elif encrypted_key == 'private_' + str(senders):
+            elif "private" in encrypted_key:
+                encrypted_keys.append('Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key.")
             else:
                 encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
         elif encryption_type  == 'signed':
-            if encrypted_key == 'private_' + str(senders):
+            if "private" in encrypted_key:
+            #if encrypted_key == 'private_' + str(senders):
                 signed_keys.append(encrypted_key)
             elif encrypted_key == 'public_' + recipients:
-                signed_keys.append("Warning: but a signature usually requires the sender's private key.")
+                signed_keys.append('Warning: ' + encrypted_key + " but a signature usually requires the sender's private key.")
             else:
                 signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
 
         signed_keys_string = ", ".join(map(str, signed_keys))
         encrypted_keys_string = ", ".join(map(str, encrypted_keys))
         #create the message and add it to the db
-        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=form.content.data, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
+        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=senders, new_recipient=recipients, edited_content=form.content.data, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
         db.session.add(new_message)
         db.session.commit()
         #display success to user
@@ -198,7 +202,7 @@ def create_message(user, game, request, form, username, time_stamp):
         return False,None
 
 
-def decrypt_button_show(encryption_keys, is_encrypted):
+def decrypt_button_show(message):
     """Decides if decrypt button will show
     Args:
         user(User): the current_user object of the user creating a message.
@@ -207,19 +211,32 @@ def decrypt_button_show(encryption_keys, is_encrypted):
     Returns:
         bool: whether or not decrypt button will show
     """
-    if is_encrypted == False:
+    if message.is_encrypted == False and message.is_signed == False:
         return False
-    # Case 2: Warning for cannot decrypt (wrong usage in encryption side) ->  No need for decrypt
-    elif "Warning" in encryption_keys and "cannot" in encryption_keys:
-        return False
+    # Case 1: shared key
+    recipient = message.new_recipient if message.new_recipient else message.recipient
+    if message.encryption_type == "symmetric" and recipient in message.key: 
+        show_result = True
+    elif message.encryption_type == "asymmetric" and "private" in message.key:
+        show_result = True
+    elif message.encryption_type == "asymmetric" and recipient in message.key:
+        show_result = True
+    # Case 3: Use sender private key, sign
+    elif  message.encryption_type == "signed" and "private" in message.key:
+        show_result = True
+    # Case 4: Use adv_public key, sign
+    elif  message.encryption_type == "signed" and recipient in message.key:
+        show_result = True
     else:
-        return True
+        show_result = False
+
+    return show_result
 
 def decrypt_button_show_for_adv(message, adv_name, encryption_keys, is_encrypted):
     #print(recipent,adv_name)
     show_result = False
     if message.recipient == adv_name:
-        return decrypt_button_show(encryption_keys=encryption_keys,is_encrypted=is_encrypted)
+        return decrypt_button_show(message)
     else:
         # Case 1: Use sender_adv_symmetric key
         if message.encryption_type == "symmetric" and adv_name in message.key: 

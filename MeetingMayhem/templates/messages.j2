@@ -114,10 +114,10 @@
                     Warning:</div>
                     {% if msg[0].encryption_type == 'symmetric' %}
                         <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                            Symmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                            Symmetrically encrypted with {{msg[0].initial_encryption_details[9:] }}</div>
                     {% elif msg[0].encryption_type == 'asymmetric' %}
                         <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                            Asymmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                            Asymmetrically encrypted with {{msg[0].initial_encryption_details[9:] }}</div>
                     {% endif %}
                 {% else %}
                 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
@@ -179,6 +179,10 @@ function decrypt(id_button){
     const recipent = id_button.split("-")[3];
     const encryption_type = id_button.split("-")[4];
     const encryption_key = id_button.split("-")[5];
+    const key_owner = encryption_key.split("_")[1];
+    const key_owner2 = encryption_key.split("_")[2];
+    console.log(key_owner);
+    console.log(key_owner2);
     console.log(msg_id);
     console.log(sender);
     console.log(recipent);
@@ -196,7 +200,7 @@ function decrypt(id_button){
             return;
         }
         // correct Key
-        if (decryption_key === "Shared_".concat(recipent,"_",sender)){
+        if (decryption_key === "Shared_".concat(key_owner,"_",key_owner2) || decryption_key === "Shared_".concat(key_owner2,"_",key_owner)){
             document.getElementById(`content-${msg_id}`).style.display = "";
             document.getElementById(`${id_button}`).style.display = "none";
             document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
@@ -217,9 +221,9 @@ function decrypt(id_button){
             return;
         }
         // correct way to do asymmetric encryption : encrypt with Receiver's public key
-        if (encryption_key === "public_".concat(recipent)){
+        if (encryption_key.startsWith("public_")){
             // use reciever's private key
-            if (decryption_key === "private_".concat(recipent)){
+            if (decryption_key === "private_".concat(key_owner)){
                 document.getElementById(`content-${msg_id}`).style.display = "";
                 document.getElementById(`${id_button}`).style.display = "none";
                 document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
@@ -233,9 +237,9 @@ function decrypt(id_button){
             }
         }
         // Wrong way to do asymmetric encryption: use sender's public key
-        if (encryption_key === "private_".concat(sender)){
+        if (encryption_key.startsWith("private_")){
             // use sender's public key
-            if (decryption_key === "public_".concat(sender)){
+            if (decryption_key === "public_".concat(key_owner)){
                 document.getElementById(`content-${msg_id}`).style.display = "";
                 document.getElementById(`${id_button}`).style.display = "none";
                 document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
@@ -256,9 +260,9 @@ function decrypt(id_button){
             return;
         }
         // correct way to do signature :sign with sender's private key
-        if (encryption_key === "private_".concat(sender)){
-            // use sender's public key
-            if (decryption_key === "public_".concat(sender)){
+        if (encryption_key.startsWith("private_")){
+            // use own private key
+            if (decryption_key === "public_".concat(key_owner)){
                 document.getElementById(`content-${msg_id}`).style.display = "";
                 document.getElementById(`${id_button}`).style.display = "none";
                 document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
@@ -268,13 +272,13 @@ function decrypt(id_button){
                 socket.emit('decrypted', { message: msg_id });
             }
             else{
-                alert("Please select correct Key for asymmetric encryption");
+                alert("Please select correct Key for Verification of Signature!");
             }
         }
         // Wrong way to do signature: use reciever's public key
-        if (encryption_key === "public_".concat(recipent)){
+        if (encryption_key.startsWith("public_")){
             // use own private key
-            if (decryption_key === "private_".concat(recipent)){
+            if (decryption_key === "private_".concat(key_owner)){
                 document.getElementById(`content-${msg_id}`).style.display = "";
                 document.getElementById(`${id_button}`).style.display = "none";
                 document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
@@ -284,9 +288,10 @@ function decrypt(id_button){
                 socket.emit('decrypted', { message: msg_id });
             }
             else{
-                alert("Please select correct Key for asymmetric encryption");
+                alert("Please select correct Key for Verification of Signature!");
             }
         }
+        
     } 
     else{
         alert("Error");

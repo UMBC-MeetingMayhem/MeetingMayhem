@@ -110,7 +110,7 @@
 			 </div>
 		  </fieldset>
 			 <div class="form-group">
-				{{ msg_form.submit(class="btn btn-outline-info", onclick="addCryptography()", id="submitButton") }}
+				{{ msg_form.submit(class="btn btn-outline-info", id="submitButton") }}
 			 </div>
 		  </div>
 	   </form>
@@ -168,110 +168,6 @@
 	 
 </script>	
 <script>
-	function addCryptography(){
-		var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
-		var submitString = "";
-		key_select = $( "#key_select" ).val();
-		type_select = $( "encryption_sign_type_select" ).val();
-	
-	
-		var allSelectedValues = Array.from(dropboxes).every(function(db) {
-			return db.value !== '-1';
-		});
-		
-		if(allSelectedValues){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
-			
-			listEl.classList.add("select2-selection__choice");
-			
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
-			
-			listEl.appendChild(buttonEl);
-			
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = type_select;
-			listEl.appendChild(spanEl);
-			
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = user_select + "." + key_select;
-			listEl.appendChild(spanEl2);
-			
-			var listContainer = $( "#cryptography_tags_list" );
-			listContainer.append(listEl);
-				
-			var submitString = "";
-				
-			$('#cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
-
-				var chars = option_all.split(',');
-				
-				submitString += chars[1] + "(" + chars[2] + "),"
-			}) 		
-	}
-	
-	submitString = submitString.slice(0, -1) 
-	console.log(submitString);
-	document.getElementById('encryption_and_signed_keys').value = submitString; 
-}
-   	
-	function addCryptographyADV(){
-		console.log("eewew");
-		user_select = $( "#adv_cryptography_user_select" ).val();
-		key_select = $( "#adv_cryptography_key_select" ).val();
-		type_select = $( "#adv_cryptography_type_select" ).val();
-			
-		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
-			
-			listEl.classList.add("select2-selection__choice");
-			
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
-			
-			listEl.appendChild(buttonEl);
-			
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = type_select;
-			listEl.appendChild(spanEl);
-			
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = user_select + "." + key_select;
-			listEl.appendChild(spanEl2);
-			
-			var listContainer = $( "#adv_cryptography_tags_list" );
-			listContainer.append(listEl);
-			 
-			var submitString = "";
-			 
-			$('#adv_cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
-
-				var chars = option_all.split(',');
-				
-				submitString += chars[1] + "(" + chars[2] + "),"
-			}) 		
-		}
-		
-		submitString = submitString.slice(0, -1) 
-		console.log(submitString);
-		document.getElementById('adv_encryption_and_signed_keys').value = submitString; 
-   }
    var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
    
    // Add event listener to all selected elements
@@ -325,20 +221,20 @@ function clear_all(){
 					<div class="article-metadata">
 						<a>Sender: {{ msg[0].sender }} | </a>
 						<a>Recipient: {{ msg[0].recipient }}</a>
-						<!-- <a> | Time Received: {{ msg[0].time_received }} </a> -->
+						<a> | Time Sent: {{ msg[0].time_sent }} </a> 
 					</div>
 					<div>
 						<p style="margin: 0; display:inline; color:#0dcaf0;">@{{ msg[0].location_meet }} {{msg[0].time_meet}}{{ msg[0].time_am_pm }}</p>
 					</div>
 					<!-- if the message has been decrypted or not be decrypted at all, display the original message-->
 					{% if (not msg[0].is_encrypted) and (not msg[0].is_signed) %}
-						<div id="content-{{ msg[0].id }}" class="content" >{{ msg[0].content }}</div>
+						<div id="content-{{ msg[0].id }}-adv" class="content" >{{ msg[0].content }}</div>
 					{% else %}
 						<!-- Show decrypt button -->
 						{% if msg[1] %}
-							<div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
+							<div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}-adv" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
 								<div class="col">
-									<select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+									<select id="decryption_type_select-{{msg[0].id}}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 										<option value= "-1" selected>No Decryption/Verification of Signature</option>
 										<option value="symmetric">Symmetrically Decrypt</option>
 										<option value="asymmetric">Asymmetrically Decrypt</option>
@@ -347,7 +243,7 @@ function clear_all(){
 								</div>
 								with
 								<div class="col">
-									<select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+									<select id="decryption_key_select-{{ msg[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 										<option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
 										{% set current_user_name = current_user.username -%}
 										{% for username,_ in usernames %}
@@ -364,10 +260,10 @@ function clear_all(){
 									</select>
 								</div>
 							</div>
-							<button id="decrypt-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt_adv(this.id)">Decrypt</button>
-							<div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
+							<button id="decryptadv-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt_adv(this.id)">Decrypt</button>
+							<div id="content-{{ msg[0].id }}-adv" class="content" style="display:none;">{{ msg[0].content }}</div>
 						{% else %}
-							<p id="content-{{ msg[0].id }}" class="article-content">--CANNOT DECRYPT--</p>
+							<p id="content-{{ msg[0].id }}-adv" class="article-content">--CANNOT DECRYPT--</p>
 						{% endif %}
 					{% endif %}
 				</div>
@@ -454,7 +350,7 @@ function select_msg(ele, num) {
 	document.getElementById('edit_form').scrollIntoView();
 	$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
 	
-	id = "content-" + num;
+	id = "content-" + num + "-adv";
 	console.log(id)
 	const content_box = document.getElementById(id);
 	var text ="--CANNOT DECRYPT--";
@@ -505,7 +401,8 @@ $(document).ready(function(){
 		}
 
 	}
-
+	document.getElementById('adv_msg_edit_form').value = ""; 
+	document.getElementById('adv_msg_edit_form').disabled = true;
 });
 </script>
 <script>
@@ -523,8 +420,8 @@ function decrypt_adv(id_button){
 	//console.log(encryption_key);
 	//console.log("aaaa")
 	//console.log(current_user_username);
-	const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
-	const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
+	const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
+	const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
 	console.log(decryption_key);
 	console.log(decryption_type);
 	var socket = io();
@@ -537,12 +434,12 @@ function decrypt_adv(id_button){
 		// correct Key, the decrypt button will only show if adv could decrypt it
 		// Therefore, decryption_key must be shared adv_name _sender
 		if (decryption_key === "Shared_".concat(current_user_username,"_",sender)){
-			document.getElementById(`content-${msg_id}`).style.display = "";
+			document.getElementById(`content-${msg_id}-adv`).style.display = "";
 			document.getElementById(`${id_button}`).style.display = "none";
-			document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
-			localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+			document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+			localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
 			localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-			localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+			localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
 			socket.emit('decrypted', { message: msg_id });
 		}
 		// Wrong key
@@ -560,12 +457,12 @@ function decrypt_adv(id_button){
 		if (encryption_key === "public_".concat(current_user_username)){
 			// use reciever's private key
 			if (decryption_key === "private_".concat(current_user_username)){
-				document.getElementById(`content-${msg_id}`).style.display = "";
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
 				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
@@ -576,12 +473,12 @@ function decrypt_adv(id_button){
 		if (encryption_key === "private_".concat(sender)){
 			// use sender's public key
 			if (decryption_key === "public_".concat(sender)){
-				document.getElementById(`content-${msg_id}`).style.display = "";
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
 				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
@@ -599,12 +496,12 @@ function decrypt_adv(id_button){
 		if (encryption_key === "private_".concat(sender)){
 			// use sender's public key
 			if (decryption_key === "public_".concat(sender)){
-				document.getElementById(`content-${msg_id}`).style.display = "";
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
 				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
@@ -615,12 +512,12 @@ function decrypt_adv(id_button){
 		if (encryption_key === "public_".concat(current_user_username)){
 			// use own private key
 			if (decryption_key === "private_".concat(current_user_username)){
-				document.getElementById(`content-${msg_id}`).style.display = "";
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
 				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}`, document.getElementById(`content-${msg_id}`).style.display !== "none" ? 'visible' : 'hidden');
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }`, document.getElementById(`decryption-${ msg_id }-${recipent }`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
 				socket.emit('decrypted', { message: msg_id });
 			}
 			else{
@@ -643,16 +540,16 @@ var options_for_decrypt = document.querySelectorAll('[data-group="decrypt_option
 for (let i = 0; i < options_for_decrypt.length; i++) {
 	msg_id = options_for_decrypt[i].id.split("-")[1];
 	current_user_username = options_for_decrypt[i].id.split("-")[2].replace(',', '');
-	decryption_type_select = document.getElementById(`decryption_type_select-${msg_id}`);
-	de_key_select = document.getElementById(`decryption_key_select-${msg_id}`);
+	decryption_type_select = document.getElementById(`decryption_type_select-${msg_id}-adv`);
+	de_key_select = document.getElementById(`decryption_key_select-${msg_id}-adv`);
 	
 	//var decrytion_type = decryption_type_select.value;
 	decryption_type_select.addEventListener("change", function() {
 		msg_id = options_for_decrypt[i].id.split("-")[1];
 		// Get the selected user from the dropdown
-		new_decryption_type_select =  document.getElementById(`decryption_type_select-${msg_id}`);
-		de_default_key = document.getElementById(`default_key_select-${msg_id}`);
-		de_key_select = document.getElementById(`decryption_key_select-${msg_id}`);
+		new_decryption_type_select =  document.getElementById(`decryption_type_select-${msg_id}-adv`);
+		de_default_key = document.getElementById(`default_key_select-${msg_id}-adv`);
+		de_key_select = document.getElementById(`decryption_key_select-${msg_id}-adv`);
 		all_options = de_key_select.querySelectorAll('option');
 		if (new_decryption_type_select.value === "symmetric") {
 			all_options.forEach((single_option) => {
@@ -784,7 +681,7 @@ for (let i = 0; i < options_for_decrypt.length; i++) {
 		<div class="form-group" style="margin:10px 0px;">
 			<!-- previous, next, delete, and submit buttons for message editing -->
 			{{ adv_msg_edit_form.delete_msg(class="btn btn-outline-info") }}
-			{{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info", onclick="addCryptographyADV()") }}
+			{{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
 			<!-- {{ adv_msg_edit_form.send_no_change(class="btn btn-outline-info") }} -->
 			{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
 			{{ adv_msg_edit_form.not_editable(id="not_editable", type="hidden") }}
