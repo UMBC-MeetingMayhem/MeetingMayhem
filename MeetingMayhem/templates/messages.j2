@@ -29,40 +29,69 @@
             {% else %}
                 <!-- Show decrypt button -->
                 {% if msg[1] %}
-                <div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
-                    <div class="col">
-                        <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                            <option value= "-1" selected>No Decryption/Verification of Signature</option>
-                            <option value="symmetric">Symmetrically Decrypt</option>
-                            <option value="asymmetric">Asymmetrically Decrypt</option>
-                            <option value="signed">Verify Signature</option>
-                        </select>
-                    </div>
-                    with
-                    <div class="col">
-                        <select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                            <option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
-                            {% set current_user_name = msg[0].recipient.replace(', ', '') -%}
-                            {% for username,_ in usernames %}
-                                {% if current_user_name != username %}
-                                <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
-                                {% endif %}
-                            {% endfor %}
-                            {% for username,_ in usernames %}
-                                <option value="public_{{username}}">{{username}}'s Public Key</option>
-                                {% if current_user_name == username %}
-                                <option value="private_{{username}}">{{username}}'s Private Key </option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                {% if msg[0].is_edited %}
-                    <div id="content-{{ msg[0].id }}" class="content" style="display:none;" >{{ msg[0].edited_content }}</div>
-                {% else %}
-                    <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
-                {% endif %}
-                <button id="decrypt-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt(this.id)">Decrypt</button>
+                    {% if msg[0].is_edited %}
+                        <div id="decryption-{{ msg[0].id }}-{{ msg[0].new_recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
+                            <div class="col">
+                                <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                                    <option value= "-1" selected>No Decryption/Verification of Signature</option>
+                                    <option value="symmetric">Symmetrically Decrypt</option>
+                                    <option value="asymmetric">Asymmetrically Decrypt</option>
+                                    <option value="signed">Verify Signature</option>
+                                </select>
+                            </div>
+                            with
+                            <div class="col">
+                                <select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                                    <option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
+                                    {% set current_user_name = msg[0].new_recipient.replace(', ', '') -%}
+                                    {% for username,_ in usernames %}
+                                        {% if current_user_name != username %}
+                                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for username,_ in usernames %}
+                                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                                        {% if current_user_name == username %}
+                                        <option value="private_{{username}}">{{username}}'s Private Key </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="content-{{ msg[0].id }}" class="content" style="display:none;" >{{ msg[0].edited_content }}</div>
+                        <button id="decrypt-{{msg[0].id}}-{{msg[0].new_sender}}-{{msg[0].new_recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt(this.id)">Decrypt</button>
+                    {% else %}
+                        <div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options">
+                            <div class="col">
+                                <select id="decryption_type_select-{{msg[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                                    <option value= "-1" selected>No Decryption/Verification of Signature</option>
+                                    <option value="symmetric">Symmetrically Decrypt</option>
+                                    <option value="asymmetric">Asymmetrically Decrypt</option>
+                                    <option value="signed">Verify Signature</option>
+                                </select>
+                            </div>
+                            with
+                            <div class="col">
+                                <select id="decryption_key_select-{{ msg[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                                    <option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
+                                    {% set current_user_name = msg[0].new_recipient.replace(', ', '') -%}
+                                    {% for username,_ in usernames %}
+                                        {% if current_user_name != username %}
+                                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for username,_ in usernames %}
+                                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                                        {% if current_user_name == username %}
+                                        <option value="private_{{username}}">{{username}}'s Private Key </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="content-{{ msg[0].id }}" class="content" style="display:none;">{{ msg[0].content }}</div>
+                        <button id="decrypt-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt(this.id)">Decrypt</button>
+                    {% endif %}
                 {% else %}
                     <p class="article-content">--CANNOT DECRYPT--</p>
                 {% endif %}
@@ -71,15 +100,25 @@
         {% if msg[0].is_encrypted %}
             <div class="m-1 row ">
                 {% if 'Warning' not in msg[0].encryption_details %}
-                <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                    Encrypted with:</div>
+                    {% if msg[0].encryption_type == 'symmetric' %}
+                        <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                            Symmetrically encrypted with:</div>
+                    {% elif msg[0].encryption_type == 'asymmetric' %}
+                            <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                            Asymmetrically encrypted with:</div>
+                    {% endif %}
                 <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
                     msg[0].encryption_details }}</div>
                 {% elif 'but' in msg[0].encryption_details %}
                     <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                     Warning:</div>
-                    <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                    Encrypted with: {{msg[0].encryption_details[9:] }}</div>
+                    {% if msg[0].encryption_type == 'symmetric' %}
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                            Symmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                    {% elif msg[0].encryption_type == 'asymmetric' %}
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                            Asymmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                    {% endif %}
                 {% else %}
                 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
                     Warning:</div>
@@ -168,7 +207,7 @@ function decrypt(id_button){
         }
         // Wrong key
         else{
-        alert("Please select correct Key for symmetric encryption");
+            alert("Please select correct Key for symmetric encryption");
         }
     }
     else if (encryption_type === "asymmetric") {

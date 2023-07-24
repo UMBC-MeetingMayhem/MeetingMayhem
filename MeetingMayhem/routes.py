@@ -178,7 +178,7 @@ def messages():
         #msgs = [] #create a list to store the messages to dispay to pass to the template
 
         for message in display_message: #for each message
-            if check_for_str(message.new_recipient, current_user.username) or check_for_str(message.recipient, current_user.username):
+            if check_for_str(message.new_recipient, current_user.username) or (check_for_str(message.recipient, current_user.username) and not message.is_edited):
                 message.time_recieved = datetime.now(pytz.timezone("US/Eastern")).strftime("%b.%d.%Y-%H.%M")
                 msgs_tuple.append((message, decrypt_button_show(message.encryption_details, message.is_encrypted or message.is_signed)))
                 db.session.commit()
@@ -906,7 +906,7 @@ def serve_images(filename):
 def decrypted(json):
     display_message =  Message.query.filter_by(id=json["message"]).first()
     display_message.is_decrypted = True
-    display_message.is_edited = True
+    #display_message.is_edited = True
     db.session.commit()
     # print("*******************************************")
     # print(display_message)
