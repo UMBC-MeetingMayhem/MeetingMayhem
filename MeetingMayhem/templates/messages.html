@@ -103,14 +103,45 @@ function onlyOne(checkbox) {
             </div>
             {% else %}
             <!-- if there aren't errors, just display normally -->
-            {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
-            {% endif %}
+          <!-- {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}--> 
+            
 <!--            {{ form.encryption_type(class="gray-blue") }}-->
+               <br>
+               <h1 class="float-start" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black; ">User Messages</h1>
+               <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 500px; height: 750px; margin-top: 130px; border-radius: 25px;">
+                  <div class="chatbox">
+                     <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px; border-radius: 10px;">
+                     <p>Hi, How are you?</p>
+                  </div>
+
+               <div class="chatbox">
+                  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px;  margin: 0 0 20px 150px; margin-top: 45px; margin-bottom: 45px; border-radius: 10px;">
+                  <p>Hey! I'm fine. Thanks for asking!</p>
+               </div>
+
+               <div class="chatbox">
+                  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px; border-radius: 10px;">
+                  <p>Sweet! So, what do you wanna do today?</p>
+               </div>
+
+               <div class="chatbox">
+                  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px; margin: 0 0 30px 150px; margin-top: 45px; border-radius: 10px;">
+                  <p>Nah, I dunno. Play soccer.. or learn more coding perhaps?</p>
+               </div>
+               </div>
+               </div>
+               </div>
+               </div>
+               {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
+               <div class="form-group" style="margin: 0 0 30px 250px;">
+                  {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
+               </div>
          </div>
+         {% endif %}
       </fieldset>
-      <div class="form-group">
+      <!--<div class="form-group" >
          {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
-      </div>
+      </div>-->
    </form>
 </div>
 
