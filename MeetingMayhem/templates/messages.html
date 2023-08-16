@@ -113,6 +113,7 @@ function onlyOne(checkbox) {
                      {% for index in range(other_names|length) %}
                         <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 500px; height: 750px; margin-top: 130px; border-radius: 25px;">
                            <!-- Header for profile + names -->
+                           <!--! TODO: Center Name + Adding Profile Picture  -->
                            <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
                               {{other_names[index]}}
                            </div>
@@ -120,15 +121,20 @@ function onlyOne(checkbox) {
                            <div class="chatbox">
                               {% if msgs_flag[index] %}
                                  {% for message in msgs_tuple[index] %}
+                                  <!--! TODO: Profile next to box  -->
                                     {% if message[3] %}
+                                       <!--? Message box for other user(left) -->
                                        <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px; border-radius: 10px;">
                                           <p>{{message[0].content}}</p>
                                        </div>
+                                       <!--? other user Profile Image -->
                                        <img src="{{ image_url[index] }}" alt="Profile Image" class="nav-image1" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; ">
                                     {% else %}
+                                       <!--? Message box for current user(right) -->
                                        <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px;  margin: 0 0 20px 150px; margin-top: 45px; margin-bottom: 45px; border-radius: 10px;">
                                           <p>{{message[0].content}}</p>
                                        </div>
+                                        <!--? Current user Profile Image -->
                                        <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image1" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; ">
                                     {% endif %}
                                  {% endfor %}
