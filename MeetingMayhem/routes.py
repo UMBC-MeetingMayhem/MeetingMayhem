@@ -162,62 +162,73 @@ def messages():
     users = User.query.filter_by(role=4, game=current_game.id).all()
     adversaries = User.query.filter_by(role=3, game=current_game.id).all()
     usernames = []
+    other_name = []
+    image_url = []
     for user in users:
         usernames.append((user.username,user.image_url))
     for adversary in adversaries:
         usernames.append((adversary.username,adversary.image_url))
-    
     #usernames = random.sample(usernames, len(usernames)) # randomizes usernames
     usernames = sorted(usernames)
+    for username,url_image in usernames:
+        if current_user.username != username:
+            other_name.append(username)
+            image_url.append(url_image)
     form = MessageForm() #use the standard message form
-    #msgs = None
-    msgs_tuple = []
-    if (current_game.current_round>=1):
-        #pull messages from current_round where the message isn't deleted
-        display_message = Message.query.filter_by(adv_submitted=True, is_deleted=False, game=current_game.id).all()
-        #msgs = [] #create a list to store the messages to dispay to pass to the template
 
-        for message in display_message: #for each message
-            if check_for_str(message.new_recipient, current_user.username) or (check_for_str(message.recipient, current_user.username) and not message.is_edited):
+    #sent and recieved messages
+    sent_msg = [Message.query.filter_by(sender=current_user.username, recipient = name, game=current_game.id,adv_submitted=False).all() for name in other_name]
+    #print(sent_msg)
+    recieved_msg = [Message.query.filter_by(new_recipient=current_user.username,sender=name,adv_submitted=True, is_deleted=False, game=current_game.id).all() for name in other_name]
+   
+    # Organize messages by chatbox
+    msgs_tuple = []
+    
+    for index in range(len(other_name)):
+        msg_tuple_list = []
+        if recieved_msg[index]:
+            for message in recieved_msg[index]:
                 if message.time_recieved == "Null":
                     message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
-                msgs_tuple.append((message, decrypt_button_show(message),message.time_recieved))
+                # False means to this message is on the right (recieved)
+                msg_tuple_list.append((message, decrypt_button_show(message),message.time_recieved,True))
                 db.session.commit()
-                #print(message)
-        # print(display_message)
-        # print(Message.query.filter_by(game=current_game.id).all())
+        if sent_msg[index]:
+            for message in sent_msg[index]:
+                msg_tuple_list.append((message, None,message.time_sent,False))
+                db.session.commit()
+        msgs_tuple.append(msg_tuple_list)
+
 
     #setup message flag to tell template if it should display messages or not
-    msg_flag = False
-    if msgs_tuple:
-        msg_flag = True
-        msgs_tuple = sorted(msgs_tuple, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=True)
-
-    #sent messages
-    sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id,adv_submitted=False).all()
-    sent_msgs.reverse()
-
+    msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
+    msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
     if form.validate_on_submit(): #when the user submits the message form and it is valid
         #capture the list of players from the checkboxes and make it into a string delimited by commas
         checkbox_output_list = request.form.getlist('recipients')
         #ensure the list isn't empty
         if not checkbox_output_list:
             flash(f'Please select one recipient.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+            return render_template('messages.html', title='Messages', form=form, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                            usernames=usernames,other_names=other_name,image_url=image_url)
 
         if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
             flash(f'Please select a time and location.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+            return render_template('messages.html', title='Messages', form=form, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                            usernames=usernames,other_names=other_name,image_url=image_url)
 
         #ensure keys entered are keys of actual recipients chosen
         curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
-        create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
+        _,msg_new = create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
         update()
-
-    #sent messages
-    sent_msgs = Message.query.filter_by(sender=current_user.username, game=current_game.id).all()
-    sent_msgs.reverse()
-    return render_template('messages.html', title='Messages', form=form, msgs=msgs_tuple, game=current_game, msg_flag=msg_flag, sent_msgs=sent_msgs, usernames=usernames)
+        msgs_tuple[other_name.index(msg_new.recipient)].append((msg_new, None,msg_new.time_sent,False))
+   
+    print(msgs_tuple)
+    return render_template('messages.html', title='Messages', form=form, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                            usernames=usernames,other_names=other_name,image_url=image_url)
 
 
 
