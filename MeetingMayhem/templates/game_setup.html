@@ -49,18 +49,20 @@
                 {% for username in usernames %}
                     <div class="form-check form-check-inline">
                         <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="players" value="{{ username }}, ">
+                        <input class="form-check-input discheck" type="checkbox" id="inlineCheckbox1" name="players" value="{{ username }}, ">
                         <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
                     </div>
                 {% endfor %}
                 </div> <br/>
             </fieldset>
-            <div class="form-group">
-                {{ setup_form.create_game(class="btn btn-outline-info") }}
+             <div class="form-group">
+                <!-- {{ setup_form.create_game(class="btn btn-outline-info") }} -->
+            
+            <button type="submit" id="submit-button"  {% if disabled %}disabled{% endif %} {{ setup_form.create_game(class="btn btn-outline-info") }} Submit </button>
             </div>
         </form>
     </div>
-
+    <button onclick="clear_all()"> Clear Cache</button>
     <div class="content-section">
         <form method="POST" action="">        
             {{ mng_form.hidden_tag() }}
@@ -83,7 +85,8 @@
             </fieldset>
             <div class="form-group">
                 {{ mng_form.end_game(class="btn btn-outline-info") }}
-                {{ mng_form.end_game_page(class="btn btn-outline-info") }}
+                <!-- {{ mng_form.end_game_page(class="btn btn-outline-info") }} -->
+                {{ mng_form.random(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
@@ -121,9 +124,24 @@
                         {{ usr_form.role(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> <br/>
+                <div class="form-group">
+                    {{ usr_form.profile.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    
+                    {% if usr_form.profile.errors %} <!-- if there are errors in the form... -->
+                        {{ usr_form.profile(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for errors in usr_form.profile.errors %}
+                                <span>{{ errors }}</span> <!-- display the errors -->
+                            {% endfor %}
+                        </div>
+                    {% else %} <!-- if there aren't errors, just display normally -->
+                        {{ usr_form.profile(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div> <br/>
             </fieldset>
             <div class="form-group">
                 {{ usr_form.update(class="btn btn-outline-info") }}
+                {{ usr_form.update_profile(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
@@ -145,5 +163,30 @@
 			});
         });
 	});
+    const checkboxes = document.querySelectorAll('.discheck');
+const submitButton = document.querySelector('#submit-button');
+
+
+function updateSubmitButtonState() {
+  let numCheckboxSelected = 0;
+  checkboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      numCheckboxSelected++;
+    }
+  });
+  submitButton.disabled = numCheckboxSelected < 2;
+}
+
+checkboxes.forEach((checkbox) => {
+  checkbox.addEventListener('click', updateSubmitButtonState);
+});
+
+
+
+updateSubmitButtonState();
+
+function clear_all(){
+    localStorage.clear();
+}
 	</script>
 {% endblock content %}

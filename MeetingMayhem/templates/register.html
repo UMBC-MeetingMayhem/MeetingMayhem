@@ -9,85 +9,134 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<div style="margin:auto;width:fit-content;display:flex;">
-        <div class="logobox bg-dark" style="border-top-right-radius:0px;border-bottom-right-radius:0px;margin:auto;">
-                <img src="{{ url_for('static', filename='MM_white.svg') }}" 
-                style="width:90%;margin:30px auto;display:block;">
-            </div>
+
+<div style="margin:auto;width:fit-content;display:flex;margin-top:40px;">
+
+    <div class="logobox bg-dark" style="border-top-right-radius:0px;border-bottom-right-radius:0px;margin:auto;">
+        <img src="/images/Arts/Logo/Logo_Logo_Simple.png"
+             style="width:90%;margin:30px auto;display:block;">
+    </div>
     <div class="joinbox bg-dark" style="line-height:175%;flex-direction:row;border-left:none;width:500px;">
         <form method="POST" action="" style="width:90%;text-align:center;margin:auto;
         animation-name:form-fadein;animation-duration:1s;">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for registration -->
-                <legend class="border-bottom mb4">Join Today</legend>
+                <legend class="mb4" style="margin:40px 0;">Join Today!</legend>
                 <div class="form-group">
-                    {{ form.username.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+                    <!--                    {{ form.username.label(class="form-control-label") }} &lt;!&ndash; i think this tells jinja to put a form box in here &ndash;&gt;-->
 
                     {% if form.username.errors %} <!-- if there are errors in the form... -->
-                        {{ form.username(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.username.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
+                    {{ form.username(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for errors in form.username.errors %}
+                        <span>{{ errors }}</span> <!-- display the errors -->
+                        {% endfor %}
+                    </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ form.username(class="form-control form-control-lg") }}
+                    {{ form.username(class="form-control form-control-lg", placeholder="Username") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
-                    
+                    <!--                    {{ form.email.label(class="form-control-label") }}-->
+
                     {% if form.email.errors %} <!-- if there are errors in the form... -->
-                        {{ form.email(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.email.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
-                    {% endif %}
+                    {{ form.email(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for errors in form.email.errors %}
+                        <span>{{ errors }}</span> <!-- display the errors -->
+                        {% endfor %}
                     </div>
+                    {% else %}
+                    {{ form.email(class="form-control form-control-lg", placeholder="Email") }}
+                    {% endif %}
+                </div>
                 <div class="form-group">
-                    {{ form.password.label(class="form-control-label") }}
+                    <!--                    {{ form.password.label(class="form-control-label") }}-->
 
                     {% if form.password.errors %} <!-- if there are errors in the form... -->
-                        {{ form.password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.password.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
+                    {{ form.password(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for errors in form.password.errors %}
+                        <span>{{ errors }}</span> <!-- display the errors -->
+                        {% endfor %}
+                    </div>
                     {% else %}
-                        {{ form.password(class="form-control form-control-lg") }}
-                    {% endif %}                    
+                    {{ form.password(class="form-control form-control-lg", placeholder="Password") }}
+                    {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.confirm_password.label(class="form-control-label") }}
-                    
+                    <!--                    {{ form.confirm_password.label(class="form-control-label") }}-->
+
                     {% if form.confirm_password.errors %} <!-- if there are errors in the form... -->
-                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in form.confirm_password.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
+                    {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for errors in form.confirm_password.errors %}
+                        <span>{{ errors }}</span> <!-- display the errors -->
+                        {% endfor %}
+                    </div>
                     {% else %}
-                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                    {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm Password") }}
                     {% endif %}
                 </div>
             </fieldset>
-            <br>
+            <div>
+                <label for="image">Select your profile image:</label>
+                <select name="image" id="image" onchange="displaySelectedImage()" style="background-color: white; color: grey; padding: 10px; width: 120px; border: 10px; outline: none; font-size: 16px; border-radius:4px">
+                    <option value="/images/Arts/Characters/1-Jordan/1-Jordan_Profile.png">Image 1</option>
+                    <option value="/images/Arts/Characters/2-Dakota/2-Dakota_Profile.png">Image 2</option>
+                    <option value="/images/Arts/Characters/3-Yasmin/3-Yasmin_Profile.png">Image 3</option>
+                    <option value="/images/Arts/Characters/4-Derek/4-Derek_Profile.png">Image 4</option>
+                    <option value="/images/Arts/Characters/5-Kaede/5-Kaede_Profile.png">Image 5</option>
+                    <option value="/images/Arts/Characters/6-Manuel/6-Manuel_Profile.png">Image 6</option>
+                    <option value="/images/Arts/Characters/7-Spy/7-Spy_Profile.png">Image 7</option>
+                    <option value="/images/Arts/Characters/8-Spyess/8-Spyess_Profile.png">Image 8</option>
+                    <option value="/images/Arts/Characters/9-Kody/9-Kody_Profile.png">Image 9</option>
+
+                </select>
+            </div>
+
+            <div id="image-container"></div>
+
+            <input type="hidden" id="selected_image" name="selected_image" value="">
+
+
+
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
-            <small class="text-muted"> <!-- link asking user to login if they already have an account -->
+            <small class=""> <!-- link asking user to login if they already have an account -->
                 Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
             </small>
         </form>
 
     </div>
-    </div>
+</div>
 
+<script>
+
+  function displaySelectedImage() {
+    var selectElement = document.getElementById("image");
+    var selectedImage = selectElement.value;
+    var imageContainer = document.getElementById("image-container");
+
+    // Clear existing content
+    imageContainer.innerHTML = "";
+
+    // Create new image element
+    var img = document.createElement("img");
+    img.src = selectedImage;
+    img.alt = "Selected Image";
+    img.style.width = "100px"; // Set the desired width
+    img.style.height = "90px"; // Set the desired height
+
+    // Append image element to the container
+    imageContainer.appendChild(img);
+    document.getElementById("selected_image").value = selectedImage;
+  }
+
+
+  // Initial display of the selected image
+  displaySelectedImage();
+</script>
 {% endblock content %}

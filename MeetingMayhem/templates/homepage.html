@@ -1,0 +1,92 @@
+<head>
+    <style>
+        body {
+            background-image: url("/images/Arts/BackGround/TitleScreen_Process.png");
+            background-size: 105%;
+            background-position-x: -1.4rem;
+            background-repeat: no-repeat;
+            background-position-y: top;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .menu {
+          width: 338px;
+          background-color: #ffe600c3;
+          opacity: 0.8;
+        }
+
+        .menu ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .menu li {
+          margin: 5px 0;
+        }
+
+        .menu a {
+          display: block;
+          padding: 10px;
+          text-decoration: none;
+          color: #121313;
+          text-transform: uppercase;
+          text-align: center;
+          font-size: 30px;
+        }
+
+        .menu a:hover {
+          color: #fff;
+          background-color:rgb(201, 191, 12);
+        }
+
+    </style>
+</head>
+
+<body style="font-family:'Courier', sans-serif">
+<!-- <h1 style="text-align:center; color:#fff; margin:30px;padding:50px;font-size:100px;" >
+    MeetingMayhem
+</h1> -->
+
+<!--    <div style="clear:both;display:box;">-->
+<!--    <div id="freeplay" class="col-auto" style="float:left;width:40%;height:300px;margin:30px;border:5px solid black;text-align:center;border-radius:15px;padding:120px;background-color: #ecb415;-->
+<!--    ;">Free Play</div>-->
+<!--    <div id="multimode" class="col-auto" style="float:right;width:40%;height:300px;margin:30px;border:5px solid black;text-align:center;border-radius:15px;padding:120px;background-color:#323d59;-->
+<!--    ">MultiPlayer</div>-->
+<!--    </div>-->
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="container" >
+    <div class="menu" style="font-weight: bold">
+        <ul>
+            <li><a href="messages">Free Play</a></li>
+            <!-- <li><a href="multilevelmessages">Multi Player</a></li> -->
+            <li><a href="home">About the Game</a></li>
+        </ul>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+    var socket = io();
+    socket.on('ingame', function() {
+        window.location.href = "{{ url_for('messages') }}";
+    });
+    });
+
+    var div = document.getElementById('freeplay');
+    div.addEventListener('click', function() {
+    window.location.href = "{{ url_for('messages') }}";
+    });
+</script>

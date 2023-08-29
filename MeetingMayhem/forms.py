@@ -17,7 +17,7 @@ getUserFactory - used to pull the usernames for the recipient selection
 """
 import re
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, HiddenField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -31,15 +31,18 @@ class RegistrationForm(FlaskForm):
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	password = PasswordField('Password', validators=[DataRequired()])
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+	selected_image = HiddenField('Selected Image')
 	submit = SubmitField('Sign Up')
-	
+
+
+
 	def validate_username(self, username):
 		user = User.query.filter_by(username=username.data).first() #check if there is already a user with the passed username in the db
 		if user: #if there is, throw an error
 			raise ValidationError('That username is already in use. Please choose a different one.')
 		if re.compile("[A-Za-z0-9]+").fullmatch(username.data) is None: #check if the username only has letters and numbers, if not, throw an error
 			raise ValidationError('Please only use letters and numbers for your username.')
-	
+
 	def validate_email(self, email):
 		email = User.query.filter_by(email=email.data).first() #check if there is already a user with the passed email in the db
 		if email: #if there is, throw an error
@@ -53,27 +56,29 @@ class LoginForm(FlaskForm):
 	remember = BooleanField('Remember Me')
 	submit = SubmitField('Login')
 
+
 #Message form for users and adversary to construct messages with
 class MessageForm(FlaskForm):
-	content = StringField('Message', validators=[DataRequired()])
+	content = StringField('', validators=[DataRequired()])
 	submit = SubmitField('Send Message')
 	encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
-	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_location = SelectField('locations', choices=["Locations", "Cafe", "Track", "Alley", "Dorm", "Garage", "Lab", "Park"])
 	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
 	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
+	encryption_type = SelectField('encryption_sign_type_select', choices=["No Encryption/Signature", "Symmetrically Encrypt", "Asymmetrically Encrypt","Sign"], default="No Encryption/Signature")
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("symmetric[(][a-zA-Z0-9]+[.](private|public|key pair)[)]$", element))) and not(bool(re.match("asymmetric[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
 				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):
 	edited_content = StringField('Edited Message')
-	meet_location = SelectField('locations', choices=["Locations", "Park", "Garage", "Alley", "Cafe", "Parking", "Rooftop", "Bus Stop", "Subway Station"])
+	meet_location = SelectField('locations', choices=["Locations", "Cafe", "Track", "Alley", "Dorm", "Garage", "Lab", "Park"])
 	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
 	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	msg_num = IntegerField()
@@ -81,13 +86,14 @@ class AdversaryMessageEditForm(FlaskForm):
 	send_no_change = SubmitField('Forward Message (no changes)')
 	delete_msg = SubmitField('Delete Message')
 	encryption_and_signed_keys = StringField('Key(s)')
-	
+	not_editable = BooleanField()
+
 	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
 		keys = (encryption_and_signed_keys.data).lower().split(',')
 		if encryption_and_signed_keys.data == '':
 			return
 		for element in keys:
-			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("encrypted[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("symmetric[(][a-zA-Z0-9]+[.](private|public|shared)[)]$", element))) and not(bool(re.match("asymmetric[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
 				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to advance the round
@@ -105,7 +111,7 @@ class GMSetupGameForm(FlaskForm):
 		game = Game.query.filter_by(name=name.data).first() #check if there is already a game with the passed name in the db
 		if game: #if there is, throw an error
 			raise ValidationError('That name is already in use. Please choose a different one.')
-	
+
 	def validate_adversary(self, adversary): #check if the adversary is already in a game
 		game = Game.query.filter_by(adversary=adversary.data.username, is_running=True).first()
 		if game:
@@ -133,12 +139,15 @@ class GMManageGameForm(FlaskForm):
 	game = QuerySelectField(u'Games', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
 	end_game = SubmitField('End Game') #ends the game completely
 	end_game_page = SubmitField('End Game Page') #brings the game to the end of game page, used for testing
+	random = SubmitField('Randomize the adv')
 
 #Form for the game master to manage the role of users
 class GMManageUserForm(FlaskForm):
 	user = QuerySelectField(u'User', query_factory=getNonGMUsersFactory(['id', 'username']), get_label='username', validators=[DataRequired()])
 	role = SelectField(u'Role', choices=[('adv', 'Adversary'), ('usr', 'User'), ('spec', 'Spectator'), ('inac', 'Inactive')], validators=[DataRequired()])
+	profile = SelectField(u'Role', choices=[('/images/Arts/Characters/1-Jordan/1-Jordan_Profile.png', 'Jordan'), ('/images/Arts/Characters/2-Dakota/2-Dakota_Profile.png', 'Dakota'), ('/images/Arts/Characters/3-Yasmin/3-Yasmin_Profile.png', 'Yasmin'), ('/images/Arts/Characters/4-Derek/4-Derek_Profile.png', 'Derek'),('/images/Arts/Characters/5-Kaede/5-Kaede_Profile.png','Kaede'),('/images/Arts/Characters/6-Manuel/6-Manuel_Profile.png','Manuel'),('/images/Arts/Characters/7-Spy/7-Spy_Profile.png','Spy'),('/images/Arts/Characters/8-Spyess/8-Spyess_Profile.png','Spyess'),('/images/Arts/Characters/9-Kody/9-Kody_Profile.png','Kody')], validators=[DataRequired()])
 	update = SubmitField('Update User')
+	update_profile  = SubmitField('Update Profile')
 
 # Form for a user to select a game
 class GameSelectForm(FlaskForm):
@@ -147,5 +156,5 @@ class GameSelectForm(FlaskForm):
 
 # Form for game master to get game info
 #class GMSelectForm(FlaskForm):
-	#running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
-	#select_game = SubmitField('Select Game')
+#running_games = QuerySelectField(u'Game', query_factory=getGameFactory(['id', 'name']), get_label='name', validators=[DataRequired()])
+#select_game = SubmitField('Select Game')

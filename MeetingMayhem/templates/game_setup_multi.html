@@ -1,0 +1,222 @@
+<!--
+    File: game_setup.html
+    Author: Robert Shovan /Voitheia
+    Date: 6/15/2021
+    Last Modified: 7/30/2021
+    E-mail: rshovan1@umbc.edu
+    Description: html and jinja file for handling the about page
+-->
+
+{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
+{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+<h1 style="text-align:center;">Game Setup</h1>
+
+<div class="content-section">
+    <form method="POST" action="">
+        {{ setup_form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb4">Create a Game</legend>
+            <div class="form-group">
+                {{ setup_form.name.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+
+                {% if setup_form.name.errors %} <!-- if there are errors in the form... -->
+                {{ setup_form.name(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for errors in setup_form.name.errors %}
+                    <span>{{ errors }}</span> <!-- display the errors -->
+                    {% endfor %}
+                </div>
+                {% else %} <!-- if there aren't errors, just display normally -->
+                {{ setup_form.name(class="form-control form-control-lg") }}
+                {% endif %}
+            </div> <br/>
+            <div class="form-group">
+                {{ setup_form.adversary.label(class="form-control-label") }}
+
+                {% if setup_form.adversary.errors %} <!-- if there are errors in the form... -->
+                {{ setup_form.adversary(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for errors in setup_form.adversary.errors %}
+                    <span>{{ errors }}</span> <!-- display the errors -->
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ setup_form.adversary(class="form-control form-control-lg") }}
+                {% endif %}
+            </div> <br/>
+            <div id="players_game_form" class="form-group">
+                <label class="form-control-label" for="name">Players</label> <br/>
+                {% for username in usernames %}
+                <div class="form-check form-check-inline">
+                    <!-- below line needs the ', ' in value to make processing usernames easier -->
+                    <input class="form-check-input discheck" type="checkbox" id="inlineCheckbox1" name="players" value="{{ username }}, ">
+                    <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
+                </div>
+                {% endfor %}
+            </div> <br/>
+            <div id="players_ability_form" class="form-group">
+                <form>
+                    <label class="form-control-label" for="nam1" >Players Ability</label> <br/>
+                        <input type="checkbox" name="send_receive" value="plain_text">
+                        Send/Receive Plain Text
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="asymmetric" value="encryption_decryption">
+                        Asymmetric Encryption/Decryption
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="symmetric" value="encryption_decryption">
+                        Symmetric Encryption/Decryption
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="signed">
+                        Signed
+                    </label><br>
+
+                </form>
+
+            </div>
+            <br/>
+            <div id="dversary_ability_form" class="form-group">
+                <form>
+                    <label class="form-control-label" for="na1" >Adversary Ability</label> <br/>
+                    <input type="checkbox" name="send_receive" value="plain_text">
+                    Send/Receive/delete Plain Text to users
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="modify" value="modify">
+                        Modify Unencrypted Messages
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="asymmetric" value="encryption_decryption">
+                        Asymmetric Encryption/Decryption
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="symmetric" value="encryption_decryption">
+                        Symmetric Encryption/Decryption
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="signed">
+                        Signed
+                    </label><br>
+
+                </form>
+
+            </div>
+        </fieldset>
+        <div class="form-group">
+            <!-- {{ setup_form.create_game(class="btn btn-outline-info") }} -->
+
+            <button type="submit" id="submit-button" {% if disabled %}disabled{% endif %} {{ setup_form.create_game(class="btn btn-outline-info") }} Submit </button>
+        </div>
+    </form>
+</div>
+
+<div class="content-section">
+    <form method="POST" action="">
+        {{ mng_form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb4">Manage a Game</legend>
+            <div class="form-group">
+                {{ mng_form.game.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+
+                {% if mng_form.game.errors %} <!-- if there are errors in the form... -->
+                {{ mng_form.game(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for errors in mng_form.game.errors %}
+                    <span>{{ errors }}</span> <!-- display the errors -->
+                    {% endfor %}
+                </div>
+                {% else %} <!-- if there aren't errors, just display normally -->
+                {{ mng_form.game(class="form-control form-control-lg") }}
+                {% endif %}
+            </div> <br/>
+        </fieldset>
+        <div class="form-group">
+            {{ mng_form.end_game(class="btn btn-outline-info") }}
+            {{ mng_form.end_game_page(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+
+<div id="manage_user_form" class="content-section">
+    <form method="POST" action="">
+        {{ usr_form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb4">Manage a User</legend>
+            <div class="form-group">
+                {{ usr_form.user.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+
+                {% if usr_form.user.errors %} <!-- if there are errors in the form... -->
+                {{ usr_form.user(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for errors in usr_form.user.errors %}
+                    <span>{{ errors }}</span> <!-- display the errors -->
+                    {% endfor %}
+                </div>
+                {% else %} <!-- if there aren't errors, just display normally -->
+                {{ usr_form.user(class="form-control form-control-lg") }}
+                {% endif %}
+            </div> <br/>
+            <div class="form-group">
+                {{ usr_form.role.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+
+                {% if usr_form.role.errors %} <!-- if there are errors in the form... -->
+                {{ usr_form.role(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for errors in usr_form.role.errors %}
+                    <span>{{ errors }}</span> <!-- display the errors -->
+                    {% endfor %}
+                </div>
+                {% else %} <!-- if there aren't errors, just display normally -->
+                {{ usr_form.role(class="form-control form-control-lg") }}
+                {% endif %}
+            </div> <br/>
+        </fieldset>
+        <div class="form-group">
+            {{ usr_form.update(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+
+		socket.on('new_player', function() {
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#players_game_form');
+				 $('#players_game_form').replaceWith(elem);
+			});
+			$.get(document.URL, function(data) {
+				var elem = $(data).find('#manage_user_form');
+				 $('#manage_user_form').replaceWith(elem);
+			});
+        });
+	});
+    const checkboxes = document.querySelectorAll('.discheck');
+const submitButton = document.querySelector('#submit-button');
+
+
+function updateSubmitButtonState() {
+  let numCheckboxSelected = 0;
+  checkboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      numCheckboxSelected++;
+    }
+  });
+  submitButton.disabled = numCheckboxSelected < 2;
+}
+
+checkboxes.forEach((checkbox) => {
+  checkbox.addEventListener('click', updateSubmitButtonState);
+});
+
+
+
+updateSubmitButtonState();
+
+	</script>
+{% endblock content %}

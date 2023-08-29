@@ -9,7 +9,6 @@
     a whole bunch of the code in here was shamelessly stolen from the tutorial.
     https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/
 -->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,16 +16,18 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
     <link rel="icon" href="{{ url_for('static', filename='MM_white.svg') }}">
 
-	<!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
     <!-- bootstrap required stuff ends here -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
-	<style>
+    <style>
+	    @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+
         @keyframes logbox {
             from {height:0;}
             to {height:350px;}
@@ -41,12 +42,11 @@
             100% {visibility:visible;opacity:1;}
         }
         body {
-            background: rgb(0,0,0);
-            background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgb(19, 19, 22) 10%, rgb(106, 108, 110) 64%, rgb(219, 222, 223) 100%);
             color: #444;
             margin-top: 5rem;
             background-attachment: fixed;
             color:#dce0f1;
+            font-family: 'Source Code Pro', monospace;
         }
         .box-bkg {
             background: #000011;
@@ -62,6 +62,7 @@
             width: 550px;
             height: 550px;
             border-radius: 15px;
+            opacity:1;
         }
         .logbox {
             display: flex;
@@ -82,6 +83,30 @@
             animation-duration: 1s;
             border-top-right-radius: 15px;
             border-bottom-right-radius: 15px;
+            background-color: rgba(255, 255, 255,1);
+            color: white;
+            opacity : 1;
+        }
+        .form-control-lg{
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        margin: 15px 0;
+
+            border: 1px solid #ccc; /* add a border */
+  border-radius: 5px; /* round the corners */
+  padding: 10px; /* add some padding inside the input box */
+  font-size: 16px; /* set the font size */
+  color: #333; /* set the text color */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* add a subtle box shadow */
+        }
+        .btn-outline-info{
+            margin:25px;
+        }
+        .fixed-top{
+            opacity : 0.7;
+        }
+        .joinbox form{
+            color: white;
         }
         .reg-logo {
             border-top-right-radius: 0px;
@@ -103,14 +128,21 @@
         }
         .site-header .navbar-nav .nav-link:hover {
             color: #ffffff;
-            background-color: rgba(86,103,131,1);
+            background-color: rgba(86,103,131,0.5);
         }
         .content-section {
-            background: #272822;
+            background: #000;
+            opacity:0.85;
             padding: 10px 20px;
             border:none;
             border-radius: 10px;
             margin-bottom: 20px;
+        }
+        .location-image {
+            opacity:1;
+        }
+        .content-section img {
+            opacity:1;
         }
         .account-opt {
             width:90%;
@@ -121,8 +153,13 @@
             text-align:center;
             color:rgb(49, 67, 124);
         }
+        .navbar-dark .navbar-nav .nav-link {
+            color: #00f3ff;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
         input[type=text], select {
-            background-color:#b0b4bd;
+<!--            background-color:#b0b4bd;-->
             border:none;
         }
         .tablinks{
@@ -132,7 +169,7 @@
 			color: #ffffff;
 			background-color: rgba(86,103,131,1);
 			transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
-		}		
+		}
 		.pillbox :first-child{
 			border-left: 50px 20px;
 			rounded-start;
@@ -142,7 +179,7 @@
 			rounded-end;
 			d-inline;
 		}
-		
+
 		#toTopBtn {
 			position: fixed;
 			bottom: 26px;
@@ -183,121 +220,151 @@
 			background-color: hsla(5, 76%, 62%, .8);
 			background-color: hsla(var(--cd-color-3-h), var(--cd-color-3-s), var(--cd-color-3-l), 0.8)
 		}
-		
+		body {
+            background-image: url("/images/Arts/BackGround/TitlePoster_BG_Only_Process.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+          .nav-item1 {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-image1 {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+        background-color: yellow; /* Set the background color to yellow */
+        padding: 5px; /* Optional: Add padding to create some spacing between the image and the circle */
+    }
     </style>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 
     <!-- we use an if else statement here to determine what the title of the page should be based on what is passed from the title variable from routes.py -->
     {% if title %}
-        <title>MeetingMayhem - {{ title }}</title>
+    <title>MeetingMayhem - {{ title }}</title>
     {% else %}
     <!-- if no title is found, just use the default title below -->
-        <title>MeetingMayhem</title>
+    <title>MeetingMayhem</title>
     {% endif %}
 </head>
 <body>
 
-    <!-- navigation bar, shamelessly stolen from the below repo -->
-    <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
-    <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <div class="container">
+<!-- navigation bar, shamelessly stolen from the below repo -->
+<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
+<!-- navigation bar, shamelessly stolen from the below repo -->
+<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/navigation.html -->
+<header class="site-header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <img src="/images/Arts/Logo/Logo_Logo_Simple.png" style="position:relative; left:30px;width:50px; height:50px;text-align:center;display:block;">
+        <div class="container" style="padding-left: 1cm;">
             <a class="navbar-brand mr-4" href="/">MeetingMayhem</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarToggle">
                 <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
-                <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                    <a class="nav-item nav-link" href="{{ url_for('homepage') }}">Home</a>
+                    {% if current_user.role == 3 %}
+                    <a class="nav-item nav-link" href="{{ url_for('home') }}">About</a>
+                    {% else %}
+                    <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                    {% endif %}
                 </div>
 
                 <!-- Navbar Right Side -->
                 <div class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
-                        <p class="nav-item nav-link" >{{ current_user.username }}</p>
-                        <p class="nav-item nav-link">|</p>
-                        {% if current_user.role == 2 %}
-                        <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
-                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
-                        {% endif %}
-                        {% if current_user.role == 5 %}
-                        <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
-                        {% endif %}
-                        {% if current_user.game != None %}
-                        <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
-                        {% endif %}
-                        <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
-                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    <div class="nav-item1">
+                        <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image1" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; ">
+                    </div>
+                    <p class="nav-item nav-link">{{ current_user.username }}</p>
+                    <p class="nav-item nav-link">|</p>
+                    {% if request.path == '/multilevelmessages' %}
+                    <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
+                    <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                    {% endif %}
+                    {% if current_user.role == 2 %}
+                    <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>
+                    <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                    {% endif %}
+                    {% if current_user.game != None %}
+                    <a class="nav-item nav-link" href="{{ url_for('messages') }}">Messages</a>
+                    {% endif %}
+                    <!-- <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a> -->
+                    <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% else %}
-                        <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-                        <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
+                    <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
                     {% endif %}
                 </div>
             </div>
-            </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
-    <!-- use the container class from bootstrap for fancy -->
-    <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/main.html -->
-    <main role="main" class="container" style="width:100%;">
+
+<!-- use the container class from bootstrap for fancy -->
+<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/main.html -->
+<main role="main" class="container" style="width:100%;">
     <div class="row" style="width:100%;margin:auto;">
         <!-- this is for displaying alerts on the webpage -->
         <div style="width:100%;">
-        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
             {% endif %}
-        {% endwith %}
-        
-        <!-- this is where the child templates can overwrite content -->
-        {% block content %}{% endblock %}
+            {% endwith %}
+
+            <!-- this is where the child templates can overwrite content -->
+            {% block content %}{% endblock %}
         </div>
 
         <!-- this is where the sidebar is managed. I haven't changed it yet -->
-<!--
-        <div class="col-md-4">
-        <div class="content-section">
-            <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.</p>
-            <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
-                <li class="list-group-item list-group-item-light">Announcements</li>
-                <li class="list-group-item list-group-item-light">Calendars</li>
-                <li class="list-group-item list-group-item-light">etc</li>
-            </ul>
-            
-        </div>
-        </div>
--->
+        <!--
+                <div class="col-md-4">
+                <div class="content-section">
+                    <h3>Our Sidebar</h3>
+                    <p class='text-muted'>You can put any information here you'd like.</p>
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-light">Latest Posts</li>
+                        <li class="list-group-item list-group-item-light">Announcements</li>
+                        <li class="list-group-item list-group-item-light">Calendars</li>
+                        <li class="list-group-item list-group-item-light">etc</li>
+                    </ul>
+
+                </div>
+                </div>
+        -->
     </div>
     <div>
         <br><br><br>
     </div>
-    </main>
+</main>
 <!--
     <footer>
         <br><br><br><br><hr>
         @2021 UMBC
     </footer>
 -->
-    <!-- bootstrap required stuff begins here -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
-    <!-- bootstrap required stuff ends here -->
-	
-	<!-- socketio 
-	<script type="text/javascript" charset="utf-8">
-    var socket = io();
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
-	</script>-->
+<!-- bootstrap required stuff begins here -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+<!-- bootstrap required stuff ends here -->
+
+<!-- socketio
+<script type="text/javascript" charset="utf-8">
+var socket = io();
+socket.on('connect', function() {
+    socket.emit('my event', {data: 'I\'m connected!'});
+});
+</script>-->
 </body>
 </html>

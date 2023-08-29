@@ -7,21 +7,23 @@
     Description: html and jinja file for handling the login page
 -->
 
-{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
-{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<div style="margin:auto;padding:auto;display:flex;flex-direction:column;width:100%;">
-<div class="logobox bg-dark" style="border-bottom-left-radius:0px;border-bottom-right-radius:0px;margin:auto;">
-        <img src="{{ url_for('static', filename='MM_white.svg') }}" 
+<!--{% extends "layout.html" %} -->
+<!--this tells jinja that we are using a template &ndash;&gt;-->
+{% block content %}
+<!--this piece of code tells jinja where to put the html for this page in the parent template &ndash;&gt;-->
+<div style="margin:auto;width:fit-content;display:flex;margin-top:40px;">
+<div class="logobox bg-dark" style="border-top-right-radius:0px;border-bottom-right-radius:0px;margin:auto;">
+        <img src="/images/Arts/Logo/Logo_Logo_Simple.png" 
         style="width:90%;margin:30px auto;display:block;">
     </div>
-    <div class="logbox bg-dark" style="line-height:175%;height:350px;flex-direction:column;border-top:none;margin:auto;">
+    <div class="joinbox bg-dark" style="line-height:175%;flex-direction:row;border-left:none;width:500px;">
         <form method="POST" action="" class="logform" style="height:300px;">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for login -->
-                <legend class="border-bottom mb4" style="text-align:center;">Log In</legend>
+                <legend class="mb4" style="text-align:center;margin: 40px 0;">Log In Here!</legend>
                 <div class="form-group" >
-                    {{ form.username.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+<!--                    {{ form.username.label(class="form-control-label") }} &lt;!&ndash; i think this tells jinja to put a form box in here &ndash;&gt;-->
                     
                     {% if form.username.errors %} <!-- if there are errors in the form... -->
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
@@ -31,11 +33,11 @@
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ form.username(class="form-control form-control-lg") }}
+                        {{ form.username(class="form-control form-control-lg", placeholder="Username", style="margin: 20px 0;") }}
                     {% endif %}
                     </div>
                 <div class="form-group">
-                    {{ form.password.label(class="form-control-label") }}
+<!--                    {{ form.password.label(class="form-control-label") }}-->
 
                     {% if form.password.errors %} <!-- if there are errors in the form... -->
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
@@ -45,7 +47,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.password(class="form-control form-control-lg") }}
+                        {{ form.password(class="form-control form-control-lg", placeholder="Password", style="margin: 20px 0;") }}
                     {% endif %}                    
                 </div>
 
@@ -60,7 +62,7 @@
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
             <!-- link at the bottom of the page if user doesn't have an account yet -->
-            <small class="text-muted">
+            <small class="">
                 Don't Have An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up</a>
             </small>
         </form>

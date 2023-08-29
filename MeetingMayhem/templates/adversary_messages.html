@@ -12,40 +12,88 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <h1>Messages</h1>
-
+<h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
+<button id="vote_bt-adv" style="box-shadow: none; font-size: 20px; padding: 13px !important" class="btn btn-primary btn-lg float-end gray-blue"
+   data-bs-toggle="button" autocomplete="off">Result</button>
+<script>
+	$("#vote_bt-adv").on("click", function () {
+	   var socket = io();
+       socket.emit('adv_result', {
+		game_id: "{{game.id}}"
+	 });
+	});	
+ </script>
+<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px">Create a Message</legend>
     <!-- this part here is just copied from messages.html -->
     <div class="content-section">
         <form method="POST" action="">
             {{ msg_form.hidden_tag() }}
             <fieldset class="form-group">
                 <!-- these form groups are basically the same thing, just for each field needed for the messages -->
-                <legend class="border-bottom mb4">Create a Message</legend>
                 <div class="form-group">
-                <label class="form-control-label" for="name">Senders</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="senders" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
+					<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">From:</label>  <br />
+                	{{messages.user_interface(usernames,"senders",true,"")}}
                 </div> <br/>
                 <div class="form-group">
-                <label class="form-control-label" for="name">Recipients</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
+					<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
+					{% set current_user_name =  current_user.username  -%}
+                	{{messages.user_interface(usernames,"recipients",true,current_user_name)}}
                 </div> <br/>
                 <div class="form-group">
                     {{ msg_form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    {{ msg_form.meet_location (class="gray-blue") }}
-                    {{ msg_form.meet_time (class="gray-blue")}}
+                    {{ msg_form.meet_location (class="gray-blue",id="locations") }}
+					<img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png" style="display:block;margin:20px;">
+					{{ msg_form.meet_time (class="gray-blue")}}
                     {{ msg_form.meet_am_pm (class="gray-blue") }}
+					<div class="content-section" style="color: #0dcaf0">
+						<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+						<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+						<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+						 <div class="row g-2 align-items-center">
+							<div class="col">
+							   <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+								  <option  value= "-1" selected>No Encryption/Signature</option>
+								  <option value="symmetric">Symmetrically Encrypt</option>
+								  <option value="asymmetric">Asymmetrically Encrypt</option>
+								  <option value="signed">Sign</option>
+							   </select>
+							</div>
+							with
+							<div class="col">
+							   <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key">
+								  <option id='default_key_select' value= "-1" selected>No Key Selected</option>
+								  {% set current_user_name =  current_user.username  -%}
+								  {% for username,_ in usernames %}
+									 {% if current_user_name != username %}
+										<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+									 {% endif %}
+								  {% endfor %}
+								  {% for username,_ in usernames %}
+									 <option value="public_{{username}}">{{username}}'s Public Key</option>
+									 {% if current_user_name == username %}
+										<option value="private_{{username}}">{{username}}'s Private Key </option>
+									 {% endif %}
+								  {% endfor %}
+							   </select>
+							</div>
+						 </div>
+						 <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
                         {{ msg_form.content(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
@@ -54,492 +102,759 @@
                             {% endfor %}
                         </div>
                     {% else %} <!-- if there aren't errors, just display normally -->
-                        {{ msg_form.content(class="form-control form-control-lg") }}
+                        {{ msg_form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
                     {% endif %}
                 </div> <br>
 				<div class="form-group">
 				{{ msg_form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }} 
 			 </div>
-			 <br/>
 		  </fieldset>
-		  <div class="content-section bg-secondary">
-			 <ul class="select2-selection__rendered" id="cryptography_tags_list">
-			 </ul>
-			 <div class="row g-3 align-items-center">
-				<div class="col-auto">
-				   <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Cryptography Type</option>
-					  <option value="Signed">Signed</option>
-					  <option value="Encrypted">Encrypted</option>
-				   </select>
-				</div>
-				<div class="col-auto">
-				   <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>User</option>
-					  {% for username in usernames %}
-					  <option value="{{ username }}">{{ username }}</option>
-					  {% endfor %}
-				   </select>
-				</div>
-				<div class="col-auto">
-				   <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Key Type</option>
-					  <option value="public">Public</option>
-					  <option value="private">Private</option>
-				   </select>
-				</div>
+			 <div class="form-group">
+				{{ msg_form.submit(class="btn btn-outline-info", id="submitButton") }}
 			 </div>
-			 <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
-			 <br/><br/>
-		  </div>
-		  
-		  <div class="form-group">
-			 {{ msg_form.submit(class="btn btn-outline-info") }}
 		  </div>
 	   </form>
 	</div>
-	
 	<script>
-		function addCryptography(){
-		user_select = $( "#cryptography_user_select" ).val();
-		key_select = $( "#cryptography_key_select" ).val();
-		type_select = $( "#cryptography_type_select" ).val();
-			
-		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
-			
-			listEl.classList.add("select2-selection__choice");
-			
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
-			
-			listEl.appendChild(buttonEl);
-			
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = type_select;
-			listEl.appendChild(spanEl);
-			
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = user_select + "." + key_select;
-			listEl.appendChild(spanEl2);
-			
-			var listContainer = $( "#cryptography_tags_list" );
-			listContainer.append(listEl);
-			 
-			var submitString = "";
-			 
-			$('#cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
 
-				var chars = option_all.split(',');
-				
-				submitString += chars[1] + "(" + chars[2] + "),"
-			}) 		
+		// This script will limit the permission of certain key
+		const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
+		const encryptionKeySelect = document.getElementById("key_select");
+	 
+		encryptionTypeSelect.addEventListener("change", () => {
+		if (encryptionTypeSelect.value === "-1") {
+		   encryptionKeySelect.value = "-1";
 		}
-		
-		submitString = submitString.slice(0, -1) 
-		console.log(submitString);
-		document.getElementById('encryption_and_signed_keys').value = submitString; 
-   }
-   	
-	function addCryptographyADV(){
-		user_select = $( "#adv_cryptography_user_select" ).val();
-		key_select = $( "#adv_cryptography_key_select" ).val();
-		type_select = $( "#adv_cryptography_type_select" ).val();
-			
-		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
-			
-			listEl.classList.add("select2-selection__choice");
-			
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
-			
-			listEl.appendChild(buttonEl);
-			
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = type_select;
-			listEl.appendChild(spanEl);
-			
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = user_select + "." + key_select;
-			listEl.appendChild(spanEl2);
-			
-			var listContainer = $( "#adv_cryptography_tags_list" );
-			listContainer.append(listEl);
-			 
-			var submitString = "";
-			 
-			$('#adv_cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
+		});
+	 
+		// Get the current user's username from the backend
+		var current_user_username = "{{ current_user.username }}";
+	 
+		// Select the dropdowns for the encryption and signature keys
+		var key_select = document.getElementById("key_select");
+		var encryption_type_select = document.getElementById("encryption_sign_type_select");
+		var default_key = document.getElementById("default_key_select");
+		// Listen for changes in the encryption user dropdown
+		encryption_type_select.addEventListener("change", function() {
+		   // Get the selected user from the dropdown
+		   let all_options = key_select.querySelectorAll('option');
+		   var encrytion_type =  encryption_type_select.value;
+		   if (encrytion_type === 'symmetric') {
+			  all_options.forEach((single_option) => {
+				 single_option.disabled = true;
+			  });
+			  let shared = key_select.querySelectorAll('option[value^=Shared]');
+			  shared.forEach((userItem) => {
+				 userItem.disabled = false;
+			  });
+			  default_key.disabled = false
+		   }
+		   else if(encrytion_type === 'asymmetric' || encrytion_type === 'signed' ){
+			  all_options.forEach((single_option) => {
+				 single_option.disabled = false;
+			  });
+			  let shared = key_select.querySelectorAll('option[value^=Shared]');
+			  shared.forEach((userItem) => {
+				 userItem.disabled = true;
+			  });
+		   }
+		   else{
+			  all_options.forEach((single_option) => {
+				 single_option.disabled = true;
+			  });
+		   }  
+	 
+		});
+	 
+</script>	
+<script>
+   var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
+   
+   // Add event listener to all selected elements
+   dropboxes.forEach(function(dropbox) {
+      dropbox.addEventListener('change', function() {
+    
+         // if one of the value is selected
+         var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
+         return db.value !== '-1';
+         });
 
-				var chars = option_all.split(',');
-				
-				submitString += chars[1] + "(" + chars[2] + "),"
-			}) 		
-		}
-		
-		submitString = submitString.slice(0, -1) 
-		console.log(submitString);
-		document.getElementById('adv_encryption_and_signed_keys').value = submitString; 
-   }
-	</script>
+         // Check if all selected values are selected
+         //console.log(dropboxes);
+         var allSelectedValues = Array.from(dropboxes).every(function(dbb) {
+            //console.log(dbb.value);
+            return dbb.value !== '-1';
+         });
+         //console.log(allSelectedValues);
+         var submitButton = document.getElementById('submitButton');
+         var error_dis = document.getElementById("error-message");
+         let hidden = error_dis.getAttribute("hidden");
+		 //console.log(allSelectedValues);
+		 //console.log(allSelectedValuesNotMinusOne);
+         if(allSelectedValuesNotMinusOne && !allSelectedValues){
+            error_dis.removeAttribute("hidden");
+            submitButton.disabled = true;
+         }
+         else{
+            // Enable the button
+            error_dis.setAttribute("hidden", "hidden");
+            submitButton.disabled = false;
+         }
+         
+      });
+   });
+</script>
 
-	<div id="Incoming_Messages">
-	<h2>Incoming Messages</h2>
+
+<!-- <button onclick="clear_all()"> Clear Cache</button>
+<script>
+function clear_all(){
+    localStorage.clear();
+}
+	</script> -->
+<div id="Incoming_Messages" class="col">
+	<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 8px">Messages to be Processed</legend>
 	{% if msgs %}
-	{% for msg in msgs%}
-		<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, {{(msg[0]).id}})">
-			<div class="media-body">
-				<div class="article-metadata">
-				{% if msg[0].is_edited %}
-					{% if msg[0].new_sender %}
-					<a>New Sender: {{ msg[0].new_sender }} | </a>
+		{% for msg in msgs %}
+			<article id="disp-msg-{{(msg[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(msg[0]).id}}')">
+				<div class="media-body">
+					<div class="article-metadata">
+						<a>Sender: {{ msg[0].sender }} | </a>
+						<a>Recipient: {{ msg[0].recipient }}</a>
+						<a> | Time Sent: {{ msg[0].time_sent }} </a> 
+					</div>
+					<div>
+						<p style="margin: 0; display:inline; color:#0dcaf0;">@{{ msg[0].location_meet }} {{msg[0].time_meet}}{{ msg[0].time_am_pm }}</p>
+					</div>
+					<!-- if the message has been decrypted or not be decrypted at all, display the original message-->
+					{% if (not msg[0].is_encrypted) and (not msg[0].is_signed) %}
+						<div id="content-{{ msg[0].id }}-adv" class="content" >{{ msg[0].content }}</div>
 					{% else %}
-					<a>Sender: {{ msg[0].sender }} | </a>
+						<!-- Show decrypt button -->
+						{% if msg[1] %}
+							<div id="decryption-{{ msg[0].id }}-{{ msg[0].recipient }}-adv" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
+								<div class="col">
+									<select id="decryption_type_select-{{msg[0].id}}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+										<option value= "-1" selected>No Decryption/Verification of Signature</option>
+										<option value="symmetric">Symmetrically Decrypt</option>
+										<option value="asymmetric">Asymmetrically Decrypt</option>
+										<option value="signed">Verify Signature</option>
+									</select>
+								</div>
+								with
+								<div class="col">
+									<select id="decryption_key_select-{{ msg[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+										<option value= "-1" selected id="default_key_select-{{ msg[0].id }}">No Key Selected</option>
+										{% set current_user_name = current_user.username -%}
+										{% for username,_ in usernames %}
+											{% if current_user_name != username %}
+											<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+											{% endif %}
+										{% endfor %}
+										{% for username,_ in usernames %}
+											<option value="public_{{username}}">{{username}}'s Public Key</option>
+											{% if current_user_name == username %}
+											<option value="private_{{username}}">{{username}}'s Private Key </option>
+											{% endif %}
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+							<button id="decryptadv-{{msg[0].id}}-{{msg[0].sender}}-{{msg[0].recipient}}-{{msg[0].encryption_type}}-{{msg[0].key}}" class="btn btn-secondary decrypt-button" onclick="decrypt_adv(this.id)">Decrypt</button>
+							<div id="content-{{ msg[0].id }}-adv" class="content" style="display:none;">{{ msg[0].content }}</div>
+						{% else %}
+							<p id="content-{{ msg[0].id }}-adv" class="article-content">--CANNOT DECRYPT--</p>
+						{% endif %}
 					{% endif %}
-					{% if msg[0].new_recipient %}
-					<a>New Recipient: {{ msg[0].new_recipient }}</a>
-					{% else %}
-					<a>Recipient: {{ msg[0].recipient }}</a>
-                    {% endif %}
-                    <a> | Time Sent: {{ msg[0].time_sent }}</a>
-					{% if msg[0].adv_created %}
-					<a> | This msg was created by the adversary.</a>
-					{% endif %}
-					{% if msg[0].is_deleted %}
-					<a> | This msg has been deleted.</a>
-					{% else %}
-					<a> | This msg has been edited.</a>
-					{% endif %}
-				{% else %}
-					<a>Sender: {{ msg[0].sender }} | </a>
-					<a>Recipient: {{ msg[0].recipient }}</a>
-                    <a> | Time Sent: {{ msg[0].time_sent }}</a>
-					{% if msg[0].adv_created %}
-					<a> | This message was created by the adversary.</a>
-					{% endif %}
-				{% endif %}	
 				</div>
-				
-				{% if not msg[1] %}
-				<p id="msg-content-{{msg[0].id}}" class="article-content">--CANNOT DECRYPT--</p>
-				{% else %}
-					{% if msg[0].is_edited %}
-					<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].edited_content }}</p>
+				{% if msg[0].is_encrypted or msg[0].is_signed%}
+					{% if msg[0].recipient == current_user.username %}
+						{% if msg[0].is_encrypted %}
+							<div class="m-1 row ">
+								{% if 'Warning' not in msg[0].encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Encrypted with:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									msg[0].encryption_details }}</div>
+								{% elif 'but' in msg[0].encryption_details %}
+									<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+									<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+									Encrypted with: {{msg[0].encryption_details[9:] }}</div>
+								{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									msg[0].encryption_details[9:] }}</div>
+								{% endif %}  
+							</div>
+						{% elif msg[0].is_signed %}
+							<div class="m-1 row ">
+								{% if 'Warning' not in msg[0].signed_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Signed by:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									msg[0].signed_details }}</div>
+								{% elif 'but' in msg[0].signed_details %}
+										<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+										Warning:</div>
+										<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+										Signed by: {{msg[0].signed_details[9:] }}</div>
+								{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									msg[0].signed_details[9:] }}</div>
+								{% endif %}
+							</div>
+						{% endif %}
 					{% else %}
-					<p id="msg-content-{{msg[0].id}}" class="article-content">{{ msg[0].content }}</p>
+						<div class="m-1 row ">
+							{% if msg[1] %}
+								{% if msg[0].encryption_type == 'symmetric' %}
+									<div class="rounded-start d-inline col-md-auto border border-3 bg-success border-success">
+									Symmetrically encrypted with: </div>
+							 	{% elif msg[0].encryption_type == 'asymmetric' %}
+								   	<div class="rounded-start d-inline col-md-auto border border-3 bg-success border-success">
+									  Asymmetrically encrypted with: </div>
+								{% else %}
+									<div class="rounded-start d-inline col-md-auto border border-3 bg-success border-success">
+										Signed by:</div>
+							 	{% endif %}
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">
+									{{msg[0].key }}</div>
+							{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-danger text-dark border border-3 border-danger">
+								</div>
+								<div class="d-inline col-md-auto  border border-3 border-danger">
+									You could not decrypt this message because you do not have the key!</div>
+								<div class="d-inline col-md-auto bg-danger text-dark border border-3 border-danger rounded-end">
+								</div>
+							{% endif %}  
+						</div>
 					{% endif %}
-				{% endif %}
-			</div>
-                {% if msg[0].is_encrypted %}
-				<div class="m-1 row ">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].encryption_details }}</div>
-				</div>
-				{% endif %}
-				{% if msg[0].is_signed %}
-				<div class="m-1 row">
-					<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-					<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ msg[0].signed_details }}</div>
-				</div>
 				{% endif %}
 			</article>
-	{% endfor %}
+		{% endfor %}
 	{% else %}
-	<legend class="border-bottom mb4">No messages</legend><br/>
+		<legend class="border-bottom mb4">No messages</legend><br/>
 	{% endif %}
-	<script>
-	function select_msg(ele, num) {
-		document.getElementById('edit_form').scrollIntoView();
-		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
-		
-		id = "msg-content-" + num;
-		console.log(id)
-		text = document.getElementById(id).innerHTML;
-		console.log(text)
-		document.getElementById('adv_msg_edit_form').value = text; 
-		document.getElementById('msg_num').value = num; 
-	}
-	
-	</script>
-	</div>
-	
-	<div id="edit_form" class="inactive">
-	{% if msgs %}
-	<h2>Edit a Message</h2>
-    <div class="content-section">
-        <form method="POST" action="">
-            {{ adv_msg_edit_form.hidden_tag() }}
-            <fieldset class="form-group">
-                <div class="form-group">
-                <label class="form-control-label" for="name">New Senders</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="new_senders" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
-                </div> <br/>
-                <div class="form-group">
-                <label class="form-control-label" for="name">New Recipients</label> <br/>
-                {% for username in usernames %}
-                    <div class="form-check form-check-inline">
-                        <!-- below line needs the ', ' in value to make processing usernames easier -->
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="new_recipients" value="{{ username }}, ">
-                        <label class="form-check-label" for="inlineCheckbox1">{{ username }}</label>
-                    </div>
-                {% endfor %}
-                </div> <br/>
-                <div class="form-group">
-                    {{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-                    {% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
-                        {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for errors in adv_msg_edit_form.edited_content.errors %}
-                                <span>{{ errors }}</span> <!-- display the errors -->
-                            {% endfor %}
-                        </div>
-                    {% else %} <!-- if there aren't errors, just display normally -->
-                        {% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
-                        {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
-                        {% else %} <!-- if the message hasn't been edited, display normally -->
-                            {% if can_decrypt or message.adv_created %}
-                            {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
-                            {% else %}
-                            {{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='--CANNOT DECRYPT --') }}
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                </div> <br>
-				<div class="form-group">
-				{{ adv_msg_edit_form.encryption_and_signed_keys(id="adv_encryption_and_signed_keys", type="hidden") }} 
-			 </div>
-			 <br/>
-		  </fieldset>
-		  <div class="content-section bg-secondary">
-			 <ul class="select2-selection__rendered" id="adv_cryptography_tags_list">
-			 </ul>
-			 <div class="row g-3 align-items-center">
-				<div class="col-auto">
-				   <select id="adv_cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Cryptography Type</option>
-					  <option value="Signed">Signed</option>
-					  <option value="Encrypted">Encrypted</option>
-				   </select>
-				</div>
-				<div class="col-auto">
-				   <select id="adv_cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>User</option>
-					  {% for username in usernames %}
-					  <option value="{{ username }}">{{ username }}</option>
-					  {% endfor %}
-				   </select>
-				</div>
-				<div class="col-auto">
-				   <select id="adv_cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-					  <option value= "-1" selected>Key Type</option>
-					  <option value="public">Public</option>
-					  <option value="private">Private</option>
-				   </select>
-				</div>
-			 </div>
-			 <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptographyADV()">Add Cryptography</button>
-			 <br/><br/>
-		  </div>
-            <div class="form-group" style="margin:10px 0px;">
-                <!-- previous, next, delete, and submit buttons for message editing -->
-                {{ adv_msg_edit_form.delete_msg(class="btn btn-outline-info") }}
-                {{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
-                {{ adv_msg_edit_form.send_no_change(class="btn btn-outline-info") }}
-				{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
-            </div>
-        </form>
-    </div>
-	{% endif %}
-	</div> 
-	
-    <!-- advance round button 
-    <div class="content-section">
-        <form method="POST" action="">
-            <div class="form-group" style="margin:10px 0px;">
-                {{ adv_next_round_form.advance_round(class="btn btn-outline-info") }}
-            </div>
-        </form>
-    </div>-->
+</div>
+<script>
+function prevent_outer(e){
+	// prvent trigger slect_msg() due to bubble effect
+	window.event.stopPropagation();
+}
 
-	<div id="sent_msgs">
-    {% if prev_msgs %}
-    <legend class="border-bottom mb4">Sent Messages:</legend>
-    {% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-        <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-        {% if prev_msg[0].is_edited %} <!-- if the message has been edited, display the edited parts-->
-        <article class="media content-section" {% if prev_msg[0].is_deleted %} style="background: rgb(75, 20, 20);" {% else %} style="background: rgb(20, 20, 75);" {% endif %}>
-            <div class="media-body">
-                <div class="article-metadata">
-                {% if prev_msg[0].new_sender %}
-                <a>New Sender: {{ prev_msg[0].new_sender }} | </a>
-                {% else %}
-                <a>Sender: {{ prev_msg[0].sender }} | </a>
-                {% endif %}
-                {% if prev_msg[0].new_recipient %}
-                <a>New Recipient: {{ prev_msg[0].new_recipient }}</a>
-                {% else %}
-                <a>Recipient: {{ prev_msg[0].recipient }}</a>
-                {% endif %}
-                {% if prev_msg[0].adv_created %}
-                <a> | This message was created by the adversary.</a>
-                {% endif %}
-                <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
-                {% if prev_msg[0].is_deleted %}
-                <a> | This message has been deleted.</a>
-                {% else %}
-                <a> | This message has been edited.</a>
-                {% endif %}
-                </div>
-                {% if prev_msg[0].edited_content %}
-                <p class="article-content">{{ prev_msg[0].edited_content }}</p>
-                {% else %}
-                <p class="article-content">{{ prev_msg[0].content }}</p>
-                {% endif %}
-            </div>
-			{% if prev_msg[0].is_encrypted %}
-			<div class="m-1 row ">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
-			</div>
-			{% endif %}
-			{% if prev_msg[0].is_signed %}
-			<div class="m-1 row">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
-			</div>
-			{% endif %}
-        </article>
-        {% elif prev_msg[0].adv_created %} <!-- if the adversary created the message -->
-        <article class="media content-section" style="background: rgb(20, 75, 20);">
-            <div class="media-body">
-                <div class="article-metadata">
-                <a>Sender: {{ prev_msg[0].sender }} | </a>
-                <a>Recipient: {{ prev_msg[0].recipient }}</a>
-                <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
-                <a> | This message was created by the adversary.</a>
-                </div>
-                <p class="article-content">{{ prev_msg[0].content }}</p>
-            </div>
-			{% if prev_msg[0].is_encrypted %}
-			<div class="m-1 row ">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
-			</div>
-			{% endif %}
-			{% if prev_msg[0].is_signed %}
-			<div class="m-1 row">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
-			</div>
-			{% endif %}
-        </article>
-        {% else %} <!-- if the message hasn't been edited, display normally -->
-		<article class="media content-section" style="background: rgb(60, 60, 20);">
-            <div class="media-body">
-                <div class="article-metadata">
-                <a>Sender: {{ prev_msg[0].sender }} | </a>
-                <a>Recipient: {{ prev_msg[0].recipient }}</a>
-                <a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
-				<a> | This message was not edited by the adversary.</a>
-                </div>
-				{% if not prev_msg[1] %}
-				<p class="article-content">--CANNOT DECRYPT--</p>
-				{% else %}
-				<p class="article-content">{{ prev_msg[0].content }}</p>
-				{% endif %}
-            </div>
-			{% if prev_msg[0].is_encrypted %}
-			<div class="m-1 row ">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].encryption_details }}</div>
-			</div>
-			{% endif %}
-			{% if prev_msg[0].is_signed %}
-			<div class="m-1 row">
-				<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-				<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ prev_msg[0].signed_details }}</div>
-			</div>
-			{% endif %}
-        </article>
-			{% endif %}
-    {% endfor %}
-	{% else %}
-	<legend class="border-bottom mb4">Sent messages log</legend>
-    {% endif %}
-	</div>
+function select_msg(ele, num) {
+	document.getElementById('edit_form').scrollIntoView();
+	$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
 	
-	<!-- Modal -->
-	<div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	  <div class="modal-dialog">
-		<div class="modal-content">
-		  <div class="modal-header">
-			<h5 class="modal-title" style="color:black;" id="staticBackdropLabel">Please vote</h5>
-		  </div>
-		  <div class="modal-body">
-			<select id="places_select" class="form-select" aria-label="Default select example">
-			  <option selected>Select Location</option>
-			  <option value="1">Park</option>
-			  <option value="2">Alley</option>
-			  <option value="3">Cafe</option>
-			  <option value="4">Parking Garage</option>
-			  <option value="5">Rooftop</option>
-			  <option value="6">Bus stop</option>
-			  <option value="7">Subway station</option>
-			</select>
-			
-			<div class="row">
-				<div class="col-sm-6">
-					<select id="time_s1" class="form-select" aria-label="Default select example">
-					  <option selected>Select Time</option>
-					  <option value="1">1:00</option>
-					  <option value="2">2:00</option>
-					  <option value="3">3:00</option>
-					  <option value="4">4:00</option>
-					  <option value="5">5:00</option>
-					  <option value="6">6:00</option>
-					  <option value="7">7:00</option>
-					  <option value="8">8:00</option>
-					  <option value="9">9:00</option>
-					  <option value="10">10:00</option>
-					  <option value="11">11:00</option>
-					  <option value="12">12:00</option>
-					</select>
-				</div>
-				<div class="col-sm-6">
-					<select id="time_s2" class="form-select" aria-label="Default select example">
-					<option value="1">PM</option>
-					<option value="2">AM</option>
-					</select>
-				</div>
+	id = "content-" + num + "-adv";
+	console.log(id)
+	const content_box = document.getElementById(id);
+	var text ="--CANNOT DECRYPT--";
+	var encrypt_button = document.getElementById("encryption-panel");
+	var error_dis3 = document.getElementById("error-message-3");
+	// null means it is encrypted, the value will be default value: "--CANNOT DECRYPT--"
+	console.log(window.getComputedStyle(content_box).display);
+	if (content_box !== null && window.getComputedStyle(content_box).display !== "none"){
+		text = document.getElementById(id).innerHTML;
+		console.log(text);
+	}		
+	document.getElementById('adv_msg_edit_form').value = text; 
+	if(text == "--CANNOT DECRYPT--"){
+		document.getElementById('adv_msg_edit_form').disabled = true;
+		encrypt_button.style.display = "none";
+		error_dis3.removeAttribute("hidden");
+		document.getElementById('not_editable').value = true; 
+	}
+	else{
+		document.getElementById('adv_msg_edit_form').disabled = false;
+		encrypt_button.style.display = "block";
+		error_dis3.setAttribute("hidden", "hidden");
+		document.getElementById('not_editable').value = false; 
+	}
+	document.getElementById('msg_num').value = num; 	
+}
+
+</script>
+	
+<script>
+$(document).ready(function(){ 
+	var keys = Object.keys(localStorage);
+	var i =0;
+	for (i=0;i<keys.length; i++) {
+		var key = keys[i];
+		const containerState = localStorage.getItem(key);
+		const item_found = document.getElementById(key);
+		if(!Object.is(item_found, null)){
+			switch (containerState) {
+				case 'visible':
+				item_found.style.display = "";
+				break;
+				case 'hidden':
+				item_found.style.display = "none";
+				break;
+				default:
+			}
+		}
+
+	}
+	document.getElementById('adv_msg_edit_form').value = ""; 
+	document.getElementById('adv_msg_edit_form').disabled = true;
+});
+</script>
+<script>
+function decrypt_adv(id_button){
+	const msg_id = id_button.split("-")[1];
+	const sender = id_button.split("-")[2];
+	const recipent = id_button.split("-")[3];
+	const encryption_type = id_button.split("-")[4];
+	const encryption_key = id_button.split("-")[5];
+	var current_user_username = "{{ current_user.username }}";
+	//console.log(msg_id);
+	//console.log(sender);
+	//console.log(recipent);
+	//console.log(encryption_type);
+	//console.log(encryption_key);
+	//console.log("aaaa")
+	//console.log(current_user_username);
+	const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
+	const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
+	console.log(decryption_key);
+	console.log(decryption_type);
+	var socket = io();
+	if (encryption_type === "symmetric") {
+		// Not select correct decryption type
+		if (decryption_type !=="symmetric" ){
+			alert("Please select symmetric decryption for the type!");
+			return;
+		}
+		// correct Key, the decrypt button will only show if adv could decrypt it
+		// Therefore, decryption_key must be shared adv_name _sender
+		if (decryption_key === "Shared_".concat(current_user_username,"_",sender)){
+			document.getElementById(`content-${msg_id}-adv`).style.display = "";
+			document.getElementById(`${id_button}`).style.display = "none";
+			document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+			localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
+			localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+			localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
+			socket.emit('decrypted', { message: msg_id });
+		}
+		// Wrong key
+		else{
+			alert("Please select correct Key for symmetric encryption");
+		}
+	}
+	else if (encryption_type === "asymmetric") {
+		// Wrong decryption Type
+		if (decryption_type !=="asymmetric" ){
+			alert("Please select asymmetric decryption for the type!");
+			return;
+		}
+		// Asymmetric encryption : encrypt with Receiver's public key
+		if (encryption_key === "public_".concat(current_user_username)){
+			// use reciever's private key
+			if (decryption_key === "private_".concat(current_user_username)){
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
+				document.getElementById(`${id_button}`).style.display = "none";
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
+			}
+			else{
+				alert("Please select correct Key for asymmetric encryption");
+			}
+		}
+		// Wrong way to do asymmetric encryption: use sender's public key
+		if (encryption_key === "private_".concat(sender)){
+			// use sender's public key
+			if (decryption_key === "public_".concat(sender)){
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
+				document.getElementById(`${id_button}`).style.display = "none";
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
+			}
+			else{
+				alert("Please select correct Key for asymmetric encryption");
+			}
+		}
+	} 
+	else if (encryption_type === "signed"){
+		// Wrong decryption Type
+		if (decryption_type !=="signed" ){
+			alert("Please select Verification of Signature for the type!");
+			return;
+		}
+		// correct way to do signature :sign with sender's private key
+		if (encryption_key === "private_".concat(sender)){
+			// use sender's public key
+			if (decryption_key === "public_".concat(sender)){
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
+				document.getElementById(`${id_button}`).style.display = "none";
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
+			}
+			else{
+				alert("Please select correct Key for asymmetric encryption");
+			}
+		}
+		// Wrong way to do signature: use reciever's public key
+		if (encryption_key === "public_".concat(current_user_username)){
+			// use own private key
+			if (decryption_key === "private_".concat(current_user_username)){
+				document.getElementById(`content-${msg_id}-adv`).style.display = "";
+				document.getElementById(`${id_button}`).style.display = "none";
+				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
+				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
+				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
+				socket.emit('decrypted', { message: msg_id });
+			}
+			else{
+				alert("Please select correct Key for asymmetric encryption");
+			}
+		}
+	} 
+	else{
+		alert("Error");
+	}
+
+}
+
+</script>
+
+<script>
+
+// This script will limit the permission of certain key
+var options_for_decrypt = document.querySelectorAll('[data-group="decrypt_options"]');
+for (let i = 0; i < options_for_decrypt.length; i++) {
+	msg_id = options_for_decrypt[i].id.split("-")[1];
+	current_user_username = options_for_decrypt[i].id.split("-")[2].replace(',', '');
+	decryption_type_select = document.getElementById(`decryption_type_select-${msg_id}-adv`);
+	de_key_select = document.getElementById(`decryption_key_select-${msg_id}-adv`);
+	
+	//var decrytion_type = decryption_type_select.value;
+	decryption_type_select.addEventListener("change", function() {
+		msg_id = options_for_decrypt[i].id.split("-")[1];
+		// Get the selected user from the dropdown
+		new_decryption_type_select =  document.getElementById(`decryption_type_select-${msg_id}-adv`);
+		de_default_key = document.getElementById(`default_key_select-${msg_id}-adv`);
+		de_key_select = document.getElementById(`decryption_key_select-${msg_id}-adv`);
+		all_options = de_key_select.querySelectorAll('option');
+		if (new_decryption_type_select.value === "symmetric") {
+			all_options.forEach((single_option) => {
+				single_option.disabled = true;
+			});
+			let shared = de_key_select.querySelectorAll('option[value^=Shared]');
+			shared.forEach((userItem) => {
+				userItem.disabled = false;
+			});
+			de_default_key.disabled = false
+		}
+		else if(new_decryption_type_select.value  === 'asymmetric' || new_decryption_type_select.value  === 'signed' ){
+			all_options.forEach((single_option) => {
+				single_option.disabled = false;
+			});
+			let shared = de_key_select.querySelectorAll('option[value^=Shared]');
+			shared.forEach((userItem) => {
+				userItem.disabled = true;
+			});
+		}
+		else{
+			all_options.forEach((single_option) => {
+				single_option.disabled = false;
+			});
+		}  
+
+	});
+}
+
+</script>
+	
+<div id="edit_form" class="inactive">
+	{% if msgs %}
+		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Edit a Message</legend>
+		<div class="content-section">
+		<form method="POST" action="">
+			{{ adv_msg_edit_form.hidden_tag() }}
+			<fieldset class="form-group">
+			<div class="form-group">
+				<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">New Sender:</label>  <br />
+					{{messages.user_interface(usernames,"newsenders",true,"")}}
+			</div> <br/>
+			<div class="form-group">
+				<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+					background-color: #333333;
+					color: #0dcaf0;
+					font-size: 15px;
+					border-color:#0dcaf0;
+					border-radius: 5px;
+					padding: 5px;
+					padding-left: 10px; padding-right: 10px;
+					text-align: center; border-style:solid; border-width: 2px">New Recipient:</label>  <br />
+					{% set current_user_name =  current_user.username  -%}
+					{{messages.user_interface(usernames,"newrecipients",true,current_user_name)}}
+			</div> <br/>
+			<div class="form-group">
+				{{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+				{% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
+					{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
+					<div class="invalid-feedback">
+						{% for errors in adv_msg_edit_form.edited_content.errors %}
+							<span>{{ errors }}</span> <!-- display the errors -->
+						{% endfor %}
+					</div>
+				{% else %} <!-- if there aren't errors, just display normally -->
+					{% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
+						{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
+					{% else %} <!-- if the message hasn't been edited, display normally -->
+						{% if can_decrypt %}
+							{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
+						{% else %}
+							{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true)}}
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			</div> <br>
+			<div class="form-group">
+				{{ adv_msg_edit_form.encryption_and_signed_keys(id="adv_encryption_and_signed_keys", type="hidden") }} 
 			</div>
-		  <div class="modal-footer">
-			<button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
-		  </div>
+			<br/>
+		</fieldset>
+
+		<div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0">
+			<ul class="select2-selection__rendered" id="adv_cryptography_tags_list">
+			</ul>
+				<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+				<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+				<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+			<div class="row g-2 align-items-center">
+			<div class="col">
+				<select id="encryption_sign_type_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select2">
+					<option  value= "-1" selected>No Encryption/Signature</option>
+					<option value="symmetric">Symmetrically Encrypt</option>
+					<option value="asymmetric">Asymmetrically Encrypt</option>
+					<option value="signed">Sign</option>
+				</select>
+			</div>
+			with
+			<div class="col">
+				<select id="key_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key2">
+					<option id='default_key_select2' value= "-1" selected>No Key Selected</option>
+					{% set current_user_name =  current_user.username  -%}
+					{% for username,_ in usernames %}
+						{% if current_user_name != username %}
+						<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+						{% endif %}
+					{% endfor %}
+					{% for username,_ in usernames %}
+						<option value="public_{{username}}">{{username}}'s Public Key</option>
+						{% if current_user_name == username %}
+						<option value="private_{{username}}">{{username}}'s Private Key </option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+			</div>
+			<div id="error-message-2" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+			<br/>
 		</div>
-	  </div>
+		<div id="error-message-3" hidden="hidden"><p>No more add-on encryption because this message has been already encrypted!</p></div>
+		<div class="form-group" style="margin:10px 0px;">
+			<!-- previous, next, delete, and submit buttons for message editing -->
+			{{ adv_msg_edit_form.delete_msg(class="btn btn-outline-info") }}
+			{{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
+			<!-- {{ adv_msg_edit_form.send_no_change(class="btn btn-outline-info") }} -->
+			{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
+			{{ adv_msg_edit_form.not_editable(id="not_editable", type="hidden") }}
+		</div>
+	</form>
+</div>
+{% endif %}
+</div> 
+
+<div class="row ">
+	<div id="sent_msgs" class="col">
+    	{% if prev_msgs %}
+    		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Messages Edited by you:</legend>
+			{% for prev_msg in prev_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
+				<!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
+				<article class="media content-section" {% if prev_msg[0].is_deleted %} style="background: rgb(75, 20, 20);" {% else %} style="background: rgb(20, 20, 75);" {% endif %}>
+					<div class="media-body">
+						<div class="article-metadata">
+							{% if prev_msg[0].new_sender %}
+								<a>New Sender: {{ prev_msg[0].new_sender }} | </a>
+							{% else %}
+								<a>Sender: {{ prev_msg[0].sender }} | </a>
+							{% endif %}
+							{% if prev_msg[0].new_recipient %}
+								<a>New Recipient: {{ prev_msg[0].new_recipient }}</a>
+							{% else %}
+								<a>Recipient: {{ prev_msg[0].recipient }}</a>
+							{% endif %}
+							{% if prev_msg[0].adv_created %}
+								<a> | This message was created by the adversary.</a>
+							{% endif %}
+							<a> | Time Sent: {{ prev_msg[0].time_sent }} </a>
+							{% if prev_msg[0].is_deleted %}
+								<a> | This message has been deleted.</a>
+							{% else %}
+								<a> | This message has been forwarded.</a>
+							{% endif %}
+						</div>
+						{% if prev_msg[0].is_encrypted or prev_msg[0].is_signed %}
+							<p class="article-content"> #######################</p>
+						{% elif prev_msg[0].edited_content %}
+							<p class="article-content">{{ prev_msg[0].edited_content }}</p>
+						{% else %}
+							<p class="article-content">{{ prev_msg[0].content }}</p>
+						{% endif %}
+           			</div>
+					{% if prev_msg[0].is_encrypted %}
+						<div class="m-1 row ">
+							{% if 'Warning' not in prev_msg[0].encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Encrypted with:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									prev_msg[0].encryption_details }}</div>
+							{% elif 'but' in prev_msg[0].encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+								Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+								Encrypted with {{prev_msg[0].encryption_details[9:] }}</div>
+							{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									prev_msg[0].encryption_details[9:] }}</div>
+							{% endif %}  
+						</div>
+					{% endif %}
+					{% if prev_msg[0].is_signed %}
+						<div class="m-1 row ">
+							{% if 'Warning' not in prev_msg[0].signed_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Signed by:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									prev_msg[0].signed_details }}</div>
+							{% elif 'but' in prev_msg[0].signed_details %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+									Signed by {{prev_msg[0].signed_details[9:] }}</div>
+							{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									prev_msg[0].signed_details[9:] }}</div>
+							{% endif %}
+						</div>
+					{% endif %}
+				</article>
+    		{% endfor %}
+		{% else %}
+			<legend class="border-bottom mb4">No messsage has been processed</legend>
+    	{% endif %}
 	</div>
+	<div id="Sent_Messages_by_you" class="col">
+		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Message Sent by you:</legend>
+		{% if sent_flag %} <!-- this checks if the passed message var has content in it -->
+			{% for sent_msg in sent_msgs %}
+      			<article class="media content-section">
+					<div class="media-body">
+						<div class="article-metadata">
+							<a>Sender: {{ sent_msg.sender }} | </a>
+							<a>Recipient: {{ sent_msg.recipient }}</a>
+							<a> | Time Sent: {{ sent_msg.time_sent }} </a>
+						</div>
+						<div id="content-{{ sent_msg.id }}">
+							<p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
+								sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+							{% if sent_msg.initial_is_encrypted or sent_msg.initial_is_signed %}
+								<p class="article-content"> #######################</p>
+							{% else %}
+								<p class="article-content">{{ sent_msg.content }}</p>
+							{% endif %}
+				   		</div>
+						{% if sent_msg.initial_is_encrypted %}
+						<div class="m-1 row ">
+							{% if 'Warning' not in sent_msg.initial_encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+									Encrypted with:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+									sent_msg.initial_encryption_details }}</div>
+							{% elif 'but' in sent_msg.initial_encryption_details %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+								Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+								Encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+							{% else %}
+								<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+									Warning:</div>
+								<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+									sent_msg.initial_encryption_details[9:] }}</div>
+							{% endif %}  
+				   		</div>
+						{% elif sent_msg.initial_is_signed %}
+							<div class="m-1 row ">
+								{% if 'Warning' not in sent_msg.initial_signed_details %}
+									<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+										Signed by:</div>
+									<div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+										sent_msg.initial_signed_details }}</div>
+								{% elif 'but' in sent_msg.initial_signed_details %}
+									<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+										Warning:</div>
+									<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+										Signed by {{sent_msg.initial_signed_details[9:] }}</div>
+								{% else %}
+									<div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+										Warning:</div>
+									<div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+										sent_msg.initial_signed_details[9:] }}</div>
+								{% endif %}
+							</div>
+				   		{% endif %}
+					</div>
+			 	</article>
+			{% endfor %}
+      	{% else %}
+      		<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px" >No messages</legend>
+      	{% endif %}
+	</div>
+</div>
+
+<div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabeladv" aria-hidden="true">
+	<div class="modal-dialog">
+	  	<div class="modal-content">
+			<div class="modal-header">
+				<button id="close-button" class="btn btn-danger" data-bs-dismiss="modal">X</button>
+			</div>
+			<div class="modal-body">
+				<h5 class="modal-title" style="color:darkgray" id="staticBackdropLabeladv">Please Vote</h5>
+			</div>
+			<div class="modal-footer"></div>
+		</div>
+  	</div>
+</div> 
 	
 	
 	<script type="text/javascript" charset="utf-8">
@@ -551,56 +866,161 @@
 		var advVoteModal = new bootstrap.Modal(document.getElementById("advVoteModal"), {});
 		
         var socket = io();
+		socket.on('update', function () {
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Received');
+               $('#Received').replaceWith(elem);
+            });
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Sent');
+               $('#Sent').replaceWith(elem);
+            });
+         });
+
+		socket.on('adv_show', function () {
+            advVoteModal.show();
+         });
 		
-		socket.on('update', function() {			
-			if ( document.getElementById("edit_form").classList.contains('inactive') ){
-				document.getElementById("edit_form").classList.remove('inactive');
-				$.get(document.URL, function(data) {
-					var elem = $(data).find('#edit_form');
-					 $('#edit_form').replaceWith(elem);
-				});
+		socket.on('return_result_for_adv', function (msg) {
+			console.log(msg);
+			switch (msg) {
+			   case "PlayerWin":
+				  $("#staticBackdropLabeladv").text("You Lost. The agents successfully met in a safe location and time!");
+				  break;
+			   case "PlayerLose":
+				  $("#staticBackdropLabeladv").text("You Won. You were able to thwart the player's meeting.");
+				  break;
+			   default: $("#staticBackdropLabeladv").text("Wait for agents to vote!");
 			}
-			$.get(document.URL, function(data) {
-				var elem = $(data).find('#Incoming_Messages');
-				 $('#Incoming_Messages').replaceWith(elem);
-			});
-			$.get(document.URL, function(data) {
-				var elem = $(data).find('#sent_msgs');
-				 $('#sent_msgs').replaceWith(elem);
-			});
-        });
-		
-		socket.on('start_vote', function() {
-			advVoteModal.show();
-		});
-		
-		socket.on('end_game', function() {
-            window.location.href = "{{ url_for('end_of_game') }}";
-        });
+		 });
 		
 	});
-	
-	function submitVote(){
-		var socket = io();
-		
-		place = $( "#places_select" ).find(':selected').text();
-		time = $( "#time_s1" ).find(':selected').text();
-		
-		if(place == "Select Location" || time == "Select Time"){
-			return;
-		}
-		$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
-		$("#submt_vote").prop("disabled",true);
-		
-		time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-		
-		vote = place + ' ' + time;
-		
-		socket.emit('cast_vote', {
-		game_id: "{{game.id}}",
-		vote: vote
-		});
 
+</script> 
+<script>
+	var select = document.getElementById("locations");
+   	var image = document.getElementById("location-image");
+
+   select.addEventListener("change", function() {
+     switch (select.value) {
+        case "Cafe":
+            image.src = "/images/Arts/Locations/Cafe_new.png";
+            break;
+         case "Track":
+            image.src = "/images/Arts/Locations/Track_new.png";
+            break;
+         case "Alley":
+            image.src = "/images/Arts/Locations/Alley_new.png";
+            break;
+         case "Dorm":
+            image.src = "/images/Arts/Locations/Dorm_new.png";
+            break;
+         case "Garage":
+            image.src = "/images/Arts/Locations/Garage_new.png";
+            break;
+         case "Lab":
+            image.src = "/images/Arts/Locations/Lab_new.png";
+            break;
+         case "Park":
+            image.src = "/images/Arts/Locations/Park_new.png";
+            break;
+         default:
+            image.src = "/images/Cafe_new.png";
+     }
+   });
+
+</script>	
+
+<!-- Sender can ONLY send to ONE recipients at a time -->
+<!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->
+<script>
+	// For onlyOne click
+	$('input[type="checkbox"]').on('change', function() {
+		$('input[name="' + this.name + '"]').not(this).prop('checked', false);
+	});
+</script>
+
+<script>
+	// This script will limit the permission of certain key
+	const encryptionTypeSelect2 = document.getElementById("encryption_sign_type_select2");
+	const encryptionKeySelect2 = document.getElementById("key_select2");
+ 
+	encryptionTypeSelect2.addEventListener("change", () => {
+	if (encryptionTypeSelect2.value === "-1") {
+	   encryptionKeySelect2.value = "-1";
 	}
-	</script>
+	});
+ 
+	// Get the current user's username from the backend
+	var current_user_username2 = "{{ current_user.username }}";
+ 
+	// Select the dropdowns for the encryption and signature keys
+	var key_select2 = document.getElementById("key_select2");
+	var encryption_type_select2 = document.getElementById("encryption_sign_type_select2");
+	var default_key2 = document.getElementById("default_key_select2");
+	// Listen for changes in the encryption user dropdown
+	encryption_type_select2.addEventListener("change", function() {
+	   // Get the selected user from the dropdown
+	   let all_options2 = key_select2.querySelectorAll('option');
+	   var encrytion_type2 =  encryption_type_select2.value;
+	   if (encrytion_type2 === 'symmetric') {
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = true;
+		  });
+		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
+		  shared2.forEach((userItem2) => {
+			 userItem2.disabled = false;
+		  });
+		  default_key2.disabled = false
+	   }
+	   else if(encrytion_type2 === 'asymmetric' || encrytion_type2 === 'signed' ){
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = false;
+		  });
+		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
+		  shared2.forEach((userItem2) => {
+			 userItem2.disabled = true;
+		  });
+	   }
+	   else{
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = true;
+		  });
+	   }  
+ 
+	});	 
+
+	var dropboxes2 = document.querySelectorAll('#encryption_sign_type_select2, #key_select2');
+   
+	// Add event listener to all selected elements
+	dropboxes2.forEach(function(dropbox2) {
+	   dropbox2.addEventListener('change', function() {
+	 
+		  // if one of the value is selected
+		  var allSelectedValuesNotMinusOne2 = Array.from(dropboxes2).some(function(db2) {
+		  return db2.value !== '-1';
+		  });
+ 
+		  // Check if all selected values are selected
+		  //console.log(dropboxes);
+		  var allSelectedValues2 = Array.from(dropboxes2).every(function(dbb2) {
+			 //console.log(dbb.value);
+			 return dbb2.value !== '-1';
+		  });
+		  //console.log(allSelectedValues);
+		  var error_dis2 = document.getElementById("error-message-2");
+		  let hidden2 = error_dis2.getAttribute("hidden");
+		  console.log(allSelectedValues2);
+		  console.log(allSelectedValuesNotMinusOne2);
+		  if(allSelectedValuesNotMinusOne2 && !allSelectedValues2){
+			 error_dis2.removeAttribute("hidden");
+		  }
+		  else{
+			 // Enable the button
+			 error_dis2.setAttribute("hidden", "hidden");
+		  }
+		  
+	   });
+	});
+</script>
 {% endblock content %}

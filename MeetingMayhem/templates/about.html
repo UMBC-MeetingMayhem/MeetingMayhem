@@ -1,13 +1,173 @@
-<!-- 
-    File: about.html
+<!--
+    File: home.html
     Author: Robert Shovan /Voitheia
-    Date: 6/15/2021
+    Date Created: 6/15/2021
     Last Modified: 7/6/2021
     E-mail: rshovan1@umbc.edu
-    Description: html and jinja file for handling the about page
+    Description: html and jinja file for handling the home page
+    this page doesn't really have anything useful for now
+
+    Update on Summer 2023
+    Author: Shan Huang
+    https://docs.google.com/document/d/1mDpigrXXO_M6OaHbYqD4Co1a8MFXbxVUptWiY5mgclU/edit?usp=sharing
 -->
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    <h1 style="text-align:center;">Here, we shall describe how the game works, I suppose</h1>
+
+<div class="container" >
+  <div class="mission" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm;">
+      <h1 style="text-align:left;" >
+          Mission:
+      </h1>
+
+      <p style="text-align:left; font-family:Lucida Console, Courier New, monospace">
+        You are an agent who needs to reach agreement on a time and place to meet with your fellow agent to exchange an essential asset. 
+        However, there is a <b>malicious</b> adversary trying to prevent you from reaching consensus on the time and place.  
+        Your only communication with your fellow agent is over a network, which is controlled by the adversary. 
+        At the end of the game session, you will vote to decide on the meeting time and place.
+    </p>
+      
+  </div>
+</div>
+
+<!-- <h1 style="text-align:left;" >
+    Mission:
+</h1> -->
+
+<!-- <p style="text-align:left; font-family:Lucida Console, Courier New, monospace;">
+    You are an agent who needs to reach agreement on a time and place to meet with your fellow agent, to exchange an essential asset. 
+    However, there is a <b>malicious</b> adversary trying to prevent you from reaching consensus on the time and place.  
+    Your only communication with your fellow agent is over a network, which is controlled by the adversary. 
+    At the end of the game session, you will vote to decide on the meeting time and place.
+</p> -->
+
+<div class="container" >
+  <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm;">
+    <h1 style="text-align:left;">
+      Goal:
+  </h1>
+  <p style="text-align:left;">
+      Reach agreement with your fellow agent on a meeting time and place.
+  </p>
+      
+  </div>
+</div>
+
+<!-- <h1 style="text-align:left;">
+    Goal:
+</h1>
+<p style="text-align:left; background-color: #ffffff; opacity: 0.5; color: #000000">
+    Reach agreement with your fellow agent on the meeting time and place.
+</p> -->
+
+<div class="container" >
+  <div class="cryptography" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm;">
+    <h1 style="text-align:left;">
+      Cryptographic Tools:
+  </h1>
+  <p style="text-align:left;font-size:45px">
+  <ul>
+      <li>Symmetric Encryption: Encrypt or decrypt  your message using a Shared Symmetric Key known by you and the recipient.<br>
+          <span id="more_symmetric_encryption" style="display:none" ><img src="/images/Lectures/Symmetric_Encryption.png" alt="Avatar" width="700px" height="300px">
+          <br>
+          Consider that Alice wants to send a confidential message to Bob. One way would be to have a key that is only known to Alice and Bob and encrypt and decrypt the message with that key. We call that key the Shared Symmetric Key of Alice and Bob. Alice would encrypt the message with the key, and Bob would decrypt with that same key. When the same key is used in both encryption and decryption, we call the method symmetric encryption.</span>
+          <a href="#" onclick="ReadMoreForSymmetricEncryption()" id="read_more_symmetric_encryption">Read more</a>
+      </li>
+      <li>Asymmetric Encryption: Encrypt messages using the Receiver’s Public Key, or decrypt the message using the Receiver's Private Key. <br>
+          <span id="more_asymmetric_encryption" style="display:none" ><img src="/images/Lectures/Asymmetric_Encryption.png" alt="Avatar" width="700px" height="300px">
+              <br>
+              Consider that Alice wants to send a confidential message to Bob. Another method can be useful called asymmetric encryption. Each user locally generates a pair of keys (public key, private key) with a key-generation algorithm. Then, the public keys are shared with all users on the network, and each person keeps their private key to themself. For Alice to send a message to Bob, Alice encrypts the message with Bob’s public key, and Bob decrypts the message using his own private key. 
+          </span>
+              <a href="#" onclick="ReadMoreForAsymmetricEncryption()" id="read_more_asymmetric_encryption">Read more</a></li>
+      </li>
+      <li>Signature: Sign your message with the Sender’s (Your) Private Key; the receiver can verify your identity with the Sender’s (Your) Public Key.  Here, a valid signature also encrypts and guarantees message integrity (i.e., that the message has not been modified in transit).<br>
+          <span id="more_signature" style="display:none" ><img src="/images/Lectures/Signature.png" alt="Avatar" width="700px" height="300px">
+              <br>
+              Whereas encryption protects the confidentiality of the message, signatures help the receiver verify that the message actually came from the purported sender. For signatures in this game, we use the same public-private key pairs generated for asymmetric encryption. Alice can sign a message with her private key, and Bob can verify the signature with Alice’s public key, verifying that the message actually came from Alice.
+          </span>
+              <a href="#" onclick="ReadMoreForSignature()" id="read_more_signature">Read more</a></li>
+      </li>
+  </ul>
+  </p>
+      
+  </div>
+</div>
+
+<!-- <h1 style="text-align:left;">
+    Cryptographic Tools:
+</h1>
+<p style="text-align:left;">
+<ul>
+    <li>Symmetric Encryption: Encrypt or decrypt  your message using a Shared Symmetric Key known by you and the recipient.<br>
+        <span id="more_symmetric_encryption" style="display:none" ><img src="/images/Lectures/Symmetric_Encryption.png" alt="Avatar" width="700px" height="300px">
+        <br>
+        Consider that Alice wants to send a confidential message to Bob. One way would be to have a key that is only known to Alice and Bob and encrypt and decrypt the message with that key. We call that key the Shared Symmetric Key of Alice and Bob. Alice would encrypt the message with the key, and Bob would decrypt with that same key. When the same key is used in both encryption and decryption, we call the method symmetric encryption.</span>
+        <a href="#" onclick="ReadMoreForSymmetricEncryption()" id="read_more_symmetric_encryption">Read more</a>
+    </li>
+    <li>Asymmetric Encryption: Encrypt messages using the Receiver’s Public Key, or decrypt the message using the Receiver's Private Key. <br>
+        <span id="more_asymmetric_encryption" style="display:none" ><img src="/images/Lectures/Asymmetric_Encryption.png" alt="Avatar" width="700px" height="300px">
+            <br>
+            Consider that Alice wants to send a confidential message to Bob. Another method can be useful called asymmetric encryption. Each user locally generates a pair of keys (public key, private key) with a key-generation algorithm. Then, the public keys are shared with all users on the network, and each person keeps their private key to themself. For Alice to send a message to Bob, Alice encrypts the message with Bob’s public key, and Bob decrypts the message using his own private key. 
+        </span>
+            <a href="#" onclick="ReadMoreForAsymmetricEncryption()" id="read_more_asymmetric_encryption">Read more</a></li>
+    </li>
+    <li>Signature: Sign your message with the Sender’s (Your) Private Key; the receiver can verify your identity with the Sender’s (Your) Public Key.  Here, a valid signature also encrypts and guarantees message integrity (i.e., that the message has not been modified in transit).<br>
+        <span id="more_signature" style="display:none" ><img src="/images/Lectures/Signature.png" alt="Avatar" width="700px" height="300px">
+            <br>
+            Whereas encryption protects the confidentiality of the message, signatures help the receiver verify that the message actually came from the purported sender. For signatures in this game, we use the same public-private key pairs generated for asymmetric encryption. Alice can sign a message with her private key, and Bob can verify the signature with Alice’s public key, verifying that the message actually came from Alice.
+        </span>
+            <a href="#" onclick="ReadMoreForSignature()" id="read_more_signature">Read more</a></li>
+    </li>
+</ul>
+</p> -->
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+        var socket = io();
+		socket.on('ingame', function() {
+            window.location.href = "{{ url_for('messages') }}";
+        });
+	});
+</script>
+<script>
+    function ReadMoreForSymmetricEncryption() {
+        var moreText = document.getElementById("more_symmetric_encryption");
+        var btnText = document.getElementById("read_more_symmetric_encryption");
+      
+        if (moreText.style.display === "none") {
+          btnText.innerHTML = "Read less";
+          moreText.style.display = "inline";
+        } else {
+          btnText.innerHTML = "Read more";
+          moreText.style.display = "none";
+        }
+      }
+      function ReadMoreForAsymmetricEncryption() {
+        var moreText = document.getElementById("more_asymmetric_encryption");
+        var btnText = document.getElementById("read_more_asymmetric_encryption");
+      
+        if (moreText.style.display === "none") {
+          btnText.innerHTML = "Read less";
+          moreText.style.display = "inline";
+        } else {
+          btnText.innerHTML = "Read more";
+          moreText.style.display = "none";
+        }
+      }
+      function ReadMoreForSignature() {
+        var moreText = document.getElementById("more_signature");
+        var btnText = document.getElementById("read_more_signature");
+      
+        if (moreText.style.display === "none") {
+          btnText.innerHTML = "Read less";
+          moreText.style.display = "inline";
+        } else {
+          btnText.innerHTML = "Read more";
+          moreText.style.display = "none";
+        }
+      }
+</script>
 {% endblock content %}

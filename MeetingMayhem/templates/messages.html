@@ -7,347 +7,584 @@
    Description: html and jinja file for handling the messages page
    -->
 {% import 'messages.j2' as messages %}
-{% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
-{% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-<h1 class="float-start">Messages</h1>
-<button id="vote_bt" style="box-shadow: none; !important" class="btn btn-primary btn-lg float-end gray-blue" data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
+{% extends "layout.html" %}
+<!-- this tells jinja that we are using a template -->
+{% block content %}
+<!-- this piece of code tells jinja where to put the html for this page in the parent template -->
+<h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
+<button id="vote_bt-{{current_user.username}}" style="box-shadow: none; font-size: 20px; padding: 13px !important" class="btn btn-primary btn-lg float-end gray-blue"
+   data-bs-toggle="button" autocomplete="off">Ready to Vote</button>
 <script>
-   $("#vote_bt").on("click", function() {
-   	$(this).prop("disabled", true);
-   	
-   	var socket = io();
-   	socket.on('connect', function() {
-   	socket.emit('ready_to_vote', {game_id: "{{game.id}}", player: "{{current_user.username}}"});
-   	});
+   $("#vote_bt-{{current_user.username}}").on("click", function () {
+      var socket = io();
+      socket.on('connect', function () {
+         socket.emit('ready_to_vote', { game_id: "{{game.id}}", player: "{{current_user.username}}" });
+      });
    });	
 </script>
 
+<!-- Sender can ONLY send to ONE recipients at a time -->
+<!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->
+<script>
+function onlyOne(checkbox) {
+   var checkboxes = document.getElementsByName('recipients')
+   checkboxes.forEach((item) => {
+       if (item !== checkbox) item.checked = false
+   })
+  }
+</script>
 
-<legend class="border-bottom mb4">Send a Message</legend>
-<div class="content-section">
+<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px">Send a Message</legend>
+<div class="content-section" id="body">
    <form method="POST" action="">
       {{ form.hidden_tag() }}
       <fieldset class="form-group">
          <div class="form-group">
-            <label class="form-control-label" for="name">Recipients</label> <br/>
-            {% for username in usernames %}
-            <div class="form-check form-check-inline">
-               <!-- below line needs the ', ' in value to make processing usernames easier -->
-               <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="recipients" value="{{ username }}, ">
-               <label class="form-check-label" for="inlineCheckbox1"> {{ username }}</label>
-            </div>
-            {% endfor %}
+            <label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+            background-color: #333333;
+            color: #0dcaf0;
+            font-size: 15px;
+            border-color:#0dcaf0;
+            border-radius: 5px;
+            padding: 5px;
+            padding-left: 10px; padding-right: 10px;
+            text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
+            {% set current_user_name =  current_user.username  -%}
+            {{messages.user_interface(usernames,current_user_name,false,"")}}
          </div>
-         <br/>
+         <br />
          <div class="form-group">
-            {{ form.content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-            {{ form.meet_location (class="gray-blue") }}
+            {{ form.content.label(class="form-control-label") }}
+            <!-- i think this tells jinja to put a form box in here -->
+            {{ form.meet_location (class="gray-blue",id="locations")}}
+            <img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+               style="display:block;margin:20px;">
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
-            {% if form.content.errors %} <!-- if there are errors in the form... -->
+            <div class="content-section" style="color: #0dcaf0">
+               <ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+               <div class="row g-2 align-items-center">
+                  <div class="col">
+                     <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                        <option value="-1" selected>No Encryption/Signature</option>
+                        <option value="symmetric">Symmetrically Encrypt</option>
+                        <option value="asymmetric">Asymmetrically Encrypt</option>
+                        <option value="signed">Sign</option>
+                     </select>
+                  </div>
+                  with
+                  <div class="col">
+                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
+                        {% set current_user_name =  current_user.username  -%}
+                        {% for username,_ in usernames %}
+                        {% if current_user_name != username %}
+                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                        {% endif %}
+                        {% endfor %}
+                        {% for username,_ in usernames %}
+                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                        {% if current_user_name == username %}
+                        <option value="private_{{username}}">{{username}}'s Private Key</option>
+                        {% endif %}
+                        {% endfor %}
+                     </select>
+                  </div>
+               </div>
+            <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+            {% if form.content.errors %}
             {{ form.content(class="form-control form-control-lg is-invalid") }}
             <div class="invalid-feedback">
                {% for errors in form.content.errors %}
                <span>{{ errors }}</span> <!-- display the errors -->
                {% endfor %}
             </div>
-            {% else %} <!-- if there aren't errors, just display normally -->
-            {{ form.content(class="form-control form-control-lg") }}
+            {% else %}
+            <!-- if there aren't errors, just display normally -->
+            {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
             {% endif %}
+<!--            {{ form.encryption_type(class="gray-blue") }}-->
          </div>
-         <br/>
-         <div class="form-group">
-            {{ form.encryption_and_signed_keys(id="encryption_and_signed_keys", type="hidden") }} 
-         </div>
-         <br/>
       </fieldset>
-      <div class="content-section bg-secondary">
-         <ul class="select2-selection__rendered" id="cryptography_tags_list">
-         </ul>
-         <div class="row g-3 align-items-center">
-            <div class="col-auto">
-               <select id="cryptography_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>Cryptography Type</option>
-                  <option value="Signed">Signed</option>
-                  <option value="Encrypted">Encrypted</option>
-               </select>
-            </div>
-            <div class="col-auto">
-               <select id="cryptography_user_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>User</option>
-                  {% for username in usernames %}
-                  <option value="{{ username }}">{{ username }}</option>
-                  {% endfor %}
-               </select>
-            </div>
-            <div class="col-auto">
-               <select id="cryptography_key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
-                  <option value= "-1" selected>Key Type</option>
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-               </select>
-            </div>
-         </div>
-         <button type="button" class="btn btn-sm btn-outline-dark" onclick="addCryptography()">Add Cryptography</button>
-         <br/><br/>
-      </div>
-	  
       <div class="form-group">
-        {{ form.submit(class="btn btn-outline-info") }}
+         {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
       </div>
    </form>
 </div>
 
-<div class="row">
+<div class="row ">
    <div id="Received" class="col">
       {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-      <legend class="border-bottom mb4">Recived messages:</legend>
-      {{ messages.print_msgs(msgs) }}
+      <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Received messages:</legend>
+      {{ messages.print_msgs(msgs,usernames) }}
       {% else %}
-      <legend class="border-bottom mb4">No messages</legend>
+      <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages</legend>
       {% endif %}
    </div>
-   <div id="Sent" class="col" >
+
+   <div id="Sent" class="col">
       {% if sent_msgs %}
-      <legend class="border-bottom mb4">Messages sent by you:</legend>
-      {% for sent_msg in sent_msgs%} <!-- if message has content, display it and some information about it like sender and round -->
-      <!-- https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/snippets/article.html -->
-      <!-- if the message hasn't been edited, display normally -->
-      <article class="media content-section">
-         <div class="media-body">
-            <div class="article-metadata">
-               <a>Sender: {{ sent_msg.sender }} | </a>
-               <a>Recipient: {{ sent_msg.recipient }}</a>
-               <a> | Time Sent: {{ sent_msg.time_sent }} </a>
-            </div>
-            <div id="content">
-                 <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{ sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
-                 <p class="article-content">{{ sent_msg.content }}</p>
-            </div>
-         </div>
-         {% if sent_msg.initial_is_encrypted %}
-         <div class="m-1 row ">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Encrypted For:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_encryption_details }}</div>
-         </div>
-         {% endif %}
-         {% if sent_msg.initial_is_signed %}
-         <div class="m-1 row">
-            <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">Signed by:</div>
-            <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{ sent_msg.initial_signed_details }}</div>
-         </div>
-         {% endif %}
-      </article>
-      {% endfor %}
+         <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages sent by you:</legend>
+         {% for sent_msg in sent_msgs %}
+            {% if not sent_msg.adv_created %}
+               <article class="media content-section">
+                  <div class="media-body">
+                     <div class="article-metadata">
+                        <a>Sender: {{ sent_msg.sender }} | </a>
+                        <a>Recipient: {{ sent_msg.recipient }}</a>
+                        <a> | Time Sent: {{ sent_msg.time_sent }} </a>
+                     </div>
+                     <div id="content-{{ sent_msg.id }}">
+                        <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
+                           sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
+                        {% if sent_msg.initial_is_encrypted or sent_msg.initial_is_signed %}
+                           <p class="article-content"> #######################</p>
+                        {% else %}
+                           <p class="article-content">{{ sent_msg.content }}</p>
+                        {% endif %}
+                     </div>
+                     {% if sent_msg.initial_is_encrypted %}
+                     <div class="m-1 row ">
+                        {% if 'Warning' not in sent_msg.initial_encryption_details %}
+                           {% if sent_msg.encryption_type == 'symmetric' %}
+                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                 Symmetrically encrypted with:</div>
+                           {% elif sent_msg.encryption_type == 'asymmetric' %}
+                                 <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                    Asymmetrically encrypted with:</div>
+                           {% endif %}
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                                 sent_msg.initial_encryption_details }}</div>
+                        {% elif 'but' in sent_msg.initial_encryption_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                           Warning:</div>
+                           {% if sent_msg.encryption_type == 'symmetric' %}
+                              <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                 Symmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                           {% elif sent_msg.encryption_type == 'asymmetric' %}
+                                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                    Asymmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
+                           {% endif %}
+                        {% else %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                              sent_msg.initial_encryption_details[9:] }}</div>
+                        {% endif %}  
+                     </div>
+                     {% elif sent_msg.initial_is_signed %}
+                     <div class="m-1 row ">
+                        {% if 'Warning' not in sent_msg.initial_signed_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                              Signed by:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                              sent_msg.initial_signed_details }}</div>
+                        {% elif 'but' in sent_msg.initial_signed_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                              Signed by {{sent_msg.initial_signed_details[9:] }}</div>
+                        {% else %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                              sent_msg.initial_signed_details[9:] }}</div>
+                        {% endif %}
+                     </div>
+                     {% endif %}
+                  </div>
+               </article>
+            {% endif %}
+         {% endfor %}
       {% else %}
-      <legend class="border-bottom mb4">No messages sent</legend>
-      {% endif %} 
+         <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages sent</legend>
+      {% endif %}
    </div>
+</div>
+   
+<script>
+    const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
+   const encryptionKeySelect = document.getElementById("key_select");
+   const defaultKeySelect = document.getElementById("default_key_select");
+
+   encryptionTypeSelect.addEventListener("change", () => {
+      if (encryptionTypeSelect.value === "-1") {
+         encryptionKeySelect.value = "-1";
+      }
+   });
+
+   var current_user_username = "{{ current_user.username }}";
+   var key_select = document.getElementById("key_select");
+   var encryption_type_select = document.getElementById("encryption_sign_type_select");
+   var default_key = document.getElementById("default_key_select");
+
+   encryption_type_select.addEventListener("change", function () {
+      let all_options = key_select.querySelectorAll('option');
+      var encryption_type = encryption_type_select.value;
+
+      if (encryption_type === 'symmetric') {
+         all_options.forEach((single_option) => {
+            single_option.disabled = true;
+         });
+         let shared = key_select.querySelectorAll('option[value^=Shared]');
+         shared.forEach((userItem) => {
+            userItem.disabled = false;
+         });
+         default_key.disabled = false;
+      } else if (encryption_type === 'asymmetric' || encryption_type === 'signed') {
+         all_options.forEach((single_option) => {
+            single_option.disabled = false;
+         });
+         let shared = key_select.querySelectorAll('option[value^=Shared]');
+         shared.forEach((userItem) => {
+            userItem.disabled = true;
+         });
+      } else {
+         all_options.forEach((single_option) => {
+            single_option.disabled = true;
+         });
+      }
+   });
+
+   // Store selected values in localStorage before page refresh
+   window.addEventListener('beforeunload', () => {
+      localStorage.setItem('encryptionType', encryptionTypeSelect.value);
+      localStorage.setItem('encryptionKey', encryptionKeySelect.value);
+   });
+
+   // Retrieve selected values from localStorage on page load
+   window.addEventListener('load', () => {
+      const storedEncryptionType = localStorage.getItem('encryptionType');
+      const storedEncryptionKey = localStorage.getItem('encryptionKey');
+
+      if (storedEncryptionType) {
+         encryptionTypeSelect.value = storedEncryptionType;
+      }
+
+      if (storedEncryptionKey) {
+         encryptionKeySelect.value = storedEncryptionKey;
+      }
+
+      // Trigger the change event to enable/disable options based on selected encryption type
+      const changeEvent = new Event('change');
+      encryptionTypeSelect.dispatchEvent(changeEvent);
+   });
+   </script>
+
+   <script>
+      function special_chars(length) {
+         var chars = "!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+         var result = "";
+         for (var i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+         }
+         return result;
+      }
+   </script>
+
 </div>
 
 <a href="#" id="toTopBtn" class="cd-top text-replace js-cd-top cd-top--is-visible cd-top--fade-out" data-abc="true"></a>
 
 <script>
-   $(document).ready(function() {
-   $(window).scroll(function() {
-   if ($(this).scrollTop() > 20) {
-   $('#toTopBtn').fadeIn();
-   } else {
-   $('#toTopBtn').fadeOut();
+   $(document).ready(function () {
+      $(window).scroll(function () {
+         if ($(this).scrollTop() > 20) {
+            $('#toTopBtn').fadeIn();
+         } else {
+            $('#toTopBtn').fadeOut();
+         }
+      });
+
+      $('#toTopBtn').click(function () {
+         document.body.scrollTop = 0; // For Safari
+         document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+      });
+   });
+
+   function endGame() {
+
+
    }
-   });
-   
-   $('#toTopBtn').click(function() {
-   	document.body.scrollTop = 0; // For Safari
-   	document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-   });
-   });
-   
-   function endGame(){
-   
-   
-   }
-   
+
 </script>
 
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-<div class="modal-dialog">
-   <div class="modal-content">
-      <div class="modal-header">
-         <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel">Please vote</h5>
-      </div>
-      <div class="modal-body">
-         <select id="places_select" class="form-select" aria-label="Default select example">
-            <option selected>Select Location</option>
-            <option value="1">Park</option>
-            <option value="2">Alley</option>
-            <option value="3">Cafe</option>
-            <option value="4">Parking Garage</option>
-            <option value="5">Rooftop</option>
-            <option value="6">Bus stop</option>
-            <option value="7">Subway station</option>
-         </select>
-         <br>
-         <div class="row">
-            <div class="col-sm-6">
-               <select id="time_s1" class="form-select" aria-label="Default select example">
-                  <option selected>Select Time</option>
-                  <option value="1">1:00</option>
-                  <option value="2">2:00</option>
-                  <option value="3">3:00</option>
-                  <option value="4">4:00</option>
-                  <option value="5">5:00</option>
-                  <option value="6">6:00</option>
-                  <option value="7">7:00</option>
-                  <option value="8">8:00</option>
-                  <option value="9">9:00</option>
-                  <option value="10">10:00</option>
-                  <option value="11">11:00</option>
-                  <option value="12">12:00</option>
-               </select>
-            </div>
-            <div class="col-sm-6">
-               <select id="time_s2" class="form-select" aria-label="Default select example">
-                  <option value="1">PM</option>
-                  <option value="2">AM</option>
-               </select>
-            </div>
+<div class="modal fade" id="staticBackdrop-{{current_user.username}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+   aria-labelledby="staticBackdropLabel-{{current_user.username}}" aria-hidden="true">
+   <div class="modal-dialog" id="dialog-box">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" style="color:darkgray" id="staticBackdropLabel-{{current_user.username}}">Please vote</h5>
+            <button id="close-button" class="btn btn-danger">X</button>
          </div>
-         <div class="modal-footer">
-            <button id="#submt_vote" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
+         <div class="modal-body">
+            <img id="displayedImage-{{current_user.username}}" src="/images/Arts/Locations/Cafe_new.png" width="450px" height="200px" alt="Image description">
+            <select id="places_select-{{current_user.username}}" class="form-select" aria-label="Default select example">
+               <option selected>Select Location</option>
+               <option value="Cafe">Cafe</option>
+               <option value="Track">Track</option>
+               <option value="Alley">Alley</option>
+               <option value="Dorm">Dorm</option>
+               <option value="Garage">Garage</option>
+               <option value="Lab">Lab</option>
+               <option value="Park">Park</option>
+            </select>
+            <br>
+            <div class="row">
+               <div class="col-sm-6">
+                  <select id="time_s1-{{current_user.username}}" class="form-select" aria-label="Default select example">
+                     <option selected>Select Time</option>
+                     <option value="1:00">1:00</option>
+                     <option value="2:00">2:00</option>
+                     <option value="3:00">3:00</option>
+                     <option value="4:00">4:00</option>
+                     <option value="5:00">5:00</option>
+                     <option value="6:00">6:00</option>
+                     <option value="7:00">7:00</option>
+                     <option value="8:00">8:00</option>
+                     <option value="9:00">9:00</option>
+                     <option value="10:00">10:00</option>
+                     <option value="11:00">11:00</option>
+                     <option value="12:00">12:00</option>
+                  </select>
+               </div>
+               <div class="col-sm-6">
+                  <select id="time_s2-{{current_user.username}}" class="form-select" aria-label="Default select example">
+                     <option value="PM">PM</option>
+                     <option value="AM">AM</option>
+                  </select>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button id="submt_vote-{{current_user.username}}" onclick="submitVote()" type="button" class="btn btn-primary">Vote</button>
+            </div>
          </div>
       </div>
    </div>
-</div>
 
 
-<script type="text/javascript" charset="utf-8">
-   $(document).ready(function() {
-	document.getElementById('encryption_and_signed_keys').value = ""; 
-   	var myModal = new bootstrap.Modal(document.getElementById("staticBackdrop"), {});
-   	// Connect to the Socket.IO server.
-          // The connection URL has the following format, relative to the current page:
-          //     http[s]://<domain>:<port>[/<namespace>]
-          var socket = io();
-   	socket.on('update', function() {
-   		$.get(document.URL, function(data) {
-   			var elem = $(data).find('#Received');
-   			 $('#Received').replaceWith(elem);
-   		});
-   		$.get(document.URL, function(data) {
-   			var elem = $(data).find('#Sent');
-   			 $('#Sent').replaceWith(elem);
-   		});
-          });
-   	
-   	socket.on('start_vote', function() {
-   		myModal.show();
-   	});
-   	
-   	socket.on('end_game', function() {
-   		//console.log("end the game");
-              window.location.href = "{{ url_for('end_of_game') }}";
-          });
+   <script type="text/javascript" charset="utf-8">
+      $(document).ready(function () {
+         var username = "{{ current_user.username }}";
+         var myModal = new bootstrap.Modal(document.getElementById(`staticBackdrop-${username}`), {});
+         // Connect to the Socket.IO server.
+         // The connection URL has the following format, relative to the current page:
+         //     http[s]://<domain>:<port>[/<namespace>]
+         var socket = io();
+         socket.on('update', function () {
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Received');
+               $('#Received').replaceWith(elem);
+            });
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Sent');
+               $('#Sent').replaceWith(elem);
+            });
+         });
+
+         socket.on('start_vote', function () {
+            myModal.show();
+         });
+
+      });
+         $(document).ready(function(){ 
+             var keys = Object.keys(localStorage);
+             var i =0;
+             for (i=0;i<keys.length; i++) {
+                 var key = keys[i];
+                 const containerState = localStorage.getItem(key);
+                 const item_found = document.getElementById(key);
+                 if(!Object.is(item_found, null)){
+                     // Save for showing and not showing button(decrypt and vote)
+                     if (containerState == "visible") {
+                        item_found.style.display = "";
+                     }
+                     else if(containerState =='hidden'){
+                        item_found.style.display = "none";
+                     }
+                     // Save for image src of voting system
+                     else if(containerState.startsWith("/images/Arts/Locations/")){
+                        item_found.src = containerState;
+                     }
+                     // Save for wining condition
+                     else{
+                        item_found.textContent = containerState;
+                     }
+                 }
+         
+             }
+         
+         });
+   function submitVote() {
+      var socket = io();
+      var username = "{{ current_user.username }}";
+      place = document.getElementById(`places_select-${username}`).value;
+      time = document.getElementById(`time_s1-${username}`).value;
+      console.log(username)
+      if (place == "Select Location" || time == "Select Time") {
+         return;
+      }
+      time = time + ' ' + document.getElementById(`time_s2-${username}`).value;
+      vote = place + ' ' + time;
+
+      socket.emit('cast_vote', {
+         game_id: "{{game.id}}",
+         vote: vote
+      });
+      //Atmika - disable button and change images upon selected location
+      document.getElementById(`submt_vote-${username}`).style.display="none";
+      document.getElementById(`places_select-${username}`).style.display="none";
+      document.getElementById(`time_s1-${username}`).style.display="none";
+      document.getElementById(`time_s2-${username}`).style.display="none";
+      localStorage.setItem(`submt_vote-${username}`, document.getElementById(`submt_vote-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      localStorage.setItem(`places_select-${username}`, document.getElementById(`places_select-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      localStorage.setItem(`time_s1-${username}`, document.getElementById(`time_s1-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      localStorage.setItem(`time_s2-${username}`, document.getElementById(`time_s2-${username}`).style.display !== "none" ? 'visible' : 'hidden');
+      console.log(place);
+      if (place == "Track") {
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Track_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Track_new.png");
+      }else if (place == "Alley") {
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Alley_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Alley_new.png");
+      }else if (place == "Dorm") {
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Dorm_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Dorm_new.png");
+      }else if (place == "Garage") {
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Garage_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Garage_new.png");
+      }else if (place == "Lab") {
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Lab_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Lab_new.png");
+      }else if (place == "Park") {
+         document.getElementById(`displayedImage-${username}`).src = "/images/Arts/Locations/Park_new.png";
+         localStorage.setItem(`displayedImage-${username}`,"/images/Arts/Locations/Park_new.png");
+      }
+      
+      socket.on('return_result', function (msg) {
+         switch (msg) {
+            case "PlayerWin":
+               document.getElementById(`staticBackdropLabel-${username}`).textContent = "You won. The players successfully met in a safe location!";
+               localStorage.setItem(`staticBackdropLabel-${username}`,"You won. The players successfully met in a safe location!");
+               break;
+            case "PlayerLose":
+               document.getElementById(`staticBackdropLabel-${username}`).textContent = "You Lost. The Adversary was able to thwart the player's meeting.";
+               localStorage.setItem(`staticBackdropLabel-${username}`,"You Lost. The Adversary was able to thwart the player's meeting.");
+               break;
+            default:  
+               document.getElementById(`staticBackdropLabel-${username}`).textContent = "Thank you for voting: Please Wait";
+               localStorage.setItem(`staticBackdropLabel-${username}`,"Thank you for voting: Please Wait");
+         }
+      });
+   }
+
+   // START: This part is for controlling sned message button
+   // encryption type  keys need to be selcted if encrytion/signature to be selcted
+   var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
+   
+   // Add event listener to all selected elements
+   dropboxes.forEach(function(dropbox) {
+      dropbox.addEventListener('change', function() {
+    
+         // if one of the value is selected
+         var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
+         return db.value !== '-1';
+         });
+
+         // Check if all selected values are selected
+         //console.log(dropboxes);
+         var allSelectedValues = Array.from(dropboxes).every(function(dbb) {
+            //console.log(dbb.value);
+            return dbb.value !== '-1';
+         });
+         //console.log(allSelectedValues);
+         var submitButton = document.getElementById('submitButton');
+         var error_dis = document.getElementById("error-message");
+         let hidden = error_dis.getAttribute("hidden");
+         if(allSelectedValuesNotMinusOne && !allSelectedValues){
+            // Disable the button
+            error_dis.removeAttribute("hidden");
+            submitButton.disabled = true;
+         }
+         else{
+            // Enable the button
+            error_dis.setAttribute("hidden", "hidden");
+            submitButton.disabled = false;
+         }
+         
+      });
    });
-   
-   function submitVote(){
-   	var socket = io();
-   	
-   	place = $( "#places_select" ).find(':selected').text();
-   	time = $( "#time_s1" ).find(':selected').text();
-   	
-   	if(place == "Select Location" || time == "Select Time"){
-   		return;
-   	}
-   	$( "#staticBackdropLabel" ).text("Thank you for voting: Please Wait"); 
-   	$("#submt_vote").prop("disabled",true);
-   	
-   	time = time + ' ' + $( "#time_s2" ).find(':selected').text();
-   	
-   	vote = place + ' ' + time;
-   	
-   	socket.emit('cast_vote', {
-   	game_id: "{{game.id}}",
-   	vote: vote
-   	});
-   
-   }
-  
-   function addCryptography(){
-		user_select = $( "#cryptography_user_select" ).val();
-		key_select = $( "#cryptography_key_select" ).val();
-		type_select = $( "#cryptography_type_select" ).val();
-			
-		if(!(user_select == -1 || key_select == -1 || type_select == -1)){
-			const listEl = document.createElement('li');
-			const buttonEl = document.createElement('button');
-			const spanEl = document.createElement('span');
-			const spanEl2 = document.createElement('span');
-			
-			listEl.classList.add("select2-selection__choice");
-			
-			buttonEl.setAttribute("type", "button");
-			buttonEl.setAttribute("onclick", "return this.parentNode.remove();");
-			buttonEl.classList.add("select2-selection__choice__remove");
-			buttonEl.textContent = "×";
-			
-			listEl.appendChild(buttonEl);
-			
-			spanEl.classList.add("select2-selection__choice__display");
-			spanEl.textContent = type_select;
-			listEl.appendChild(spanEl);
-			
-			spanEl2.classList.add("select2-selection__choice__display");
-			spanEl2.textContent = user_select + "." + key_select;
-			listEl.appendChild(spanEl2);
-			
-			var listContainer = $( "#cryptography_tags_list" );
-			listContainer.append(listEl);
-			 
-			var submitString = "";
-			 
-			$('#cryptography_tags_list li').each(function() {
-				var option_all = $(this).children().map(function () {
-					return $(this).text();
-				}).get().join(',');
-
-				var chars = option_all.split(',');
-				
-				submitString += chars[1] + "(" + chars[2] + "),"
-			}) 		
-		}
-		
-		submitString = submitString.slice(0, -1) 
-		console.log(submitString);
-		document.getElementById('encryption_and_signed_keys').value = submitString; 
+   // START - This is for set color of username
+   function setRandomColor(obj, color) {
+      obj.css("color", color);
    }
 
-    function setRandomColor(obj, color) {
-        obj.css("color", color);
-    }
+   function generatePastelColor() {
+      let R = Math.floor((Math.random() * 127) + 127);
+      let G = Math.floor((Math.random() * 127) + 127);
+      let B = Math.floor((Math.random() * 127) + 127);
 
-    function generatePastelColor() {
-        let R = Math.floor((Math.random() * 127) + 127);
-        let G = Math.floor((Math.random() * 127) + 127);
-        let B = Math.floor((Math.random() * 127) + 127);
+      let rgb = (R << 16) + (G << 8) + B;
+      return `#${rgb.toString(16)}`;
+   }
 
-        let rgb = (R << 16) + (G << 8) + B;
-        return `#${rgb.toString(16)}`;
-    }
-
-    let usernames = $(".form-check-label")
+   let usernames = $(".form-check-label")
 
    // randomizes colors in recipient list
-    for (let name = 0; name < usernames.length; name++){
-        setRandomColor($(usernames[name]), generatePastelColor())
-    }
+   for (let name = 0; name < usernames.length; name++) {
+      setRandomColor($(usernames[name]), generatePastelColor())
+   }
+   // END - This is for set color of username
 
-    function content(message){
-        let h = $("#content");
-        console.log(this.sent_msg)
+   function content(message) {
+      let h = $("#content");
+      //console.log(this.sent_msg)
    }
    content(0)
-</script>
-			
-{% endblock content %}
+
+   var dialogBox = document.getElementById("dialog-box");
+   var closeButton = document.getElementById("close-button");
+   var body = document.getElementById("body");
+
+   closeButton.addEventListener("click", function () {
+      dialogBox.style.display = "none";
+      location.reload();
+   });
+
+
+   var select = document.getElementById("locations");
+   var image = document.getElementById("location-image");
+
+   select.addEventListener("change", function () {
+      switch (select.value) {
+         case "Cafe":
+            image.src = "/images/Arts/Locations/Cafe_new.png";
+            break;
+         case "Track":
+            image.src = "/images/Arts/Locations/Track_new.png";
+            break;
+         case "Alley":
+            image.src = "/images/Arts/Locations/Alley_new.png";
+            break;
+         case "Dorm":
+            image.src = "/images/Arts/Locations/Dorm_new.png";
+            break;
+         case "Garage":
+            image.src = "/images/Arts/Locations/Garage_new.png";
+            break;
+         case "Lab":
+            image.src = "/images/Arts/Locations/Lab_new.png";
+            break;
+         case "Park":
+            image.src = "/images/Arts/Locations/Park_new.png";
+            break;
+         default:
+            image.src = "/images/Arts/Locations/Cafe_new.png";
+      }
+   });
+   </script>
+
+   {% endblock content %}

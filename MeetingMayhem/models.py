@@ -36,8 +36,10 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.Integer, nullable=False) #dictates what role the account is
+    image_url = db.Column(db.String(255), nullable=True)
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=True)
-    
+
+
     """
     roles: 1 - admin, 2 - GM, 3 - adversary, 4 - user, 5 - spectator, 6 - inactive
     admin: is able to changes the roles of the users incase we need to do this
@@ -117,9 +119,13 @@ class Message(db.Model):
     time_meet = db.Column(db.String, default="Null") # keeps track of the time user chooses to meet
     location_meet = db.Column(db.String, default="Null") # keeps track of the location user chooses to meet
     time_am_pm = db.Column(db.String, default="Null") # keeps track of the choice between am and pm for time
+    encryption_type = db.Column(db.String, nullable=False,default="Null") # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
+    key = db.Column(db.String, nullable=False,default="Null") # Key select
+    is_decrypted = db.Column(db.Boolean, nullable=False) #keeps track of decrypted message
+    #adv_details = db.Column(db.String, nullable=False, default="Null") #kepp track of adv
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message(ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM={self.time_am_pm})\n"
-        
+        return f"Message(key = '{self.key}', encryption_type = '{self.encryption_type}',ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM={self.time_am_pm}, Edited ='{self.is_edited}',Decrypt='{self.is_decrypted}')\n"
+
 #game table
 #include information about the game in here so it can by dynamically pulled
 #also allows for scaling once we allow for multiple game sessions
@@ -139,7 +145,7 @@ class Game(db.Model):
     end_result = db.Column(db.String)
 
     def __repr__(self): #this is what gets printed out for the metadata, just spits out everything
-        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', Who_voted='{self.who_voted}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n" 
+        return f"Game(ID='{self.id}', Name='{self.name}', Running='{self.is_running}', Adversary='{self.adversary}', Players='{self.players}', Vote_ready='{self.vote_ready}', Who_voted='{self.who_voted}', votes='{self.votes}', adv_vote='{self.adv_vote}', end_result='{self.end_result}')\n"
 
 #queryfactory for games, used for gm to modify specific games
 def getGame(columns=None):
@@ -240,19 +246,22 @@ db.session.add(spc)
 db.session.commit()
 
 Create gm:
-gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+#gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$MIKYo2NKqRT9nhrKDr4MoeE5SPdEUgboaAziELzc6k2lTU24xuLtC', role=2)
+gm = User(username='gmaster', email='gmaster@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=2)
 db.session.add(gm)
 db.session.commit()
 
 Create adversary:
 adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
+adv = User(username='adv', email='adv@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
+user3 = User(username='user3', email='user3@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=3)
 db.session.add(adv)
 db.session.commit()
 
 Create test users:
 user1 = User(username='user1', email='user1@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 user2 = User(username='user2', email='user2@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
-user3 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
+user5 = User(username='bob', email='bob@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 user4 = User(username='joe', email='joe@gmail.com', password='$2b$12$JdWTF/r7bfb9ijMoVcUAeeiM3tId8Stbk4PNtVem/aozNTTa8wFS6', role=4)
 db.session.add(user1)
 db.session.add(user2)

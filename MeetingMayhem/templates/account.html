@@ -1,4 +1,4 @@
-<!-- 
+<!--
     File: account.html
     Author: Robert Shovan /Voitheia
     Date Created: 6/15/2021
@@ -10,65 +10,70 @@
 
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
-    
+<!-- the below is in place for testing only, only displays for adversary -->
+<div class="box-border" style="margin:30px;width:fit-content;float:left;border-width:8px;border-radius:20px;background-color:rgb(49, 67, 124)">
+    <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
-
-
-
-
-    <!-- the below is in place for testing only, only displays for adversary -->
-    {% if current_user.role == 3 %}
-    <div class="content-section">
-        <form method="POST" action="">
-            <div class="form-group">
-                <p>decrement round number</p>
-                {{ form.advance_round(class="btn btn-outline-info") }}
-            </div>
-        </form>
-    </div>
-    {% endif %}
-    
-    <div class="box-border" style="margin:30px;width:fit-content;float:left;border-width:8px;border-radius:20px;background-color:rgb(49, 67, 124)">
-        <svg width="100" height="100">
-            <circle cx="50" cy="50" r="32" stroke="#eeeeff" stroke-width="8" fill="none" />
-        </svg>
-    </div> <div style="height:150px;display:flex;float:left;">
+    <!--        {% if current_user.email == 'gmaster@gmail.com' %}-->
+    <!--        <img src="/images/gmaster.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% elif current_user.email == 'adv@gmail.com'%}-->
+    <!--        <img src="/images/adversary.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% elif current_user.email == 'user1@gmail.com' %}-->
+    <!--        <img src="/images/user1.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% elif current_user.email == 'user2@gmail.com' %}-->
+    <!--        <img src="/images/user2.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% elif current_user.email == 'bob@gmail.com' %}-->
+    <!--        <img src="/images/user3.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% elif current_user.email == 'joe@gmail.com' %}-->
+    <!--        <img src="/images/user4.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% elif current_user.email == 'spc@gmail.com' %}-->
+    <!--        <img src="/images/spc.png" alt="Avatar" width="100px" height="100px">-->
+    <!--        {% endif %}-->
+</div> <div style="height:150px;display:flex;float:left;">
     <h1 style="align-self:flex-end;font-size:80px;font-family:Verdana, Geneva, Tahoma, sans-serif"> {{ current_user.username }}</h1>
+
+</div>
+<br>
+<div style="width: 1200px;;margin:auto;display:flex;">
+
+    <div class="content-section" style="width:60%;margin:1%;height:fit-content;text-align:center;">
+        {% if result == "AdvWin" %}
+        <h1 style="text-align:center;">You have won!</h1>
+        <h3 style="text-align:center;">The Adversary was able to thwart the player's meeting.</h3>
+        {% elif result== "AdvLose" %}
+        <h1 style="text-align:center;">You have lost.</h1>
+        <h3 style="text-align:center;">The players successfully met in a safe location.</h3>
+        {% elif result == "PlayerWin" %}
+        <h1 style="text-align:center;">You have won!</h1>
+        <h3 style="text-align:center;">The players successfully met in a safe location!</h3>
+        <h1 style="text-align:center;">Meeting time and {{place}}: place</h1>
+        {% elif result == "PlayerLose" %}
+        <h1 style="text-align:center;">You have lost.</h1>
+        <h3 style="text-align:center;">The Adversary was able to thwart the player's meeting.</h3>
+        {% else %}
+        <p>Game in progress</p>
+        {% endif %}
     </div>
-    <br>
-    <div style="width: 1200px;;margin:auto;display:flex;">
-
-        <div class="content-section" style="width:60%;margin:1%;height:fit-content;text-align:center;">
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
-            <p style="color:rgb(49, 67, 124);">Stats</p><br>
+    <div class="content-section" style="width:30%;margin:1%;height:fit-content;">
+        <h3 style="font-family:Verdana, Geneva, Tahoma, sans-serif;font-weight: bold;color:rgb(49, 67, 124)">You are currently:</h3>
+        {% if current_user.role == 1 %}
+        <h3 style="color:rgb(49, 67, 124);">an Admin</h3>
+        {% elif current_user.role == 2 %}
+        <h3 style="color:rgb(49, 67, 124);">a Game Master</h3>
+        {% elif current_user.role == 3 %}
+        <h3 style="color:rgb(49, 67, 124);">an Adversary</h3>
+        {% elif current_user.role == 4 %}
+        <h3 style="color:rgb(49, 67, 124);">a User</h3>
+        {% elif current_user.role == 5 %}
+        <h3 style="color:rgb(49, 67, 124);">a Sectator</h3>
+        {% endif %}
+        <br>
+        <hr style="color:rgb(49, 67, 124);">
+        <div class="account-opt">
+            <h5 style="color:rgb(49, 67, 124);">Edit Account</h5>
         </div>
-        <div class="content-section" style="width:30%;margin:1%;height:fit-content;">
-            <h3 style="font-family:Verdana, Geneva, Tahoma, sans-serif;font-weight: bold;color:rgb(49, 67, 124)">You are currently:</h3>
-            {% if current_user.role == 1 %}
-            <h3 style="color:rgb(49, 67, 124);">an Admin</h3>
-            {% elif current_user.role == 2 %}
-            <h3 style="color:rgb(49, 67, 124);">a Game Master</h3>
-            {% elif current_user.role == 3 %}
-            <h3 style="color:rgb(49, 67, 124);">an Adversary</h3>
-            {% elif current_user.role == 4 %}
-            <h3 style="color:rgb(49, 67, 124);">a User</h3>
-            {% elif current_user.role == 5 %}
-            <h3 style="color:rgb(49, 67, 124);">a Sectator</h3>
-            {% endif %}
-            <br>
-            <hr style="color:rgb(49, 67, 124);">
-            <div class="account-opt">
-                <h5 style="color:rgb(49, 67, 124);">Edit Account</h5>
-            </div>
-        </div>
-
-
     </div>
+
+
+</div>
 {% endblock content %}
