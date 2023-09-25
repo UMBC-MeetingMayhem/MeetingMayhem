@@ -53,6 +53,7 @@ function onlyOne(checkbox) {
             {{messages.user_interface(usernames,current_user_name,false,"")}}
          </div>
          <br />
+         <!-- TODO: on the side of chatbox -->
          <div class="form-group">
             {{ form.content.label(class="form-control-label") }}
             <!-- i think this tells jinja to put a form box in here -->
@@ -61,6 +62,7 @@ function onlyOne(checkbox) {
                style="display:block;margin:20px;">
             {{ form.meet_time (class="gray-blue")}}
             {{ form.meet_am_pm (class="gray-blue") }}
+            <!-- TODO: at the bottom of chatbox -->
             <div class="content-section" style="color: #0dcaf0">
                <ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
                <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
@@ -102,6 +104,7 @@ function onlyOne(checkbox) {
                      {% endfor %}
                   </div>
                {% else %}
+                  <!-- TODO: on/next to the text box -->
                   <!-- Send Message box -->
                   <!--! Need to make it at the button -->
                   {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
@@ -199,6 +202,7 @@ function onlyOne(checkbox) {
    </form>
 </div>
 
+<!-- NOT needed -->
 <div class="row ">
    <div id="Received" class="col">
       {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
@@ -209,6 +213,7 @@ function onlyOne(checkbox) {
       {% endif %}
    </div>
 
+   <!-- TODO: Embedded within the chatbox -->
    <div id="Sent" class="col">
       {% if sent_msgs %}
          <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages sent by you:</legend>
