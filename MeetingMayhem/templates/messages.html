@@ -169,7 +169,18 @@ function onlyOne(checkbox) {
                         
                      {% endfor %}
                {% endif %}
-               <style>
+
+
+
+               <!-- Tab links -->
+               <div class="tab">
+                  <button class="tablinks" style= "background-color: #000000; margin-top: 100px; margin-bottom: -70px;" onclick = "openuser(event, 'other_user1')">User 2</button>
+                  <button class="tablinks" style= "background-color: #000000" onclick="openCity(event, 'other_user2')">User 3 </button>
+               </div>
+
+               <!-- Tab content -->
+               <div id="other_user1 class="tabcontent">
+                   <style>
                   .column {
                   float: left;
                   width: 50%;
@@ -179,19 +190,48 @@ function onlyOne(checkbox) {
                    content: "";
                   display: table;
                   clear: both;}
-               </style>
+                  </style>
 
-               <div class="row">
+                  <div class="row">
+                     <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 760px; height: 750px; margin-top: 5px; border-radius: 25px; overflow-y: scroll; ">  
+                      <h2>User 2</h2>
+                        <p>Messages</p>
+                        <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
+                     </div>
+                  <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 5px; border-radius: 25px; overflow-y: scroll; ">
+                     <h2>User 2</h2>
+                     <p>Message Information</p>
+                  </div>
+                  </div>
+               </div>
+
+               <div id="other_user2" class="tabcontent">
+                  <style>
+                  .column {
+                  float: left;
+                  width: 50%;
+                  padding: 10px;
+                  height: 300px;}
+                  .row:after {
+                   content: "";
+                  display: table;
+                  clear: both;}
+                  </style>
+
+                  <div class="row">
                   <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 760px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">  
-                     <h2>Text</h2>
-                     <p>Some text..</p>
+                     <h2>User 3</h2>
+                     <p>Messages</p>
                      <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
                   </div>
                   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
-                     <h2>Text</h2>
-                    <p>Some text..</p>
+                     <h2>User 3</h2>
+                    <p>Message Information</p>
                   </div>
                 </div>
+               </div>
+
+              
       </fieldset>
       <!--<div class="form-group" >
          {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
