@@ -197,10 +197,37 @@ function onlyOne(checkbox) {
                       <h2>User 2</h2>
                         <p>Messages</p>
                         <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
+                        {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
+                        <div class="form-group">
+                        {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
+                        </div>
+                        
                      </div>
                   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 5px; border-radius: 25px; overflow-y: scroll; ">
                      <h2>User 2</h2>
                      <p>Message Information</p>
+                     <div class="form-group">
+                        <label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+                        background-color: #333333;
+                        color: #0dcaf0;
+                        font-size: 15px;
+                        border-color:#0dcaf0;
+                        border-radius: 5px;
+                        padding: 5px;
+                        padding-left: 10px; padding-right: 10px;
+                        text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
+                        {% set current_user_name =  current_user.username  -%}
+                        {{messages.user_interface(usernames,current_user_name,false,"")}}
+                     </div>
+                     <div class="form-group">
+                        {{ form.content.label(class="form-control-label") }}
+                        <!-- i think this tells jinja to put a form box in here -->
+                        {{ form.meet_location (class="gray-blue",id="locations")}}
+                        <img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+                           style="display:block;margin:20px;">
+                        {{ form.meet_time (class="gray-blue")}}
+                        {{ form.meet_am_pm (class="gray-blue") }}
+                     </div>
                   </div>
                   </div>
                </div>
@@ -223,10 +250,37 @@ function onlyOne(checkbox) {
                      <h2>User 3</h2>
                      <p>Messages</p>
                      <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
+                     {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
+                     <div class="form-group">
+                        {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
+                     </div>
                   </div>
                   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
                      <h2>User 3</h2>
                     <p>Message Information</p>
+                    <div class="form-group">
+                     <label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+                     background-color: #333333;
+                     color: #0dcaf0;
+                     font-size: 15px;
+                     border-color:#0dcaf0;
+                     border-radius: 5px;
+                     padding: 5px;
+                     padding-left: 10px; padding-right: 10px;
+                     text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
+                     {% set current_user_name =  current_user.username  -%}
+                     {{messages.user_interface(usernames,current_user_name,false,"")}}
+                     </div>
+                     
+                     <div class="form-group">
+                        {{ form.content.label(class="form-control-label") }}
+                        <!-- i think this tells jinja to put a form box in here -->
+                        {{ form.meet_location (class="gray-blue",id="locations")}}
+                        <img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+                           style="display:block;margin:20px;">
+                        {{ form.meet_time (class="gray-blue")}}
+                        {{ form.meet_am_pm (class="gray-blue") }}
+                     </div>
                   </div>
                 </div>
                </div>
