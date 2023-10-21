@@ -32,145 +32,7 @@ function onlyOne(checkbox) {
        if (item !== checkbox) item.checked = false
    })
   }
-</script>
-
-<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px">Send a Message</legend>
-<div class="content-section" id="body">
-   <form method="POST" action="">
-      {{ form.hidden_tag() }}
-      <fieldset class="form-group">
-         <div class="form-group">
-            <label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
-            background-color: #333333;
-            color: #0dcaf0;
-            font-size: 15px;
-            border-color:#0dcaf0;
-            border-radius: 5px;
-            padding: 5px;
-            padding-left: 10px; padding-right: 10px;
-            text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
-            {% set current_user_name =  current_user.username  -%}
-            {{messages.user_interface(usernames,current_user_name,false,"")}}
-         </div>
-         <br />
-         <div class="form-group">
-            {{ form.content.label(class="form-control-label") }}
-            <!-- i think this tells jinja to put a form box in here -->
-            {{ form.meet_location (class="gray-blue",id="locations")}}
-            <img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
-               style="display:block;margin:20px;">
-            {{ form.meet_time (class="gray-blue")}}
-            {{ form.meet_am_pm (class="gray-blue") }}
-            <div class="content-section" style="color: #0dcaf0">
-               <ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
-               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
-               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
-               <div class="row g-2 align-items-center">
-                  <div class="col">
-                     <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
-                        <option value="-1" selected>No Encryption/Signature</option>
-                        <option value="symmetric">Symmetrically Encrypt</option>
-                        <option value="asymmetric">Asymmetrically Encrypt</option>
-                        <option value="signed">Sign</option>
-                     </select>
-                  </div>
-                  with
-                  <div class="col">
-                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
-                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
-                        {% set current_user_name =  current_user.username  -%}
-                        {% for username,_ in usernames %}
-                        {% if current_user_name != username %}
-                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
-                        {% endif %}
-                        {% endfor %}
-                        {% for username,_ in usernames %}
-                        <option value="public_{{username}}">{{username}}'s Public Key</option>
-                        {% if current_user_name == username %}
-                        <option value="private_{{username}}">{{username}}'s Private Key</option>
-                        {% endif %}
-                        {% endfor %}
-                     </select>
-                  </div>
-               </div>
-            <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
-               {% if form.content.errors %}
-                  {{ form.content(class="form-control form-control-lg is-invalid") }}
-                  <div class="invalid-feedback">
-                     {% for errors in form.content.errors %}
-                     <span>{{ errors }}</span> <!-- display the errors -->
-                     {% endfor %}
-                  </div>
-               {% else %}
-                  <!-- Send Message box -->
-                  <!--! Need to make it at the button -->
-                  {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
-                  <div class="form-group">
-                     {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
-                  </div>
-                  <br>
-                  <h1 class="float-start" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black; ">User Messages</h1>
-                     {% for index in range(other_names|length) %}
-                        <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 1200px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
-                           
-                           <!-- Header for profile + names -->
-                           
-                           <div class="float-start" style="margin: 0 0 25px 180px; color: rgb(250, 236, 33); font-weight: bold;">
-                              {{other_names[index]}}
-                           </div>
-
-                           <!-- Print Message -->
-                           <div class="chatbox" >
-                              {% if msgs_flag[index] %}
-                                 {% for message in msgs_tuple[index] %}
-                                  <!--! TODO: Profile next to box  -->
-                                   
-
-                                    <!-- If message recieved then display left-->
-                                    {% if message[index].sender == current_user.username %}
-                                       <!--? Message box for current user (right) -->
-                                       <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 300px; height: 100px; border-radius: 10px; margin-top: 45px; margin-bottom: 45px; ">
-                                          <p>{{message[index].content}}</p>
-                                          <img src="{{ current_user.image_url }}" alt="Profile Image" class="nav-image1" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%; margin: 0 0 100px 220px; margin-bottom: -60px; margin-top: -60px;">
-                                          <div class="article-metadata">
-                                             <a>Sender: {{ message[index].sender }} | </a>
-                                             <a>Recipient: {{ message[index].recipient }}</a>
-                                             <a> | Time Sent: {{ message[index].time_sent }} </a>
-                                          </div>
-                                          <div id="content-{{ msgs_flag.id }}">
-                                             <p style="margin: 0; display:inline; color:#0dcaf0;">{{ msgs_flag.location_meet }} {{
-                                                msgs_flag.time_meet}}{{ msgs_flag.time_am_pm }}</p>
-                                          </div>
-                                        <!--? Current user Profile Image -->
-                                        
-                                       <!--else if message sent , then display right-->
-                                       <!--? other user Profile Image -->
-                                       </div>
-                                    {% else %}
-
-                                       <!--? Message box for other user (left) -->
-                                       <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(15, 198, 110); padding: 0.5cm; width: 300px; height: 100px; border-radius: 10px; margin: 0 0 20px 161dpx; margin-top: 45px; margin-bottom: 45px; ">
-                                          <p>{{message[index].content}}</p>
-                                          <img src="{{ image_url[index] }}" alt="Profile Image" class="nav-image1" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%; margin: 0 0 100px 220px; margin-bottom: -70px; margin-top: -70px;">
-                                       </div>
-                                       <div class="article-metadata">
-                                          <div class="article-metadata">
-                                             <a>Sender: {{ message[index].sender }} | </a>
-                                             <a>Recipient: {{ message[index].recipient }}</a>
-                                             <a> | Time Sent: {{ message[index].time_sent }} </a>
-                                          </div>
-                                       </div>
-                                       
-                                    {% endif %}
-                                 {% endfor %}
-                              {% endif %}
-                           </div>
-                        </div>
-                        
-                     {% endfor %}
-               {% endif %}
-
-
+</script>        
 
                <!-- Tab links -->
                <div class="tab">
@@ -228,10 +90,132 @@ function onlyOne(checkbox) {
                         {{ form.meet_time (class="gray-blue")}}
                         {{ form.meet_am_pm (class="gray-blue") }}
                      </div>
+                     <div class="content-section" style="color: #0dcaf0">
+                        <ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+                        <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+                        <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+                        <div class="row g-2 align-items-center">
+                           <div class="col">
+                              <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                                 <option value="-1" selected>No Encryption/Signature</option>
+                                 <option value="symmetric">Symmetrically Encrypt</option>
+                                 <option value="asymmetric">Asymmetrically Encrypt</option>
+                                 <option value="signed">Sign</option>
+                              </select>
+                           </div>
+                           with
+                     <div class="col">
+                        <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+<legend class="border-bottom mb4" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in; padding-bottom: 5px">Send a Message</legend>
+<div class="content-section" id="body">
+   <form method="POST" action="">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+         <div class="form-group">
+            <label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+            background-color: #333333;
+            color: #0dcaf0;
+            font-size: 15px;
+            border-color:#0dcaf0;
+            border-radius: 5px;
+            padding: 5px;
+            padding-left: 10px; padding-right: 10px;
+            text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
+            {% set current_user_name =  current_user.username  -%}
+            {{messages.user_interface(usernames,current_user_name,false,"")}}
+         </div>
+         <br />
+         <!-- TODO: on the side of chatbox -->
+         <div class="form-group">
+            {{ form.content.label(class="form-control-label") }}
+            <!-- i think this tells jinja to put a form box in here -->
+            {{ form.meet_location (class="gray-blue",id="locations")}}
+            <img id="location-image" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+               style="display:block;margin:20px;">
+            {{ form.meet_time (class="gray-blue")}}
+            {{ form.meet_am_pm (class="gray-blue") }}
+            <!-- TODO: at the bottom of chatbox -->
+            <div class="content-section" style="color: #0dcaf0">
+               <ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+               <div class="row g-2 align-items-center">
+                  <div class="col">
+                     <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                        <option value="-1" selected>No Encryption/Signature</option>
+                        <option value="symmetric">Symmetrically Encrypt</option>
+                        <option value="asymmetric">Asymmetrically Encrypt</option>
+                        <option value="signed">Sign</option>
+                     </select>
+                  </div>
+                  with
+                  <div class="col">
+                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
+                        {% set current_user_name =  current_user.username  -%}
+                        {% for username,_ in usernames %}
+                        {% if current_user_name != username %}
+                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                        {% endif %}
+                        {% endfor %}
+                        {% for username,_ in usernames %}
+                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                        {% if current_user_name == username %}
+                        <option value="private_{{username}}">{{username}}'s Private Key</option>
+                        {% endif %}
+                        {% endfor %}
+                        </select>
+                     </div>
+               </div>
                   </div>
                   </div>
                </div>
-
+            <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+               {% if form.content.errors %}
+                  {{ form.content(class="form-control form-control-lg is-invalid") }}
+                  <div class="invalid-feedback">
+                     {% for errors in form.content.errors %}
+                     <span>{{ errors }}</span> <!-- display the errors -->
+                     {% endfor %}
+                  </div>
+               {% else %}
+                  <!-- TODO: on/next to the text box -->
+                  <!-- Send Message box -->
+                  <!--! Need to make it at the button -->
+                  {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
+                  <div class="form-group">
+                     {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
+                  </div>
+                  <br>
+                  <h1 class="float-start" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black; ">User Messages</h1>
+                     {% for index in range(other_names|length) %}
+                        <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 1200px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
+                           
+                           <!-- Header for profile + names -->
+                           
+                           <div class="float-start" style="margin: 0 0 25px 180px; color: rgb(250, 236, 33); font-weight: bold;">
+                              {{other_names[index]}}
+                           </div>
+                           {% endfor %}
+                           {% endif %}
+                           with
+                  <div class="col">
+                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
+                        {% set current_user_name =  current_user.username  -%}
+                        {% for username,_ in usernames %}
+                        {% if current_user_name != username %}
+                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                        {% endif %}
+                        {% endfor %}
+                        {% for username,_ in usernames %}
+                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                        {% if current_user_name == username %}
+                        <option value="private_{{username}}">{{username}}'s Private Key</option>
+                        {% endif %}
+                        {% endfor %}
+                        </select>
+                     </div>
                <div id="other_user2" class="tabcontent">
                   <style>
                   .column {
@@ -246,7 +230,7 @@ function onlyOne(checkbox) {
                   </style>
 
                   <div class="row">
-                  <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 760px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">  
+                  <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 760px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; scrollbar-gutter: stable;">  
                      <h2>User 3</h2>
                      <p>Messages</p>
                      <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
@@ -255,6 +239,7 @@ function onlyOne(checkbox) {
                         {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
                      </div>
                   </div>
+                  
                   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
                      <h2>User 3</h2>
                     <p>Message Information</p>
@@ -281,6 +266,87 @@ function onlyOne(checkbox) {
                         {{ form.meet_time (class="gray-blue")}}
                         {{ form.meet_am_pm (class="gray-blue") }}
                      </div>
+                     <div class="content-section" style="color: #0dcaf0">
+                        <ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+                        <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+                        <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+                        <div class="row g-2 align-items-center">
+                           <div class="col">
+                              <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                                 <option value="-1" selected>No Encryption/Signature</option>
+                                 <option value="symmetric">Symmetrically Encrypt</option>
+                                 <option value="asymmetric">Asymmetrically Encrypt</option>
+                                 <option value="signed">Sign</option>
+                              </select>
+                           </div>
+                           with
+                  <div class="col">
+                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
+                        {% set current_user_name =  current_user.username  -%}
+                        {% for username,_ in usernames %}
+                        {% if current_user_name != username %}
+                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                        {% endif %}
+                        {% endfor %}
+                        {% for username,_ in usernames %}
+                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                        {% if current_user_name == username %}
+                        <option value="private_{{username}}">{{username}}'s Private Key</option>
+                        {% endif %}
+                        {% endfor %}
+                        </select>
+                     </div>
+               </div>
+                  </div>
+                  </div>
+               </div>
+            <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+               {% if form.content.errors %}
+                  {{ form.content(class="form-control form-control-lg is-invalid") }}
+                  <div class="invalid-feedback">
+                     {% for errors in form.content.errors %}
+                     <span>{{ errors }}</span> <!-- display the errors -->
+                     {% endfor %}
+                  </div>
+               {% else %}
+                  <!-- TODO: on/next to the text box -->
+                  <!-- Send Message box -->
+                  <!--! Need to make it at the button -->
+                  {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
+                  <div class="form-group">
+                     {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
+                  </div>
+                  <br>
+                  <h1 class="float-start" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black; ">User Messages</h1>
+                     {% for index in range(other_names|length) %}
+                        <div class="goal" style="background-color: rgba(0,0,0,.8); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 1200px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
+                           
+                           <!-- Header for profile + names -->
+                           
+                           <div class="float-start" style="margin: 0 0 25px 180px; color: rgb(250, 236, 33); font-weight: bold;">
+                              {{other_names[index]}}
+                           </div>
+                           {% endfor %}
+                           {% endif %}
+                           with
+                  <div class="col">
+                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
+                        {% set current_user_name =  current_user.username  -%}
+                        {% for username,_ in usernames %}
+                        {% if current_user_name != username %}
+                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                        {% endif %}
+                        {% endfor %}
+                        {% for username,_ in usernames %}
+                        <option value="public_{{username}}">{{username}}'s Public Key</option>
+                        {% if current_user_name == username %}
+                        <option value="private_{{username}}">{{username}}'s Private Key</option>
+                        {% endif %}
+                        {% endfor %}
+                        </select>
+                     </div>
                   </div>
                 </div>
                </div>
@@ -293,6 +359,7 @@ function onlyOne(checkbox) {
    </form>
 </div>
 
+<!-- NOT needed -->
 <div class="row ">
    <div id="Received" class="col">
       {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
@@ -303,6 +370,7 @@ function onlyOne(checkbox) {
       {% endif %}
    </div>
 
+   <!-- TODO: Embedded within the chatbox -->
    <div id="Sent" class="col">
       {% if sent_msgs %}
          <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages sent by you:</legend>
