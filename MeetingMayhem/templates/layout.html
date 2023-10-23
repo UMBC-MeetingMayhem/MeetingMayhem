@@ -285,9 +285,8 @@
                     </div>
                     <p class="nav-item nav-link">{{ current_user.username }}</p>
                     <p class="nav-item nav-link">|</p>
-                    {% if request.path == '/multilevelmessages' %}
-                    <a class="nav-item nav-link" href="{{ url_for('game_setup_multi') }}">Game Setup</a>
-                    <a class="nav-item nav-link" href="{{ url_for('spectate_game') }}">Spectate</a>
+                    {% if request.path == '/AI' %}
+                    <a class="nav-item nav-link" href="{{ url_for('AI') }}">Message</a>
                     {% endif %}
                     {% if current_user.role == 2 %}
                     <a class="nav-item nav-link" href="{{ url_for('game_setup') }}">Game Setup</a>

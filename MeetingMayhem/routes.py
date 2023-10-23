@@ -28,12 +28,13 @@ from flask_login import login_user, logout_user, login_required, current_user
 from wtforms.validators import ValidationError
 from MeetingMayhem import app, db, bcrypt, socketio
 from MeetingMayhem.forms import GMManageUserForm, RegistrationForm, LoginForm, MessageForm, AdversaryMessageEditForm, AdversaryAdvanceRoundForm, GMManageGameForm, GMSetupGameForm, GameSelectForm
-from MeetingMayhem.models import User, Message, Game
+from MeetingMayhem.models import User, Message, Game,AI_Message
 from MeetingMayhem.helper import check_for_str, strip_list_str, str_to_list, create_message, decrypt_button_show,decrypt_button_show_for_adv
 from datetime import datetime
 from collections import Counter
 from flask import Flask, send_from_directory
-import pytz
+
+import MeetingMayhem.Text_Generator as Text_Generator
 
 #root route, basically the homepage, this page doesn't really do anything right now
 #having two routes means that flask will put the same html on both of those pages
@@ -651,126 +652,7 @@ def game_setup():
 @app.route('/game_setup_multi', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
 @login_required #requires the user to be logged in
 def game_setup_multi():
-    if current_user.role != 2: #if the user isn't a game master
-        flash(f'Your permissions are insufficient to access this page.', 'danger') #flash error message
-        return render_template('home.html', title='Home') #display the home page when they try to access this page directly.
-
-    #seutp the forms the gm uses
-    mng_form = GMManageGameForm()
-    setup_form = GMSetupGameForm()
-    usr_form = GMManageUserForm()
-
-    #grab the state of the submit buttons so they only need to be pressed once
-    is_mng_submit = mng_form.end_game.data
-    is_end_game_page_submit = mng_form.end_game_page.data
-    is_setup_submit = setup_form.create_game.data
-    is_usr_form = usr_form.update.data
-
-    #create list of usernames for checkboxes
-    users = User.query.filter_by(role=4).all()
-    usernames = []
-    for user in users:
-        usernames.append(user.username)
-
-    #game setup
-    if is_setup_submit and setup_form.validate(): #when the create game button is pressed and the form is valid
-        #capture the list of players from the checkboxes and make it into a string delimited by commas
-        checkbox_output_list = request.form.getlist('players')
-        checkbox_output_str = ''.join(map(str, checkbox_output_list))
-        players = checkbox_output_str[:len(checkbox_output_str)-2] #len-2 is so that the last comma and space is removed from the last username
-
-
-        #validation" since I don't know how to use the flaskform validation with a custom form, we call the validation in the setup form
-        #doing it this way is kinda janky, the error messages don't look the same as other validation, but it works
-        try:
-            GMSetupGameForm.validate_players_checkbox(players)
-        except ValidationError:
-            #if validation for players fails, display an error and refresh the page so the game doesn't get created
-            flash(f'One of the selected users is already in a game.', 'danger')
-            return render_template('game_setup.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
-
-        #create the game with info from the form
-        new_game = Game(name=setup_form.name.data, is_running=True, adversary=setup_form.adversary.data.username, players=players, current_round=1, adv_current_msg=0, adv_current_msg_list_size=0)
-        db.session.add(new_game) #send to db
-        db.session.commit()
-        game = Game.query.order_by(-Game.id).filter_by(adversary=setup_form.adversary.data.username,players=players).first() #this finds the last game in the db with the passed players and adversary
-        adv = User.query.filter_by(username=setup_form.adversary.data.username).first() #grab the adversary user of the game we just made
-        adv.game = game.id #set their game to this game
-        db.session.commit()
-        player_list = []
-        player_list = str_to_list(players, player_list)
-        for player in strip_list_str(player_list): #for each player in the string of players
-            user = User.query.filter_by(username=player).first() #grab their user object
-            user.game = game.id #set their game to this game
-            db.session.commit()
-        flash(f'The game ' + setup_form.name.data + ' has been created.', 'success') #flash success message
-        socketio.emit('ingame')
-
-    #game management
-    if is_mng_submit and mng_form.validate(): #when the end game button is pressed and the form is valid
-        game = Game.query.filter_by(name=mng_form.game.data.name).first()
-        game.is_running = False
-        adv = User.query.filter_by(username=game.adversary).first() #find the game's adversary
-        adv.game = None #remove the game from the user
-        db.session.commit() #commit
-        player_list = []
-        player_list = str_to_list(game.players, player_list) #grab a list of players from the game
-        for player in player_list:
-            user = User.query.filter_by(username=player).first() #find each of the player objects
-            user.game = None #remove the game from the user
-            db.session.commit() #commit
-        flash(f'The game has been ended.', 'success') #show success message upon completion
-
-        #pull the forms again because their information has updated, might not need to do this
-        mng_form = GMManageGameForm()
-        setup_form = GMSetupGameForm()
-
-    #bring the selected game to the end game screen, used for testing
-    if is_end_game_page_submit and mng_form.validate():
-        game = Game.query.filter_by(name=mng_form.game.data.name).first()
-        game.end_result = "testing"
-        db.session.commit()
-        socketio.emit('end_game')
-        flash(f'The game has been brought to the end game page.', 'success')
-
-    #user management
-    if is_usr_form and usr_form.validate(): #when the edit user button is pressed and the form is valid
-        user = User.query.filter_by(username=usr_form.user.data.username).first() #grab the targeted user
-        if user.game: #if the user is in a game
-            #show an error message. changing a user's role while they are in a game will break stuff
-            flash(f'Unable to change a user\'s role while they are in a game. Please end the game first.', 'danger')
-            return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
-        if usr_form.role.data == 'adv': #if the selected new role is adversary
-            if user.role == 3:
-                # show an error message. can't change a user's role to what they already are
-                flash(f"You cannot change a user's role to what it already is!", 'danger')
-                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
-            user.role = 3 #update to adversary
-        if usr_form.role.data == 'usr': #if the selected new role is user
-            if user.role == 4:
-                # show an error message. can't change a user's role to what they already are
-                flash(f"You cannot change a user's role to what it already is!", 'danger')
-                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
-            user.role = 4 #update to user
-        if usr_form.role.data == 'spec': #if the selected new role is spectator
-            if user.role == 5:
-                # show an error message. can't change a user's role to what they already are
-                flash(f"You cannot change a user's role to what it already is!", 'danger')
-                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
-            user.role = 5 #update to spectator
-        if usr_form.role.data == 'inac': #if the selected new role is inactive
-            if user.role == 6:
-                # show an error message. can't change a user's role to what they already are
-                flash(f"You cannot change a user's role to what it already is!", 'danger')
-                return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form)
-            user.role = 6 #update to spectator
-        db.session.commit()
-        flash(f'The user ' + usr_form.user.data.username + ' has been updated.', 'success') #flash success message
-        update()
-
-    #display webpage normally
-    return render_template('game_setup_multi.html', title='Game Setup', mng_form=mng_form, setup_form=setup_form, usr_form=usr_form, usernames=usernames)
-
+    pass
 # Route for spectating
 @app.route('/spectate', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information
 @login_required  # user must be logged in
@@ -997,3 +879,245 @@ def Generate_Log():
     worksheet.write(row, 6, str(current_game.who_voted))
     worksheet.write(row, 7, str(current_game.end_result))
     workbook.close()
+
+@app.route('/AI', methods=['GET', 'POST']) 
+@login_required
+def AI():
+    if current_user.role != 3:
+        return render_template('home.html', title='Home')
+    #if the current user isn't in a game, send them to the homepage and display message
+    if not current_user.game:
+        flash(f'You are not currently in a game. Please have your game master put you in a game.', 'danger')
+        return render_template('home.html', title='Home')
+   
+    #? Current Game session
+    current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
+
+    #? setup variables for the forms the adversary needs to use
+    msg_form = MessageForm()
+    adv_msg_edit_form = AdversaryMessageEditForm()
+    adv_next_round_form = AdversaryAdvanceRoundForm()
+
+    #? create list of usernames for checkboxes
+    users = User.query.filter_by(role=4, game=current_game.id).all()
+    usernames = []
+    agent_name = []
+    adversaries = User.query.filter_by(role=3, game=current_game.id).all()
+    for user in users:
+        usernames.append((user.username,user.image_url))
+        agent_name.append(user.username)
+    for adversary in adversaries:
+        usernames.append((adversary.username,adversary.image_url))
+    usernames = sorted(usernames)
+
+    #messages not being processed yet
+    messages = AI_Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
+    msgs_tuple = []
+    Processed_length = 0
+    for message in messages:
+        #print(message)
+        msgs_tuple.append((message, False))
+        Processed_length += 1
+    
+    #! AI_text_generator
+    AI_message = Text_Generator.message_generator(current_game,Processed_length,agent_name)
+
+    # Pull sent_msgs
+    sent_msgs = [message for message in AI_Message.query.filter_by(adv_created=True, game=current_game.id).all()]
+    sent_flag = False
+    if sent_msgs:
+        sent_flag = True
+        sent_msgs.reverse()
+
+    #set the adv_current_msg_list_size so that the edit message box "scrolling" works correctly
+    current_game.adv_current_msg_list_size = len(messages)
+
+    display_message = None
+    can_decrypt_curr_message = None
+    #create variables for the edit message box buttons so that we only check their state once
+    is_submit_edits = adv_msg_edit_form.submit_edits.data
+    is_delete_msg = adv_msg_edit_form.delete_msg.data
+
+    # Message_edited_by_you
+    prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True,adv_created=False).all() #grab all the previous messages for this game
+
+    #reset prev msgs tuple before filling it with new messages
+    prev_msgs_tuple = []
+
+    for message in prev_messages:
+        prev_msgs_tuple.append((message, False)) # append it to the tuple
+
+    prev_msgs_tuple.reverse()
+    if msg_form.submit.data and msg_form.validate(): #if the adversary tries to send a message, and it is valid
+        #ensure keys entered are keys of actual recipients chosen
+        flag,new_message = Text_Generator.create_message_adv(current_game,  msg_form, request.form)
+        update()
+        if flag:
+            sent_msgs.insert(0,new_message)
+            sent_flag = True if sent_msgs else False
+        current_game.adv_current_msg = 0
+        current_game.adv_current_msg_list_size = len(messages)
+        #commit the messages to the database
+        db.session.commit()
+
+        # #render the webpage
+        return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                               adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                               current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+    #adversary message editing
+    elif (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
+        display_message = AI_Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
+        can_decrypt_curr_message = True
+        #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
+        #capture the list of players from the checkboxes and make it into a string delimited by commas
+        new_recipients = request.form.getlist('newrecipients')
+        new_senders= request.form.getlist('newsenders')
+        #ensure the lists aren't empty
+
+        #if is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
+        if is_submit_edits:
+            if not new_recipients :
+                flash(f'Please select one recipient.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                                       adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                                       current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+            if not new_senders:
+                flash(f'Please select one sender.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                                       adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                                       current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+
+            new_recipients = new_recipients[0]
+            new_senders = new_senders[0]
+            #print(new_senders,new_recipients)
+            if new_senders == new_recipients:
+                flash(f'Please do not select same sender and recipient.', 'danger')
+                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                                   adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
+                                   current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+            #setup the changes to be made to the current message
+            encryption_type = request.form.get("encryption_type_select2")
+            encrypted_key = request.form.get("encryption_key2")
+            display_message.new_sender = new_senders
+            display_message.new_recipient = new_recipients
+            display_message.edited_content = display_message.content
+            #print(adv_msg_edit_form.not_editable.data)
+            #print(encrypted_key,encryption_type)
+            if not adv_msg_edit_form.not_editable.data:
+                #display_message.is_edited = True
+                display_message.edited_content = adv_msg_edit_form.edited_content.data
+                encrypted_keys = []
+                signed_keys = []
+                if  encryption_type == 'symmetric':
+                    display_message.encryption_type = encryption_type
+                    display_message.key = encrypted_key
+                    if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
+                        encrypted_keys.append(encrypted_key)
+                    else:
+                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                elif encryption_type  == 'asymmetric':
+                    display_message.encryption_type = encryption_type
+                    display_message.key = encrypted_key
+                    if encrypted_key == 'public_' + new_recipients:
+                        encrypted_keys.append(encrypted_key)
+                    elif encrypted_key == 'private_' + str(new_senders):
+                        encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
+                    else:
+                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                elif encryption_type  == 'signed':
+                    display_message.encryption_type = encryption_type
+                    display_message.key = encrypted_key
+                    if encrypted_key == 'private_' + str(new_senders):
+                        signed_keys.append(encrypted_key)
+                    elif encrypted_key == 'public_' + new_recipients:
+                        signed_keys.append("Warning: but a signature usually requires the sender's private key.")
+                    else:
+                        signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                else:
+                    # no-add on: not edited
+                    display_message.is_edited = False
+
+                if display_message.edited_content != display_message.content or display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
+                    display_message.is_edited = True
+
+                display_message.is_signed = len(signed_keys) > 0
+                display_message.is_encrypted = len(encrypted_keys) > 0
+                display_message.encryption_details = ", ".join(map(str, encrypted_keys))
+                display_message.signed_details = ", ".join(map(str, signed_keys))
+
+            elif display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
+                display_message.is_edited = True
+                encrypted_keys = []
+                signed_keys = []
+                encrypted_key = display_message.key
+                encryption_type = display_message.encryption_type
+                if  encryption_type == 'symmetric':
+                    if (new_recipients in encrypted_key):
+                        encrypted_keys.append(encrypted_key)
+                    else:
+                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                elif encryption_type  == 'asymmetric':
+                    if encrypted_key == 'public_' + new_recipients:
+                        encrypted_keys.append(encrypted_key)
+                    elif "private" in encrypted_key:
+                    #elif encrypted_key == 'private_' + str(new_senders):
+                        encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
+                    else:
+                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                elif encryption_type  == 'signed':
+                    if "private" in encrypted_key:
+                    #if encrypted_key == 'private_' + str(new_senders):
+                        signed_keys.append(encrypted_key)
+                    elif encrypted_key == 'public_' + new_recipients:
+                        signed_keys.append("Warning: but a signature usually requires the sender's private key.")
+                    else:
+                        signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                display_message.is_signed = len(signed_keys) > 0
+                display_message.is_encrypted = len(encrypted_keys) > 0
+                display_message.encryption_details = ", ".join(map(str, encrypted_keys))
+                display_message.signed_details = ", ".join(map(str, signed_keys))
+            
+            display_message.adv_submitted = True
+            
+            #print(display_message)
+            messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
+            msgs_tuple = []
+            for message in messages:
+                msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
+            db.session.commit()
+        elif is_delete_msg: #if the delete message button is clicked
+            #flag the message as edited and deleted
+            display_message.adv_submitted = True
+            display_message.is_edited = True
+            display_message.is_deleted = True
+            db.session.commit()
+            #pull the messages again since the messages we want to display has changed
+            messages = AI_Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
+            msgs_tuple = []
+            Processed_length = 0
+            for message in messages:
+                #print(message)
+                msgs_tuple.append((message, False))
+                Processed_length += 1
+            db.session.commit()
+
+        is_submit_edits = False
+        is_delete_msg = False
+        prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True,adv_created=False).all() #grab all the previous messages for this game
+
+        #reset prev msgs tuple before filling it with new messages
+        prev_msgs_tuple = []
+
+        for message in prev_messages:
+            prev_msgs_tuple.append((message, decrypt_button_show(message))) # append it to the tuple
+
+        prev_msgs_tuple.reverse()
+        #render the webpage
+
+        update()
+        return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                               adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple,  sent_msgs=sent_msgs,sent_flag=sent_flag,usernames=usernames, msgs=msgs_tuple)
+
+    else:
+        return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
+                               adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)

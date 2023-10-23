@@ -158,6 +158,49 @@ def getGame(columns=None):
 def getGameFactory(columns=None):
     return partial(getGame, columns=columns)
 
+class AI_Message(db.Model):
+    #? Origin Message Cotent
+    id = db.Column(db.Integer, primary_key=True)
+    game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
+    sender = db.Column(db.String, nullable=False)
+    recipient = db.Column(db.String, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    time_sent = db.Column(db.String, nullable=False, default="Null") 
+    time_recieved = db.Column(db.String, nullable=False, default="Null") 
+    location_meet = db.Column(db.String, default="Null") # keeps track of the location user chooses to meet
+    time_am_pm = db.Column(db.String, default="Null") # keeps track of the choice between am and pm for time
+    time_meet = db.Column(db.String, default="Null") # keeps track of the time user chooses to meet
+    # For cryptographic option
+    cryptography_type = db.Column(db.String, nullable=False,default="Null") # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
+    key = db.Column(db.String, nullable=False,default="Null") # Key select
+    is_encrypted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is encrypted or not
+    is_signed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is signed or not
+    warning_message = db.Column(db.String, nullable=False, default="Null")
+    #? Special Attribute if Adv_crated Message
+    adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
+    #? New Attribute if message is edited
+    is_edited = db.Column(db.Boolean, nullable=False)
+    new_sender = db.Column(db.String, nullable=True)
+    new_recipient = db.Column(db.String, nullable=True)
+    edited_content = db.Column(db.Text, nullable=True)
+    is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
+    new_cryptography_type = db.Column(db.String, nullable=True,default="Null") # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
+    new_key = db.Column(db.String, nullable=True,default="Null") # Key select
+    new_is_encrypted = db.Column(db.Boolean, nullable=True, default=False) #keeps track of whether the message is encrypted or not
+    new_is_signed = db.Column(db.Boolean, nullable=True, default=False) #keeps track of whether the message is signed or not
+    warning_message = db.Column(db.String, nullable=True, default="Null")
+    #? If adv has processed the message
+    adv_submitted = db.Column(db.Boolean, nullable=False, default=False) 
+
+    #? Check if the message has been decrypted
+    is_decrypted = db.Column(db.Boolean, nullable=False) #keeps track of decrypted message
+   
+    def __repr__(self): #this is what gets printed out for the message, just spits out everything
+        return f"Message(key = '{self.key}', encryption_type = '{self.cryptography_type}', \
+                ID='{self.id}', Game='{self.game}', \
+                Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM='{self.time_am_pm}',\
+                Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', new_key = '{self.new_key}', new_encryption_type = '{self.new_cryptography_type}'\
+                Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Signed='{self.is_signed}', adv_submitted='{self.adv_submitted}')\n"
 
 """
 
