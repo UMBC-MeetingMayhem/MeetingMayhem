@@ -1,13 +1,9 @@
 *.pyc
 *.xml
 *.iml
-<<<<<<< HEAD
 instance/
 wtforms/
 venv/
 help.txt
-=======
-/venv
-wtforms.zip
-.DS_Store
->>>>>>> 98fe4a7bde85ea632a96c48d7f8ea1f601d6aa04
+*.DS_Store
+.vscode
