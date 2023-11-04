@@ -59,7 +59,7 @@ function onlyOne(checkbox) {
                      <style>
                         /* width */
                         ::-webkit-scrollbar {
-                          width: 13px;
+                          width: 10px;
                         }
                         
                         /* Track */
@@ -70,13 +70,18 @@ function onlyOne(checkbox) {
                          
                         /* Handle */
                         ::-webkit-scrollbar-thumb {
-                          background: rgb(201, 191, 12); 
+                          background: rgb(194, 191, 122); 
                           border-radius: 10px;
                         }
                         
                         /* Handle on hover */
                         ::-webkit-scrollbar-thumb:hover {
-                          background: #8e8614; 
+                          background: #52502d; 
+                        }
+                        ::-webkit-scrollbar-corner {
+                           background:rgb(0, 0, 0)
+                           border-radius: 7px;
+
                         }
                         </style>
                      <h2>User 2</h2>
@@ -149,7 +154,8 @@ function onlyOne(checkbox) {
                   </div>
                   </div>
                </div>
-            <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+               <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p>
+               </div>
                {% if form.content.errors %}
                   {{ form.content(class="form-control form-control-lg is-invalid") }}
                   <div class="invalid-feedback">
