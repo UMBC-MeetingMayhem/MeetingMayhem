@@ -44,7 +44,7 @@ function onlyOne(checkbox) {
                   border-radius: 5px;
                   padding: 5px;
                   padding-left: 10px; padding-right: 10px;
-                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'other_user1')">User 2</button>
+                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'other_user1')">{{other_names[0]}}</button>
                   <button class="tablinks" style="margin-top: 0.1in; margin-bottom: 0.1in; 
                   background-color: #333333;
                   color: #0dcaf0;
@@ -53,7 +53,7 @@ function onlyOne(checkbox) {
                   border-radius: 5px;
                   padding: 5px;
                   padding-left: 10px; padding-right: 10px;
-                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'other_user2')">User 3</button>
+                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'other_user2')">{{other_names[1]}}</button>
                </div>
 
                <!-- Tab content -->
@@ -101,7 +101,7 @@ function onlyOne(checkbox) {
                         }
                         </style>
                         
-                     <h2>User 2</h2>
+                     <h2>{{other_names[0]}}</h2>
                      <p>Messages</p>  
                      <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; "></div>
                      <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 80px; margin-right:100 px; margin-left: -60 px; border-radius: 10px; "></div>
@@ -109,13 +109,13 @@ function onlyOne(checkbox) {
                      {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
                      
                      <div class="form-group">
-                        {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
+                        {{ form.submit(class="btn btn-outline-info", id="submitButton",value="user2") }}
                      </div>
                      
                   </div>
                   
                   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
-                     <h2>User 2</h2>
+                     <h2>{{other_names[0]}}</h2>
                     <p>Message Information</p>
                   </br>
                      
@@ -171,7 +171,7 @@ function onlyOne(checkbox) {
                         <span>{{ errors }}</span> <!-- display the errors -->
                         {% endfor %}
                         {% endif %}
-                     </div>
+                     </div>t comm
                   <br>
                </div>
 
@@ -190,7 +190,7 @@ function onlyOne(checkbox) {
 
                   <div class="row">
                      <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
-                        <h2>User 3</h2>
+                        <h2>{{other_names[1]}}</h2>
                         <p>Messages</p>
                         <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
                         {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here") }}
@@ -199,7 +199,7 @@ function onlyOne(checkbox) {
                         </div>
                      </div>
                      <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
-                        <h2>User 3</h2>
+                        <h2>{{other_names[1]}}</h2>
                            <p>Message Information</p>
                         <br>
                         <div class="form-group">
