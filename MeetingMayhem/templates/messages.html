@@ -36,13 +36,29 @@ function onlyOne(checkbox) {
 
                <!-- Tab links -->
                <div class="tab">
-                  <button class="tablinks" style= "background-color: #000000; margin-top: 50px; margin-bottom: -100px;" onclick = "openuser(event, 'other_user1')">User 2</button>
-                  <button class="tablinks" style= "background-color: #000000" onclick="openCity(event, 'other_user2')">User 3 </button>
+                  <button class="tablinks" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+                  background-color: #333333;
+                  color: #0dcaf0;
+                  font-size: 20px;
+                  border-color:#0dcaf0;
+                  border-radius: 5px;
+                  padding: 5px;
+                  padding-left: 10px; padding-right: 10px;
+                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'other_user1')">User 2</button>
+                  <button class="tablinks" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+                  background-color: #333333;
+                  color: #0dcaf0;
+                  font-size: 20px;
+                  border-color:#0dcaf0;
+                  border-radius: 5px;
+                  padding: 5px;
+                  padding-left: 10px; padding-right: 10px;
+                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'other_user2')">User 3</button>
                </div>
 
                <!-- Tab content -->
                <div id="other_user1" class="tabcontent">
-                  <style>
+                  <!-- <style>
                   .column {
                   float: left;
                   width: 50%;
@@ -52,11 +68,11 @@ function onlyOne(checkbox) {
                    content: "";
                   display: table;
                   clear: both;}
-                  </style>
+                  </style> -->
 
                   <div class="row">
-                  <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 760px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll;">  
-                     <style>
+                     <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
+                        <style>
                         /* width */
                         ::-webkit-scrollbar {
                           width: 10px;
@@ -79,7 +95,7 @@ function onlyOne(checkbox) {
                           background: #52502d; 
                         }
                         ::-webkit-scrollbar-corner {
-                           background:rgb(0, 0, 0)
+                           background:rgb(0, 0, 0);
                            border-radius: 7px;
 
                         }
@@ -98,22 +114,10 @@ function onlyOne(checkbox) {
                      
                   </div>
                   
-                  <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
+                  <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
                      <h2>User 2</h2>
                     <p>Message Information</p>
-                    <div class="form-group">
-                     <label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
-                     background-color: #333333;
-                     color: #0dcaf0;
-                     font-size: 15px;
-                     border-color:#0dcaf0;
-                     border-radius: 5px;
-                     padding: 5px;
-                     padding-left: 10px; padding-right: 10px;
-                     text-align: center; border-style:solid; border-width: 2px">To:</label>  <br />
-                     {% set current_user_name =  current_user.username  -%}
-                     {{messages.user_interface(usernames,current_user_name,false,"")}}
-                     </div>
+                  </br>
                      
                      <div class="form-group">
                         {{ form.content.label(class="form-control-label") }}
@@ -172,19 +176,18 @@ function onlyOne(checkbox) {
                   <br>
                </div>
 
-
-               <div id="other_user2" class="tabcontent">
-                  <style>
-                  .column {
-                  float: left;
-                  width: 50%;
-                  padding: 10px;
-                  height: 300px;}
-                  .row:after {
-                   content: "";
-                  display: table;
-                  clear: both;}
-                  </style>
+               <div id="other_user2" class="tabcontent" style="display: none;">
+                  <!-- <style>
+                     .column {
+                     float: left;
+                     width: 50%;
+                     padding: 10px;
+                     height: 300px;}
+                     .row:after {
+                      content: "";
+                     display: table;
+                     clear: both;}
+                     </style> -->
 
                   <div class="row">
                   <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 760px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; scrollbar-gutter: stable;">  
@@ -195,7 +198,6 @@ function onlyOne(checkbox) {
                      <div class="form-group">
                         {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
                      </div>
-
                   </div>
                   
                   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 450px; height: 750px; margin-top: 130px; border-radius: 25px; overflow-y: scroll; ">
@@ -230,47 +232,74 @@ function onlyOne(checkbox) {
                         <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
                         <div class="row g-2 align-items-center">
                            <div class="col">
-                              <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
-                                 <option value="-1" selected>No Encryption/Signature</option>
-                                 <option value="symmetric">Symmetrically Encrypt</option>
-                                 <option value="asymmetric">Asymmetrically Encrypt</option>
-                                 <option value="signed">Sign</option>
-                              </select>
+                                 <select id="encryption_sign_type_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                                    <option value="-1" selected>No Encryption/Signature</option>
+                                    <option value="symmetric">Symmetrically Encrypt</option>
+                                    <option value="asymmetric">Asymmetrically Encrypt</option>
+                                    <option value="signed">Sign</option>
+                                 </select>
+                              </div>
+                              with
+                              <div class="col">
+                                 <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+                                    <option id='default_key_select' value="-1" selected>No Key Selected</option>
+                                    {% set current_user_name =  current_user.username  -%}
+                                    {% for username,_ in usernames %}
+                                    {% if current_user_name != username %}
+                                    <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% for username,_ in usernames %}
+                                    <option value="public_{{username}}">{{username}}'s Public Key</option>
+                                    {% if current_user_name == username %}
+                                    <option value="private_{{username}}">{{username}}'s Private Key</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                 </select>
+                              </div>
                            </div>
-                           with
-                  <div class="col">
-                     <select id="key_select" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
-                        <option id='default_key_select' value="-1" selected>No Key Selected</option>
-                        {% set current_user_name =  current_user.username  -%}
-                        {% for username,_ in usernames %}
-                        {% if current_user_name != username %}
-                        <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
-                        {% endif %}
-                        {% endfor %}
-                        {% for username,_ in usernames %}
-                        <option value="public_{{username}}">{{username}}'s Public Key</option>
-                        {% if current_user_name == username %}
-                        <option value="private_{{username}}">{{username}}'s Private Key</option>
-                        {% endif %}
-                        {% endfor %}
-                        </select>
+                        </div>
                      </div>
-               </div>
                   </div>
+               <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+                  {% if form.content.errors %}
+                     {{ form.content(class="form-control form-control-lg is-invalid") }}
+                     <div class="invalid-feedback">
+                        {% for errors in form.content.errors %}
+                        <span>{{ errors }}</span> <!-- display the errors -->
+                        {% endfor %}
+                        {% endif %}
+                     </div>
+                     <br>
                   </div>
-               </div>
-            <div id="error-message" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
-               {% if form.content.errors %}
-                  {{ form.content(class="form-control form-control-lg is-invalid") }}
-                  <div class="invalid-feedback">
-                     {% for errors in form.content.errors %}
-                     <span>{{ errors }}</span> <!-- display the errors -->
-                     {% endfor %}
-                     {% endif %}
-                  </div>
-                  <br>
-               </div>
-                
+               
+               <script>
+                  // Add an event listener to simulate a click on "User 2" tab when the page loads
+                  window.addEventListener('load', function () {
+                     document.querySelector(".tablinks:first-child").click(); // Click the first tab (User 2)
+                  });
+               
+                  function openUser(evt, user) {
+                     // Declare variables
+                     var i, tabcontent, tablinks;
+               
+                     // Get all elements with class="tabcontent" and hide them
+                     tabcontent = document.getElementsByClassName("tabcontent");
+                     for (i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].style.display = "none";
+                     }
+               
+                     // Get all elements with class="tablinks" and remove the class "active"
+                     tablinks = document.getElementsByClassName("tablinks");
+                     for (i = 0; i < tablinks.length; i++) {
+                        tablinks[i].className = tablinks[i].className.replace(" active", "");
+                     }
+               
+                     // Show the current tab and add an "active" class to the button that opened the tab
+                     document.getElementById(user).style.display = "block";
+                     evt.currentTarget.className += " active";
+                  }
+               </script>
                
 
               
@@ -281,18 +310,18 @@ function onlyOne(checkbox) {
    </form>
 
 <!-- NOT needed for now-->
-<div class="row ">
-   <div id="Received" class="col">
-      {% if msg_flag %} <!-- this checks if the passed message var has content in it -->
-      <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Received messages:</legend>
-      {{ messages.print_msgs(msgs,usernames) }}
-      {% else %}
-      <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages</legend>
-      {% endif %}
-   </div>
+<!-- <div class="row "> -->
+   <!-- <div id="Received" class="col"> -->
+      <!-- {% if msg_flag %} this checks if the passed message var has content in it -->
+      <!-- <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Received messages:</legend> -->
+      <!-- {{ messages.print_msgs(msgs,usernames) }} -->
+      <!-- {% else %} -->
+      <!-- <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages</legend> -->
+      <!-- {% endif %} -->
+   <!-- </div> -->
 
    <!-- TODO: Embedded within the chatbox -->
-   <div id="Sent" class="col">
+   <!-- <div id="Sent" class="col">
       {% if sent_msgs %}
          <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages sent by you:</legend>
          {% for sent_msg in sent_msgs %}
@@ -371,7 +400,7 @@ function onlyOne(checkbox) {
       {% endif %}
    </div>
 </div>
-   
+    -->
 <script>
     const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
    const encryptionKeySelect = document.getElementById("key_select");
