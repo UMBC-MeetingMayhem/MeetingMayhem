@@ -208,7 +208,7 @@ def messages():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
             if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
                 flash(f'Please select a time and location.', 'danger')
-                return render_template('messages.html', title='Messages', form=form, game=current_game, 
+                return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
                                 msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
                                 usernames=usernames,other_names=other_name,image_url=image_url)
 
