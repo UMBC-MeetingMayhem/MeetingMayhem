@@ -61,19 +61,19 @@ class LoginForm(FlaskForm):
 class MessageForm(FlaskForm):
 	content = StringField('', validators=[DataRequired()])
 	submit = SubmitField('Send Message')
-	encryption_and_signed_keys = StringField('Key(s)')
+	#encryption_and_signed_keys = StringField('Key(s)')
 	#round, sender should get automatically pulled in the route and send to db item when it is created in the route
 	meet_location = SelectField('locations', choices=["Locations", "Cafe", "Track", "Alley", "Dorm", "Garage", "Lab", "Park"])
 	meet_time = SelectField('time', choices=["Time", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00"])
 	meet_am_pm = SelectField('am_pm', choices=["am", "pm"], default="am")
 	encryption_type = SelectField('encryption_sign_type_select', choices=["No Encryption/Signature", "Symmetrically Encrypt", "Asymmetrically Encrypt","Sign"], default="No Encryption/Signature")
-	def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
-		keys = (encryption_and_signed_keys.data).lower().split(',')
-		if encryption_and_signed_keys.data == '':
-			return
-		for element in keys:
-			if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("symmetric[(][a-zA-Z0-9]+[.](private|public|key pair)[)]$", element))) and not(bool(re.match("asymmetric[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
-				raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
+	# def validate_encryption_and_signed_keys(self, encryption_and_signed_keys):
+	# 	keys = (encryption_and_signed_keys.data).lower().split(',')
+	# 	if encryption_and_signed_keys.data == '':
+	# 		return
+	# 	for element in keys:
+	# 		if (not(bool(re.match("signed[(][a-zA-Z0-9]+[.](private|public)[)]$", element))) and not(bool(re.match("symmetric[(][a-zA-Z0-9]+[.](private|public|key pair)[)]$", element))) and not(bool(re.match("asymmetric[(][a-zA-Z0-9]+[.](private|public)[)]$", element)))):
+	# 			raise ValidationError("Enter in following format Signed/Encrypted(username.private/public),Sign/Encrypt(username.private/public),....etc")
 
 #Form for the adversary to edit messages
 class AdversaryMessageEditForm(FlaskForm):

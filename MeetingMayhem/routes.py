@@ -174,7 +174,7 @@ def messages():
         if current_user.username != username:
             other_name.append(username)
             image_url.append(url_image)
-    form = MessageForm() #use the standard message form
+    forms = {key: MessageForm() for key, _ in zip(other_name,range(len(other_name)))}#use the standard message form
 
     #sent and recieved messages
     sent_msg = [Message.query.filter_by(sender=current_user.username, recipient = name, game=current_game.id,adv_submitted=False).all() for name in other_name]
@@ -203,30 +203,24 @@ def messages():
     #setup message flag to tell template if it should display messages or not
     msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
     msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
-    if form.validate_on_submit(): #when the user submits the message form and it is valid
-        #capture the list of players from the checkboxes and make it into a string delimited by commas
-        checkbox_output_list = request.form.getlist('recipients')
-        #ensure the list isn't empty
-        if not checkbox_output_list:
-            flash(f'Please select one recipient.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, game=current_game, 
-                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
-                            usernames=usernames,other_names=other_name,image_url=image_url)
+    
+    for name, form in forms.items():
+        if form.validate_on_submit(): #when the user submits the message form and it is valid
+            if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
+                flash(f'Please select a time and location.', 'danger')
+                return render_template('messages.html', title='Messages', form=form, game=current_game, 
+                                msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                                usernames=usernames,other_names=other_name,image_url=image_url)
 
-        if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
-            flash(f'Please select a time and location.', 'danger')
-            return render_template('messages.html', title='Messages', form=form, game=current_game, 
-                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
-                            usernames=usernames,other_names=other_name,image_url=image_url)
-
-        #ensure keys entered are keys of actual recipients chosen
-        curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
-        _,msg_new = create_message(current_user, current_game, request.form, form, current_user.username, curr_time)
-        update()
-        msgs_tuple[other_name.index(msg_new.recipient)].append((msg_new, None,msg_new.time_sent,False))
-   
+            #ensure keys entered are keys of actual recipients chosen
+            curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+            _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
+            update()
+            msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
+    
     print(msgs_tuple)
-    return render_template('messages.html', title='Messages', form=form, game=current_game, 
+    print(msg_flag)
+    return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
                             usernames=usernames,other_names=other_name,image_url=image_url)
 

@@ -57,8 +57,13 @@ function onlyOne(checkbox) {
                </div>
 
                <!-- Tab content -->
-               {% for name in other_names %}
+               {% for index in range(other_names|length) %}
+                  {% set name = other_names[index] %}
+                  {% set form = forms[name]%}
                   <div id="{{name}}" class="tabcontent">
+                     <form method="POST" action="/messages">
+                        {{ form.hidden_tag() }}
+                     <fieldset class="form-group">
                      <!-- <style>
                      .column {
                      float: left;
@@ -104,8 +109,21 @@ function onlyOne(checkbox) {
                            
                         <h2>{{name}}</h2>
                         <p>Messages</p>  
-                        <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; "></div>
+                        {% for message in msgs_tuple[index] %}
+                              <!-- left -->
+                              {% if message[3] %} 
+                                 <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; ">
+                                    <p>{{message[0].content}}</p>
+                                 </div>
+                              {% else %}
+                                 <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; ">
+                                    <p>{{message[0].content}}</p>
+                                 </div>
+                              {% endif %}
+                              
+                        {% endfor %}
                         <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 80px; margin-right:100 px; margin-left: -60 px; border-radius: 10px; "></div>
+
                         <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
                         {% set  id_content= "content_" + name %}
                         {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here",id=id_content) }}
@@ -125,7 +143,7 @@ function onlyOne(checkbox) {
                         {% set  id_time= "time_" + name %}
                         {% set  id_am= "am_" + name %}
                         <div class="form-group" id="{{name}}_form_2">
-                           <!-- {{ form.content.label(class="form-control-label") }} -->
+                           {{ form.content.label(class="form-control-label") }}
                            <!-- i think this tells jinja to put a form box in here -->
                            {{ form.meet_location (class="gray-blue",id=id_loc)}}
                            <img id="location-image_{{ name }}" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
@@ -168,16 +186,17 @@ function onlyOne(checkbox) {
                         </div>
                      </div>
                      </div>
-                     <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+                     <!-- <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div> -->
                      {% if form.content.errors %}
-                        {{ form.content(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                            {% for errors in form.content.errors %}
-                           <span>{{ errors }}</span> <!-- display the errors -->
+                              {{ errors }} <!-- display the errors -->
                            {% endfor %}
                            {% endif %}
                         </div>
                      <br>
+                     </fieldset>
+                  </form>
                   </div>
                {% endfor %}
 
@@ -212,9 +231,6 @@ function onlyOne(checkbox) {
 
               
       </fieldset>
-      <!--<div class="form-group" >
-         {{ form.submit(class="btn btn-outline-info", id="submitButton") }}
-      </div>-->
    </form>
 
 <!-- NOT needed for now-->
@@ -628,14 +644,14 @@ function onlyOne(checkbox) {
    var other_names = Array.from(JSON.parse(other_names_str))
 
    for (let name = 0; name < other_names.length; name++){
-      console.log(other_names);
-      console.log(other_names[name]);
+      //console.log(other_names);
+      //console.log(other_names[name]);
       const select = document.getElementById(`locations_${other_names[name]}`);
       const image = document.getElementById(`location-image_${other_names[name]}`);
 
       select.addEventListener("change", function () {
-         console.log(select.value)
-         console.log(select)
+         //console.log(select.value)
+         //console.log(select)
          
          switch (select.value) {
             case "Cafe":

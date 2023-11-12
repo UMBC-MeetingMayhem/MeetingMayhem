@@ -97,7 +97,7 @@
                     {% if msg_form.content.errors %} <!-- if there are errors in the form... -->
                         {{ msg_form.content(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for errors in msg_form.content.errors %}
+                            {% for errors in msg_form.contenxt.errors %}
                                 <span>{{ errors }}</span> <!-- display the errors -->
                             {% endfor %}
                         </div>

@@ -80,7 +80,7 @@ def str_to_list(st, li):
         raise TypeError("Incorrect argument type or empty string passed to function.")
     return li #return the list filled with strings
 
-def create_message(user, game, request, form, username, time_stamp):
+def create_message(user, game, request, form, recipients, time_stamp):
 
     print("---------------\n\n\n\n")
     """Create a message. Used by both the adversary and the users.
@@ -151,24 +151,13 @@ def create_message(user, game, request, form, username, time_stamp):
         flash(f'Your message has been sent!', 'success')
         return True, new_message
     elif user.role == 4: #if the user is a user
-        #get the list of the recipient
-        recipients = request.get('recipients').strip(", ")
-        #if one of those lists are empty, display an error, return false
-        if not recipients:
-            flash(f'Please select one recipient.', 'danger')
-            return False,None
-        # TODO: change to duplicate message for time and place
-        #check if the message is a duplicate, and if it is, display an error, return false
-        # if Message.query.filter_by(sender=user.username, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
-        #     flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-        #     return False,None
 
         signed_keys = [] # list to keep track of digital signatures
         encrypted_keys = [] # list to keep track of encryption keys
 
         # Code for determining whether entered keys are warning or not
-        encryption_type = request.get("encryption_type_select")
-        encrypted_key = request.get("encryption_key")
+        encryption_type = request.get("encryption_type_select_" + recipients)
+        encrypted_key = request.get("encryption_key_" + recipients)
         if  encryption_type == 'symmetric':
             if recipients in encrypted_key:
                 encrypted_keys.append(encrypted_key)
