@@ -61,7 +61,7 @@ function onlyOne(checkbox) {
                   {% set name = other_names[index] %}
                   {% set form = forms[name]%}
                   <div id="{{name}}" class="tabcontent">
-                     <form method="POST" action="/messages">
+                     <form method="POST" action="/messages" id="form_{{name}}">
                         {{ form.hidden_tag() }}
                      <fieldset class="form-group">
                      <!-- <style>
@@ -109,20 +109,22 @@ function onlyOne(checkbox) {
                            
                         <h2>{{name}}</h2>
                         <p>Messages</p>  
-                        {% for message in msgs_tuple[index] %}
-                              <!-- left -->
-                              {% if message[3] %} 
-                                 <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; ">
-                                    <p>{{message[0].content}}</p>
-                                 </div>
-                              {% else %}
-                                 <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; ">
-                                    <p>{{message[0].content}}</p>
-                                 </div>
-                              {% endif %}
-                              
-                        {% endfor %}
-                        <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 80px; margin-right:100 px; margin-left: -60 px; border-radius: 10px; "></div>
+                        {% if msgs_flag[index] %}
+                           {% for message in msgs_tuple[index] %}
+                                 <!-- left recieved-->
+                                 {% if message[3] %} 
+                                    <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; ">
+                                       <p>{{message[0].content}}</p>
+                                    </div>
+                                  <!-- sent -->
+                                 {% else %}
+                                    <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 80px; margin-top: 60px; border-radius: 10px; ">
+                                       <p>{{message[0].content}}</p>
+                                    </div>
+                                 {% endif %}
+                                 
+                           {% endfor %}
+                        {% endif %}
 
                         <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
                         {% set  id_content= "content_" + name %}
@@ -130,7 +132,8 @@ function onlyOne(checkbox) {
                         
                         <div class="form-group" id="{{name}}_form">
                            {% set  id_button= "button_" + name %}
-                           {{ form.submit(class="btn btn-outline-info",id=id_button) }}
+                           {% set  id_button_form= "Send Message to " + name %}
+                           {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
                         </div>
                         
                      </div>

@@ -206,6 +206,9 @@ def messages():
     
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
+            sent_str = request.form.get("submit")[16:]
+            if sent_str.strip() != name.strip():
+                continue
             if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
                 flash(f'Please select a time and location.', 'danger')
                 return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
@@ -218,8 +221,8 @@ def messages():
             update()
             msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
     
-    print(msgs_tuple)
-    print(msg_flag)
+    #print(msgs_tuple)
+    #print(msg_flag)
     return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
                             usernames=usernames,other_names=other_name,image_url=image_url)
