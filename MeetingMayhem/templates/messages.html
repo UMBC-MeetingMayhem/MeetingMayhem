@@ -121,9 +121,10 @@ function onlyOne(checkbox) {
                                  {% else %}
                                     <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 150px; margin-top: 60px; border-radius: 10px; ">
                                        <p>{{message[0].content}}</p>
-                                       <p>Time Sent: {{ msgs_flag.meet_time }}</p>
-                                       <p>Location: {{ msgs_flag.loc }}</p>
-                                       <p>Encryption Type: {{ msgs_flag.loc }}</p>
+                                       <p>Time Sent: {{ message[2]}}</p>
+                                       <p>Location: {{ message[0].location_meet }}</p>
+                                       <p>Encryption Type: {{ message[0].encryption_type }}</p>
+                                       <p>Key: {{ message[0].key }}</p>
                                     </div>
                                  {% endif %}
                                  

@@ -221,7 +221,6 @@ def messages():
             update()
             msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
     
-    #print(msgs_tuple)
     #print(msg_flag)
     return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 

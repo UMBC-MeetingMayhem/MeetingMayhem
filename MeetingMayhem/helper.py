@@ -156,8 +156,10 @@ def create_message(user, game, request, form, recipients, time_stamp):
         encrypted_keys = [] # list to keep track of encryption keys
 
         # Code for determining whether entered keys are warning or not
-        encryption_type = request.get("encryption_type_select_" + recipients)
-        encrypted_key = request.get("encryption_key_" + recipients)
+        print(request)
+        encryption_type = request.get("encryption_type_select")
+        encrypted_key = request.get("encryption_key")
+        print(encryption_type,encrypted_key)
         if  encryption_type == 'symmetric':
             if recipients in encrypted_key:
                 encrypted_keys.append(encrypted_key)
