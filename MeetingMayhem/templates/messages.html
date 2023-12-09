@@ -36,7 +36,7 @@ function onlyOne(checkbox) {
 
                <!-- Tab links -->
                <div class="tab">
-                  <button class="tablinks" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+                  <button class="tablinks" style="position:relative; left:-160px; top:22px;
                   background-color: #333333;
                   color: #0dcaf0;
                   font-size: 20px;
@@ -45,7 +45,7 @@ function onlyOne(checkbox) {
                   padding: 5px;
                   padding-left: 10px; padding-right: 10px;
                   text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
-                  <button class="tablinks" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+                  <button class="tablinks" style="position:relative; left:-168.5px; top:22px; 
                   background-color: #333333;
                   color: #0dcaf0;
                   font-size: 20px;
@@ -106,10 +106,12 @@ function onlyOne(checkbox) {
 
                            }
                            </style>
-                           
-                        <h2>{{name}}</h2>
+
+                        {% set profile = image_url[index] %}  
+                        <h2>{{name}}{{profile}}</h2>
                         <p>Messages</p>  
                         {% if msgs_flag[index] %}
+                        
                            {% for message in msgs_tuple[index] %}
                                  <!-- left recieved-->
                                  {% if message[3] %} 
