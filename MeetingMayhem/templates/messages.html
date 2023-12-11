@@ -115,23 +115,81 @@ function onlyOne(checkbox) {
                            {% for message in msgs_tuple[index] %}
                                  <!-- left recieved-->
                                  {% if message[3] %} 
-                                    <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 150px; margin-top: 60px; border-radius: 10px; ">
+                                    <div class="chatbox" style="background-color: rgb(223, 219, 141); color: #fff9f9; border: thick double rgb(51, 48, 3); width: 200px; height: 150px; border-radius: 10px; ">
                                        <p>{{message[0].content}}</p>
-                                       
+                                       <!-- {{ messages.print_msgs(msgs,usernames) }} -->
                                     </div>
                                   <!-- sent -->
-                                 {% else %}
-                                    <div class="chatbox" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 300px; height: 240px; margin-left:410px; margin-top: 60px; border-radius: 10px; ">
-                                       <p>{{message[0].content}}</p>
-                                       <p>Time Sent: {{ message[2]}}</p>
-                                       <p>Location: {{ message[0].location_meet }}</p>
-                                       <p>Encryption Type: {{ message[0].encryption_type }}</p>
-                                       <p>Key: {{ message[0].key }}</p>
-                                    </div>
-                                 {% endif %}
-                                 
-                           {% endfor %}
-                        {% endif %}
+                                 {% elif message[0] %}
+                                    <div class="chatbox" style= "width: 325px; height: 240px; margin-left:410px; margin-top: 80px;">
+                                       <p>{{ message[2]}}</p>
+                                       <!-- <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 120px; margin-left:410px; margin-top: 60px; border-radius: 10px; "> -->
+                                       <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 325px; height: 150px; border-radius: 10px;">
+                                          <!-- <p>{{message[0].content}}</p> -->
+                                             {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
+                                                <p class="article-content"> #######################</p>
+                                             {% else %}
+                                                <p class="article-content">{{ message[0].content }}</p>
+                                             {% endif %}
+                                          
+                                          <p style="color: #0dcaf0">Location: {{ message[0].location_meet }}</p>
+                                          <p style="color: #0dcaf0">Time: {{message[0].time_meet}} {{message[0].time_am_pm}} </p>
+                                       </div>
+
+                                    
+                                          {% if message[0].initial_is_encrypted %}
+                                                         <div class="m-1 row ">
+                                                            {% if 'Warning' not in message[0].initial_encryption_details %}
+                                                               {% if message[0].encryption_type == 'symmetric' %}
+                                                                  <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                                                     Symmetrically encrypted with:</div>
+                                                               {% elif message[0].encryption_type == 'asymmetric' %}
+                                                                     <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                                                        Asymmetrically encrypted with:</div>
+                                                               {% endif %}
+                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                                                                     message[0].initial_encryption_details }}</div>
+                                                            {% elif 'but' in message[0].initial_encryption_details %}
+                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                                                               Warning:</div>
+                                                               {% if message[0].encryption_type == 'symmetric' %}
+                                                                  <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                                                     Symmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
+                                                               {% elif message[0].encryption_type == 'asymmetric' %}
+                                                                     <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                                                        Asymmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
+                                                               {% endif %}
+                                                            {% else %}
+                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                                                                  Warning:</div>
+                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                                                                  message[0].initial_encryption_details[9:] }}</div>
+                                                            {% endif %}  
+                                                         </div>
+                                                         {% elif message[0].initial_is_signed %}
+                                                         <div class="m-1 row ">
+                                                            {% if 'Warning' not in message[0].initial_signed_details %}
+                                                               <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                                                  Signed by:</div>
+                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                                                                  message[0].initial_signed_details }}</div>
+                                                            {% elif 'but' in message[0].initial_signed_details %}
+                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                                                                  Warning:</div>
+                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                                                  Signed by {{message[0].initial_signed_details[9:] }}</div>
+                                                            {% else %}
+                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                                                                  Warning:</div>
+                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                                                                  message[0].initial_signed_details[9:] }}</div>
+                                                            {% endif %}
+                                                         </div>
+                                                         {% endif %}
+                                 </div>
+                              {% endif %}
+                        {% endfor %}
+                     {% endif %}
 
                         <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
                         {% set  id_content= "content_" + name %}
