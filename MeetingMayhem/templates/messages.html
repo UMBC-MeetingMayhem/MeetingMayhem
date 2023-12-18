@@ -121,10 +121,12 @@ function onlyOne(checkbox) {
                                     </div>
                                   <!-- sent -->
                                  {% elif message[0] %}
-                                    <div class="chatbox" style= "width: 325px; height: 240px; margin-left:410px; margin-top: 80px;">
+                                    <div class="chatbox" style= "width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
                                        <p>{{ message[2]}}</p>
+                                       <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+
                                        <!-- <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 120px; margin-left:410px; margin-top: 60px; border-radius: 10px; "> -->
-                                       <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 325px; height: 150px; border-radius: 10px;">
+                                       <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: auto; height: auto; border-radius: 10px;">
                                           <!-- <p>{{message[0].content}}</p> -->
                                              {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
                                                 <p class="article-content"> #######################</p>
@@ -132,8 +134,7 @@ function onlyOne(checkbox) {
                                                 <p class="article-content">{{ message[0].content }}</p>
                                              {% endif %}
                                           
-                                          <p style="color: #0dcaf0">Location: {{ message[0].location_meet }}</p>
-                                          <p style="color: #0dcaf0">Time: {{message[0].time_meet}} {{message[0].time_am_pm}} </p>
+         
                                        </div>
 
                                     
