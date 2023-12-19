@@ -109,7 +109,6 @@ function onlyOne(checkbox) {
 
                         {% set profile = image_url[index] %}  
                         <h2>{{name}}{{profile}}</h2>
-                        <p>Messages</p>  
                         {% if msgs_flag[index] %}
                         
                            {% for message in msgs_tuple[index] %}
@@ -126,8 +125,12 @@ function onlyOne(checkbox) {
                                        <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 
                                        <!-- <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 120px; margin-left:410px; margin-top: 60px; border-radius: 10px; "> -->
-                                       <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: auto; height: auto; border-radius: 10px;">
-                                          <!-- <p>{{message[0].content}}</p> -->
+                                       <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+                                       border-color:#0dcaf0;
+                                       border-radius: 10px;
+                                       padding: 0.5cm;
+                                       border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+                           
                                              {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
                                                 <p class="article-content"> #######################</p>
                                              {% else %}
