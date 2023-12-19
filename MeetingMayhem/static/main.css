@@ -45,7 +45,7 @@ body {
 }
 
 .gray-blue{
-    background-color: #333333;
+  background: linear-gradient(346deg, rgba(0,0,0,1) 0%, rgba(10,10,47,1) 15%, rgb(106, 108, 110) 64%, rgb(40, 42, 43) 100%);
     color: #0dcaf0;
     font-size: 15px;
     border-color:#0dcaf0;
