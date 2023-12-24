@@ -36,7 +36,7 @@ function onlyOne(checkbox) {
 
                <!-- Tab links -->
                <div class="tab">
-                  <button class="tablinks" style="position:relative; left:-160px; top:22px;
+                  <button class="tablinks" style="position:relative; left:-180px; top:22px;
                   background-color: #333333;
                   color: #0dcaf0;
                   font-size: 20px;
@@ -45,7 +45,7 @@ function onlyOne(checkbox) {
                   padding: 5px;
                   padding-left: 10px; padding-right: 10px;
                   text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
-                  <button class="tablinks" style="position:relative; left:-168.5px; top:22px; 
+                  <button class="tablinks" style="position:relative; left:-189px; top:22px; 
                   background-color: #333333;
                   color: #0dcaf0;
                   font-size: 20px;
@@ -107,8 +107,8 @@ function onlyOne(checkbox) {
                            }
                            </style>
 
-                        {% set profile = image_url[index] %}  
-                        <h2>{{name}}{{profile}}</h2>
+                        {% set profile = image_url[index] %}
+                        <h2>{{name}} <img src="{{profile}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
                         {% if msgs_flag[index] %}
                         
                            {% for message in msgs_tuple[index] %}
@@ -265,7 +265,11 @@ function onlyOne(checkbox) {
                   </div>
                         </div>
                      </div>
+
+                     
                      </div>
+
+
                      <!-- <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div> -->
                      {% if form.content.errors %}
                         <div class="invalid-feedback">
