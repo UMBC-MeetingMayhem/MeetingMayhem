@@ -34,288 +34,262 @@ function onlyOne(checkbox) {
   }
 </script>        
 
-               <!-- Tab links -->
-               <div class="tab">
-                  <button class="tablinks" style="position:relative; left:-180px; top:22px;
-                  background-color: #333333;
-                  color: #0dcaf0;
-                  font-size: 20px;
-                  border-color:#0dcaf0;
-                  border-radius: 5px;
-                  padding: 5px;
-                  padding-left: 10px; padding-right: 10px;
-                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
-                  <button class="tablinks" style="position:relative; left:-189px; top:22px; 
-                  background-color: #333333;
-                  color: #0dcaf0;
-                  font-size: 20px;
-                  border-color:#0dcaf0;
-                  border-radius: 5px;
-                  padding: 5px;
-                  padding-left: 10px; padding-right: 10px;
-                  text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
-               </div>
+<div class="tab">
+      <button class="tablinks" style="position:relative; left:-180px; top:22px;
+      background-color: #333333;
+      color: #0dcaf0;
+      font-size: 20px;
+      border-color:#0dcaf0;
+      border-radius: 5px;
+      padding: 5px;
+      padding-left: 10px; padding-right: 10px;
+      text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
+      <button class="tablinks" style="position:relative; left:-189px; top:22px; 
+      background-color: #333333;
+      color: #0dcaf0;
+      font-size: 20px;
+      border-color:#0dcaf0;
+      border-radius: 5px;
+      padding: 5px;
+      padding-left: 10px; padding-right: 10px;
+      text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
+</div>
 
-               <!-- Tab content -->
-               {% for index in range(other_names|length) %}
-                  {% set name = other_names[index] %}
-                  {% set form = forms[name]%}
-                  <div id="{{name}}" class="tabcontent">
-                     <form method="POST" action="/messages" id="form_{{name}}">
-                        {{ form.hidden_tag() }}
-                     <fieldset class="form-group">
-                     <!-- <style>
-                     .column {
-                     float: left;
-                     width: 50%;
-                     padding: 10px;
-                     height: 300px;}
-                     .row:after {
-                     content: "";
-                     display: table;
-                     clear: both;}
-                     </style> -->
+   <!-- Tab content -->
+{% for index in range(other_names|length) %}
+   {% set name = other_names[index] %}
+   {% set form = forms[name]%}
+   <div id="{{name}}" class="tabcontent">
+      <form method="POST" action="/messages" id="form_{{name}}">
+         {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+         <div class="row">
+            <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
+               <style>
+               /* width */
+               ::-webkit-scrollbar {
+               width: 10px;
+               }
+               
+               /* Track */
+               ::-webkit-scrollbar-track {
+               box-shadow: inset 0 0 5px grey; 
+               border-radius: 7px;
+               }
+               
+               /* Handle */
+               ::-webkit-scrollbar-thumb {
+               background: rgb(194, 191, 122); 
+               border-radius: 10px;
+               }
+               
+               /* Handle on hover */
+               ::-webkit-scrollbar-thumb:hover {
+               background: #52502d; 
+               }
+               ::-webkit-scrollbar-corner {
+                  background:rgb(0, 0, 0);
+                  border-radius: 7px;
 
-                     <div class="row">
-                        <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
-                           <style>
-                           /* width */
-                           ::-webkit-scrollbar {
-                           width: 10px;
-                           }
-                           
-                           /* Track */
-                           ::-webkit-scrollbar-track {
-                           box-shadow: inset 0 0 5px grey; 
-                           border-radius: 7px;
-                           }
-                           
-                           /* Handle */
-                           ::-webkit-scrollbar-thumb {
-                           background: rgb(194, 191, 122); 
-                           border-radius: 10px;
-                           }
-                           
-                           /* Handle on hover */
-                           ::-webkit-scrollbar-thumb:hover {
-                           background: #52502d; 
-                           }
-                           ::-webkit-scrollbar-corner {
-                              background:rgb(0, 0, 0);
-                              border-radius: 7px;
-
-                           }
-                           </style>
-
-                        {% set profile = image_url[index] %}
-                        <h2>{{name}} <img src="{{profile}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
-                        {% if msgs_flag[index] %}
-                        
-                           {% for message in msgs_tuple[index] %}
-                                 <!-- left recieved-->
-                                 {% if message[3] %} 
-                                    <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-                                       <p>{{ message[2]}}</p>
-                                       <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-                                       <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
-                                       border-color:#0dcaf0;
-                                       border-radius: 10px;
-                                       padding: 0.5cm;
-                                       border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
-                                          <p>{{message[0].content}}</p>
-                                       </div>
-                                       <!-- {{ messages.print_msgs(msgs,usernames) }} -->
-                                    </div>
-                                  <!-- sent -->
-                                 {% elif message[0] %}
-                                    <div class="chatbox" style= "width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-                                       <p>{{ message[2]}}</p>
-                                       <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-
-                                       <!-- <div class="content" style="background-color: rgb(241, 238, 179); color: #000000; border: thick double rgb(51, 48, 3); padding: 0.5cm; width: 200px; height: 120px; margin-left:410px; margin-top: 60px; border-radius: 10px; "> -->
-                                       <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
-                                       border-color:#0dcaf0;
-                                       border-radius: 10px;
-                                       padding: 0.5cm;
-                                       border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
-                           
-                                             {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
-                                                <p class="article-content"> #######################</p>
-                                             {% else %}
-                                                <p class="article-content">{{ message[0].content }}</p>
-                                             {% endif %}
-                                          
-         
-                                       </div>
-
-                                    
-                                          {% if message[0].initial_is_encrypted %}
-                                                         <div class="m-1 row ">
-                                                            {% if 'Warning' not in message[0].initial_encryption_details %}
-                                                               {% if message[0].encryption_type == 'symmetric' %}
-                                                                  <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                                                     Symmetrically encrypted with:</div>
-                                                               {% elif message[0].encryption_type == 'asymmetric' %}
-                                                                     <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                                                        Asymmetrically encrypted with:</div>
-                                                               {% endif %}
-                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                                                                     message[0].initial_encryption_details }}</div>
-                                                            {% elif 'but' in message[0].initial_encryption_details %}
-                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                                                               Warning:</div>
-                                                               {% if message[0].encryption_type == 'symmetric' %}
-                                                                  <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                                                     Symmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
-                                                               {% elif message[0].encryption_type == 'asymmetric' %}
-                                                                     <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                                                        Asymmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
-                                                               {% endif %}
-                                                            {% else %}
-                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                                                                  Warning:</div>
-                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                                                                  message[0].initial_encryption_details[9:] }}</div>
-                                                            {% endif %}  
-                                                         </div>
-                                                         {% elif message[0].initial_is_signed %}
-                                                         <div class="m-1 row ">
-                                                            {% if 'Warning' not in message[0].initial_signed_details %}
-                                                               <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                                                  Signed by:</div>
-                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                                                                  message[0].initial_signed_details }}</div>
-                                                            {% elif 'but' in message[0].initial_signed_details %}
-                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                                                                  Warning:</div>
-                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                                                  Signed by {{message[0].initial_signed_details[9:] }}</div>
-                                                            {% else %}
-                                                               <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                                                                  Warning:</div>
-                                                               <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                                                                  message[0].initial_signed_details[9:] }}</div>
-                                                            {% endif %}
-                                                         </div>
-                                                         {% endif %}
-                                 </div>
-                              {% endif %}
-                        {% endfor %}
-                     {% endif %}
-
-                        <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
-                        {% set  id_content= "content_" + name %}
-                        {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here",id=id_content) }}
-                        
-                        <div class="form-group" id="{{name}}_form">
-                           {% set  id_button= "button_" + name %}
-                           {% set  id_button_form= "Send Message to " + name %}
-                           {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
+               }
+            </style>
+            {% set profile = image_url[index] %}
+            <h2>{{name}} <img src="{{profile}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
+            <!-- Msg can be displayed-->
+            {% if msgs_flag[index] %}
+               {% for message in msgs_tuple[index] %}
+                  <!-- left recieved-->
+                  {% if message[3] %} 
+                     <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
+                        <p>{{ message[2]}}</p>
+                        <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+                        <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+                        border-color:#0dcaf0;
+                        border-radius: 10px;
+                        padding: 0.5cm;
+                        border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+                        {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
+                           <p class="article-content"> #######################</p>
+                        {% else %}
+                           <p class="article-content">{{ message[0].content }}</p>
+                        {% endif %}
                         </div>
-                        
-                     </div>
-                  
-                     <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
-                        <h2>{{name}}</h2>
-                        <p>Message Information</p>
-                        </br>
-                        {% set  id_loc= "locations_" + name %}
-                        {% set  id_time= "time_" + name %}
-                        {% set  id_am= "am_" + name %}
-                        <div class="form-group" id="{{name}}_form_2">
-                           {{ form.content.label(class="form-control-label") }}
-                           <!-- i think this tells jinja to put a form box in here -->
-                           {{ form.meet_location (class="gray-blue",id=id_loc)}}
-                           <img id="location-image_{{ name }}" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
-                              style="display:block;margin:20px;">
-                           {{ form.meet_time (class="gray-blue",id=id_time)}}
-                           {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
+                     <!-- right send-->
+                  {% else %} 
+                     <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
+                        <p>{{ message[2]}}</p>
+                        <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+                        <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+                        border-color:#0dcaf0;
+                        border-radius: 10px;
+                        padding: 0.5cm;
+                        border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+                        {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
+                           <p class="article-content"> #######################</p>
+                        {% else %}
+                           <p class="article-content">{{ message[0].content }}</p>
+                        {% endif %}
                         </div>
-                        <div class="content-section" style="color: #0dcaf0">
-                           <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
-                           <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
-                           <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
-                           <div class="row g-2 align-items-center">
-                              <div class="col">
-                                 <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
-                                    <option value="-1" selected>No Encryption/Signature</option>
-                                    <option value="symmetric">Symmetrically Encrypt</option>
-                                    <option value="asymmetric">Asymmetrically Encrypt</option>
-                                    <option value="signed">Sign</option>
-                                 </select>
-                              </div>
-                              with
-                     <div class="col">
-                        <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
-                           <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
-                           {% set current_user_name =  current_user.username  -%}
-                           {% for username,_ in usernames %}
-                           {% if current_user_name != username %}
-                           <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+                  {% endif %}
+                  {% if message[0].initial_is_encrypted %}
+                     <div class="m-1 row ">
+                        {% if 'Warning' not in message[0].initial_encryption_details %}
+                           {% if message[0].encryption_type == 'symmetric' %}
+                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                 Symmetrically encrypted with:</div>
+                           {% elif message[0].encryption_type == 'asymmetric' %}
+                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                                 Asymmetrically encrypted with:</div>
                            {% endif %}
-                           {% endfor %}
-                           {% for username,_ in usernames %}
-                           <option value="public_{{username}}">{{username}}'s Public Key</option>
-                           {% if current_user_name == username %}
-                           <option value="private_{{username}}">{{username}}'s Private Key</option>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                              message[0].initial_encryption_details }}</div>
+                        {% elif 'but' in message[0].initial_encryption_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           {% if message[0].encryption_type == 'symmetric' %}
+                              <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                 Symmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
+                           {% elif message[0].encryption_type == 'asymmetric' %}
+                                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                                    Asymmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
                            {% endif %}
-                           {% endfor %}
-                           </select>
-                        </div>
-                  </div>
-                        </div>
+                        {% else %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                              message[0].initial_encryption_details[9:] }}</div>
+                        {% endif %}  
                      </div>
-
-                     
+                  {% elif message[0].initial_is_signed %}
+                     <div class="m-1 row ">
+                        {% if 'Warning' not in message[0].initial_signed_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                              Signed by:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+                              message[0].initial_signed_details }}</div>
+                        {% elif 'but' in message[0].initial_signed_details %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+                              Signed by {{message[0].initial_signed_details[9:] }}</div>
+                        {% else %}
+                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+                              Warning:</div>
+                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+                              message[0].initial_signed_details[9:] }}</div>
+                        {% endif %}
                      </div>
-
-
-                     <!-- <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div> -->
-                     {% if form.content.errors %}
-                        <div class="invalid-feedback">
-                           {% for errors in form.content.errors %}
-                              {{ errors }} <!-- display the errors -->
-                           {% endfor %}
-                           {% endif %}
-                        </div>
-                     <br>
-                     </fieldset>
-                  </form>
-                  </div>
+                  {% endif %}
+            </div>
                {% endfor %}
+            {% endif %}
 
-               <script>
-                  // Add an event listener to simulate a click on "User 2" tab when the page loads
-                  window.addEventListener('load', function () {
-                     document.querySelector(".tablinks:first-child").click(); // Click the first tab (User 2)
-                  });
-               
-                  function openUser(evt, user) {
-                     // Declare variables
-                     var i, tabcontent, tablinks;
-               
-                     // Get all elements with class="tabcontent" and hide them
-                     tabcontent = document.getElementsByClassName("tabcontent");
-                     for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
-                     }
-               
-                     // Get all elements with class="tablinks" and remove the class "active"
-                     tablinks = document.getElementsByClassName("tablinks");
-                     for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].className = tablinks[i].className.replace(" active", "");
-                     }
-               
-                     // Show the current tab and add an "active" class to the button that opened the tab
-                     document.getElementById(user).style.display = "block";
-                     evt.currentTarget.className += " active";
-                  }
-               </script>
-               
-
-              
-      </fieldset>
+            <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
+            {% set  id_content= "content_" + name %}
+            {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here",id=id_content) }}
+            
+            <div class="form-group" id="{{name}}_form">
+               {% set  id_button= "button_" + name %}
+               {% set  id_button_form= "Send Message to " + name %}
+               {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
+            </div>
+            
+         </div>
+      
+         <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
+            <h2>{{name}}</h2>
+            <p>Message Information</p>
+            </br>
+            {% set  id_loc= "locations_" + name %}
+            {% set  id_time= "time_" + name %}
+            {% set  id_am= "am_" + name %}
+            <div class="form-group" id="{{name}}_form_2">
+               {{ form.content.label(class="form-control-label") }}
+               <!-- i think this tells jinja to put a form box in here -->
+               {{ form.meet_location (class="gray-blue",id=id_loc)}}
+               <img id="location-image_{{ name }}" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+                  style="display:block;margin:20px;">
+               {{ form.meet_time (class="gray-blue",id=id_time)}}
+               {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
+            </div>
+            <div class="content-section" style="color: #0dcaf0">
+               <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
+               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+               <div class="row g-2 align-items-center">
+                  <div class="col">
+                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                        <option value="-1" selected>No Encryption/Signature</option>
+                        <option value="symmetric">Symmetrically Encrypt</option>
+                        <option value="asymmetric">Asymmetrically Encrypt</option>
+                        <option value="signed">Sign</option>
+                     </select>
+                  </div>
+                  with
+         <div class="col">
+            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+               <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
+               {% set current_user_name =  current_user.username  -%}
+               {% for username,_ in usernames %}
+               {% if current_user_name != username %}
+               <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}}</option>
+               {% endif %}
+               {% endfor %}
+               {% for username,_ in usernames %}
+               <option value="public_{{username}}">{{username}}'s Public Key</option>
+               {% if current_user_name == username %}
+               <option value="private_{{username}}">{{username}}'s Private Key</option>
+               {% endif %}
+               {% endfor %}
+               </select>
+            </div>
+      </div>
+            </div>
+         </div>   
+   <!-- <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div> -->
+   {% if form.content.errors %}
+      <div class="invalid-feedback">
+         {% for errors in form.content.errors %}
+            {{ errors }} <!-- display the errors -->
+         {% endfor %}
+         {% endif %}
+      </div>
+   <br>
+   </fieldset>
    </form>
+</div>
+{% endfor %}
+
+      <script>
+         // Add an event listener to simulate a click on "User 2" tab when the page loads
+         window.addEventListener('load', function () {
+            document.querySelector(".tablinks:first-child").click(); // Click the first tab (User 2)
+         });
+      
+         function openUser(evt, user) {
+            // Declare variables
+            var i, tabcontent, tablinks;
+      
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+               tabcontent[i].style.display = "none";
+            }
+      
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+               tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+      
+            // Show the current tab and add an "active" class to the button that opened the tab
+            document.getElementById(user).style.display = "block";
+            evt.currentTarget.className += " active";
+         }
+      </script>
+      
+
+
 
 <!-- NOT needed for now-->
 <!-- <div class="row "> -->
