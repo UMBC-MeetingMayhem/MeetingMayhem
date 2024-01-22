@@ -81,7 +81,6 @@ def str_to_list(st, li):
     return li #return the list filled with strings
 
 def create_message(user, game, request, form, recipients, time_stamp):
-
     print("---------------\n\n\n\n")
     """Create a message. Used by both the adversary and the users.
     Intention is to use this function with a switch statement so that different actions can
@@ -97,100 +96,60 @@ def create_message(user, game, request, form, recipients, time_stamp):
     if not form.content.data: #if there is no message content, display an error, return false
         flash(f'There was an error in creating your message. Please try again.', 'danger')
         return False,None
-    if user.role == 3: #if the user is an adversary
-        #get the list of the recipients and senders
-        recipients = request.get('recipients')
-        senders = request.get('senders')
-        #print(recipients,senders)
-        #if one of those lists are empty, display an error, return false
-        if not recipients or not senders:
-            flash(f'Please select one sender and one recipient.', 'danger')
-            return False,None
-        # TODO: change to duplicate message for time and place
-        #check if the message is a duplicate, and if it is, display an error, return false
-        # if Message.query.filter_by(sender=senders, recipient=recipients, content=form.content.data, round=game.current_round+1, game=game.id).first():
-        #     flash(f'Duplicate message detected. Please try sending a different message.', 'danger')
-        #     return False,None
-        if senders == recipients:
-            flash(f'Please do not select same sender and recipient!', 'danger')
-            return False,None
-        signed_keys = [] # list to keep track of digital signatures
-        encrypted_keys = [] # list to keep track of encryption keys
-
-        encryption_type = request.get("encryption_type_select")
-        encrypted_key = request.get("encryption_key")
-        if  encryption_type == 'symmetric':
-            if recipients in encrypted_key:
-                encrypted_keys.append(encrypted_key)
-            else:
-                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-        elif encryption_type  == 'asymmetric':
-            if encrypted_key == 'public_' + recipients:
-                encrypted_keys.append(encrypted_key)
-            #elif encrypted_key == 'private_' + str(senders):
-            elif "private" in encrypted_key:
-                encrypted_keys.append('Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key.")
-            else:
-                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-        elif encryption_type  == 'signed':
-            if "private" in encrypted_key:
-            #if encrypted_key == 'private_' + str(senders):
-                signed_keys.append(encrypted_key)
-            elif encrypted_key == 'public_' + recipients:
-                signed_keys.append('Warning: ' + encrypted_key + " but a signature usually requires the sender's private key.")
-            else:
-                signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-
-        signed_keys_string = ", ".join(map(str, signed_keys))
-        encrypted_keys_string = ", ".join(map(str, encrypted_keys))
-        #create the message and add it to the db
-        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=senders, recipient=recipients, content=form.content.data, is_edited=False, new_sender=senders, new_recipient=recipients, edited_content=form.content.data, is_deleted=False, adv_created=True, adv_submitted=True, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
-        db.session.add(new_message)
-        db.session.commit()
-        #display success to user
-        flash(f'Your message has been sent!', 'success')
-        return True, new_message
-    elif user.role == 4: #if the user is a user
-
-        signed_keys = [] # list to keep track of digital signatures
-        encrypted_keys = [] # list to keep track of encryption keys
-
-        # Code for determining whether entered keys are warning or not
-        print(request)
-        encryption_type = request.get("encryption_type_select")
-        encrypted_key = request.get("encryption_key")
-        print(encryption_type,encrypted_key)
-        if  encryption_type == 'symmetric':
-            if recipients in encrypted_key:
-                encrypted_keys.append(encrypted_key)
-            else:
-                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-        elif encryption_type  == 'asymmetric':
-            if encrypted_key == 'public_' + recipients:
-                encrypted_keys.append(encrypted_key)
-            elif encrypted_key == 'private_' + str(user.username):
-                encrypted_keys.append('Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key.")
-            else:
-                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-        elif encryption_type  == 'signed':
-            if encrypted_key == 'private_' + str(user.username):
-                signed_keys.append(encrypted_key)
-            elif encrypted_key == 'public_' + recipients:
-                signed_keys.append('Warning: ' + encrypted_key + " but a signature usually requires the sender's private key.")
-            else:
-                signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-
-        signed_keys_string = ", ".join(map(str, signed_keys))
-        encrypted_keys_string = ", ".join(map(str, encrypted_keys))
-        #create the message and add it to the db
-        new_message = Message(is_decrypted=False, encryption_type=encryption_type, key = encrypted_key, round=game.current_round+1, game=game.id, sender=user.username, recipient=recipients, content=form.content.data, is_edited=False, new_sender=None, new_recipient=None, edited_content=None, is_deleted=False, adv_created=False, is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
-        db.session.add(new_message)
-        db.session.commit()
-        #display success to user
-        flash(f'Your message has been sent!', 'success')
-        return True, new_message
-    else: #if someone who isn't a user or adversary manages to call this function, return false
+    if user.role != 3 and user.role != 4:
         return False,None
+
+    signed_keys = [] # list to keep track of digital signatures
+    encrypted_keys = [] # list to keep track of encryption keys
+    prentendSender = None # if adv pretend as others
+    # Code for determining whether entered keys are warning or not
+    if request.get("Pretend") != None:
+        new_recipients = request.get("Pretend")
+        prentendSender = "Pretend as " + new_recipients
+        
+    encryption_type = request.get("encryption_type_select")
+    encrypted_key = request.get("encryption_key")
+    print(encryption_type,encrypted_key)
+    if  encryption_type == 'symmetric':
+        if recipients in encrypted_key:
+            encrypted_keys.append(encrypted_key)
+        else:
+            encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+    elif encryption_type  == 'asymmetric':
+        if encrypted_key == 'public_' + recipients:
+            encrypted_keys.append(encrypted_key)
+        elif encrypted_key == 'private_' + str(user.username):
+            encrypted_keys.append('Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key.")
+        else:
+            encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+    elif encryption_type  == 'signed':
+        if encrypted_key == 'private_' + str(user.username):
+            signed_keys.append(encrypted_key)
+        elif encrypted_key == 'public_' + recipients:
+            signed_keys.append('Warning: ' + encrypted_key + " but a signature usually requires the sender's private key.")
+        else:
+            signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+
+    signed_keys_string = ", ".join(map(str, signed_keys))
+    encrypted_keys_string = ", ".join(map(str, encrypted_keys))
+    #create the message and add it to the db
+    new_message = Message(is_decrypted=False,
+                            encryption_type=encryption_type, key = encrypted_key, 
+                            round=game.current_round+1, game=game.id, 
+                            sender=user.username, recipient=recipients, content=form.content.data, 
+                            is_edited=False, new_sender=prentendSender, new_recipient=None, edited_content=None, 
+                            is_deleted=False, adv_created= (user.role==3) , 
+                            is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, 
+                            is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, 
+                            initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, 
+                            initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, 
+                            time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
+    db.session.add(new_message)
+    db.session.commit()
+    #display success to user
+    flash(f'Your message has been sent!', 'success')
+    return True, new_message
+    
 
 
 def decrypt_button_show(message):

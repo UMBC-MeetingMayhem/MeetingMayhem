@@ -38,6 +38,7 @@
 	 <!-- Tab content -->
   {% for index in range(other_names|length) %}
 	 {% set name = other_names[index] %}
+	 {% set pname = pretend_name[index] %}
 	 {% set form = forms[name]%}
 	 <div id="{{name}}" class="tabcontent">
 		<form method="POST" action="/messages" id="form_{{name}}">
@@ -97,7 +98,10 @@
 					   <!-- right send-->
 					{% else %} 
 					   <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-						  <p>{{ message[2]}}</p>
+						  <p>{{ message[2]}}</p> 
+						  {% if message[0].adv_created and message[0].new_sender %}
+						  	<p>{{ message[0].new_sender}}</p> 
+						  {% endif %}
 						  <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 						  <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
 						  border-color:#0dcaf0;
@@ -179,7 +183,11 @@
 		   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
 			  <h2>{{name}}</h2>
 			  <p>Message Information</p>
-			  </br>
+			  <input class="form-check-input" type="checkbox" id="{{name}}_pretend" name="Pretend"
+			  value="{{ pname }}" >
+			  <label class="form-check-label" for="inlineCheckbox1-{{name}}"> Pretend as {{ pname }}</label>
+				</br>
+				</br>
 			  {% set  id_loc= "locations_" + name %}
 			  {% set  id_time= "time_" + name %}
 			  {% set  id_am= "am_" + name %}

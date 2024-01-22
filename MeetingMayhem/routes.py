@@ -237,15 +237,15 @@ def adv_messages_page():
     #setup the current_game so that we can pull information from it
     current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
 
-    #setup variables for the forms the adversary needs to use
-    msg_form = MessageForm()
-    adv_msg_edit_form = AdversaryMessageEditForm()
-    adv_next_round_form = AdversaryAdvanceRoundForm()
+    # #setup variables for the forms the adversary needs to use
+    # msg_form = MessageForm()
+    # adv_msg_edit_form = AdversaryMessageEditForm()
+    # adv_next_round_form = AdversaryAdvanceRoundForm()
 
     #create list of usernames for checkboxes
     users = User.query.filter_by(role=4, game=current_game.id).all()
     usernames = []
-    other_name = []
+    other_name = [] # Agents name
     image_url = []
     adversaries = User.query.filter_by(role=3, game=current_game.id).all()
     for user in users:
@@ -257,7 +257,7 @@ def adv_messages_page():
         if current_user.username != username:
             other_name.append(username)
             image_url.append(url_image)
-
+    pretend_name = [other_name[-1], other_name[0]]
     #messages not being processed yet
     forms = {key: MessageForm() for key, _ in zip(other_name,range(len(other_name)))}#use the standard message form
     #sent and recieved messages
@@ -298,16 +298,16 @@ def adv_messages_page():
                 flash(f'Please select a time and location.', 'danger')
                 return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
                                 msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
-                                usernames=usernames,other_names=other_name,image_url=image_url)
+                                usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
 
             #ensure keys entered are keys of actual recipients chosen
             curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
             update()
-            msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
+            #msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
             return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
-                            usernames=usernames,other_names=other_name,image_url=image_url)
+                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
     #adversary message editing
     '''
     elif (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
@@ -465,7 +465,7 @@ def adv_messages_page():
     '''
     return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
-                            usernames=usernames,other_names=other_name,image_url=image_url)
+                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
 
 # game setup route for the game master
 @app.route('/game_setup', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
