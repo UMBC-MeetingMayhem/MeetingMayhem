@@ -33,6 +33,15 @@
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
 		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
+		<button class="tablinks" style="position:relative; left:-189px; top:22px; 
+		background-color: #333333;
+		color: #0dcaf0;
+		font-size: 20px;
+		border-color:#0dcaf0;
+		border-radius: 5px;
+		padding: 5px;
+		padding-left: 10px; padding-right: 10px;
+		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'editTab')">{{other_names[0]}}_{{other_names[1]}}</button>
   </div>
   
 	 <!-- Tab content -->
@@ -95,7 +104,7 @@
 							 <p class="article-content">{{ message[0].content }}</p>
 						  {% endif %}
 						  </div>
-					   <!-- right send-->
+					<!-- right send-->
 					{% else %} 
 					   <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
 						  <p>{{ message[2]}}</p> 
@@ -247,6 +256,307 @@
 	 </form>
   </div>
 {% endfor %}
+
+<!-- Edited form -->
+<div id="editTab" class="tabcontent">
+	{% set modifyName = other_names[0] + "_" + other_names[1]%}
+	{% set adv_msg_edit_form = forms[modifyName]%}
+	<div class="row">
+		<div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
+		<style>
+		/* width */
+		::-webkit-scrollbar {
+		width: 10px;
+		}
+		
+		/* Track */
+		::-webkit-scrollbar-track {
+		box-shadow: inset 0 0 5px grey; 
+		border-radius: 7px;
+		}
+		
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+		background: rgb(194, 191, 122); 
+		border-radius: 10px;
+		}
+		
+		/* Handle on hover */
+		::-webkit-scrollbar-thumb:hover {
+		background: #52502d; 
+		}
+		::-webkit-scrollbar-corner {
+		background:rgb(0, 0, 0);
+		border-radius: 7px;
+
+		}
+		</style>
+		{% set profile1 = image_url[0] %}
+		{% set profile2 = image_url[1] %}
+		<h2>{{other_names[0]}} <img src="{{profile1}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
+		<h2>{{other_names[1]}} <img src="{{profile2}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2> 
+		<!-- left recieved-->
+		{% if msgs_flag[0] %}
+			{% for message in editMessage %}
+				{% if message[3] %} 
+				<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
+				   <div  class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
+
+					  <p>{{ message[2]}} From User1</p>
+					  {% if message[0].adv_submitted %}
+					  	<p>Has been Processed</p>
+					  {% endif %}
+					  <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+					  <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+					  border-color:#0dcaf0;
+					  border-radius: 10px;
+					  padding: 0.5cm;
+					  border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+					  {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
+						 <div id="content-{{ message[0].id }}-adv" class="article-content"> #######################</div>
+					  {% else %}
+						 <div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].content }}</div>
+					  {% endif %}
+					  </div>
+				<!-- right send-->
+				{% else %} 
+				<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
+				   <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
+					
+					  <p>{{ message[2]}}</p> 
+					  {% if message[0].adv_created and message[0].new_sender %}
+						  <p>{{ message[0].new_sender}}</p> 
+					  {% endif %}
+					  {% if message[0].adv_submitted %}
+					  	<p>Has been Processed</p>
+					  {% endif %}
+					  <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+					  <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+					  border-color:#0dcaf0;
+					  border-radius: 10px;
+					  padding: 0.5cm;
+					  border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+					  {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
+						 <div id="content-{{ message[0].id }}-adv" class="article-content"> #######################</div>
+					  {% else %}
+						 <div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].content }}</div>
+					  {% endif %}
+					  </div>
+				{% endif %}
+				{% if message[0].initial_is_encrypted %}
+				   <div class="m-1 row ">
+					  {% if 'Warning' not in message[0].initial_encryption_details %}
+						 {% if message[0].encryption_type == 'symmetric' %}
+							<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+							   Symmetrically encrypted with:</div>
+						 {% elif message[0].encryption_type == 'asymmetric' %}
+							<div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+							   Asymmetrically encrypted with:</div>
+						 {% endif %}
+						 <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+							message[0].initial_encryption_details }}</div>
+					  {% elif 'but' in message[0].initial_encryption_details %}
+						 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+						 {% if message[0].encryption_type == 'symmetric' %}
+							<div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+							   Symmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
+						 {% elif message[0].encryption_type == 'asymmetric' %}
+							   <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+								  Asymmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
+						 {% endif %}
+					  {% else %}
+						 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+						 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+							message[0].initial_encryption_details[9:] }}</div>
+					  {% endif %}  
+				   </div>
+				{% elif message[0].initial_is_signed %}
+				   <div class="m-1 row ">
+					  {% if 'Warning' not in message[0].initial_signed_details %}
+						 <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+							Signed by:</div>
+						 <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
+							message[0].initial_signed_details }}</div>
+					  {% elif 'but' in message[0].initial_signed_details %}
+						 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+						 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
+							Signed by {{message[0].initial_signed_details[9:] }}</div>
+					  {% else %}
+						 <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
+							Warning:</div>
+						 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
+							message[0].initial_signed_details[9:] }}</div>
+					  {% endif %}
+				   </div>
+				{% endif %}
+		        </div>
+				</article>
+			{% endfor %}
+	    {% endif %}	
+	</div>	
+			<!-- right side -->
+		    <div id = "edit_form" class="inactive" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
+	   		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Edit a Message</legend>
+			<div class="content-section">
+				<form method="POST" action="">
+				{{ adv_msg_edit_form.hidden_tag() }}
+				<fieldset class="form-group">
+					<div class="form-group">
+						<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+							background-color: #333333;
+							color: #0dcaf0;
+							font-size: 15px;
+							border-color:#0dcaf0;
+							border-radius: 5px;
+							padding: 5px;
+							padding-left: 10px; padding-right: 10px;
+							text-align: center; border-style:solid; border-width: 2px">New Sender:
+						</label>  <br />
+							{{messages.user_interface(usernames,"newsenders",true,"")}}
+					</div> <br/>
+					<div class="form-group">
+						<label class="form-control-label" style="margin-top: 0.1in; margin-bottom: 0.1in; 
+							background-color: #333333;
+							color: #0dcaf0;
+							font-size: 15px;
+							border-color:#0dcaf0;
+							border-radius: 5px;
+							padding: 5px;
+							padding-left: 10px; padding-right: 10px;
+							text-align: center; border-style:solid; border-width: 2px">New Recipient:</label>  <br />
+							{% set current_user_name =  current_user.username  -%}
+							{{messages.user_interface(usernames,"newrecipients",true,current_user_name)}}
+					</div> <br/>
+					<div class="form-group">
+						{{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
+						{% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
+							{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+								{% for errors in adv_msg_edit_form.edited_content.errors %}
+									<span>{{ errors }}</span> <!-- display the errors -->
+								{% endfor %}
+							</div>
+						{% else %} <!-- if there aren't errors, just display normally -->
+							{% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
+								{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
+							{% else %} <!-- if the message hasn't been edited, display normally -->
+								{% if can_decrypt %}
+									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
+								{% else %}
+									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true)}}
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					</div> <br>
+					<div class="form-group">
+						{{ adv_msg_edit_form.encryption_and_signed_keys(id="adv_encryption_and_signed_keys", type="hidden") }} 
+					</div> <br/>
+				</fieldset>
+			</div>
+
+			<div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0">
+				<ul class="select2-selection__rendered" id="adv_cryptography_tags_list"></ul>
+				<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
+				<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
+				<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+				<div class="row g-2 align-items-center">
+					<div class="col">
+						<select id="encryption_sign_type_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select2">
+							<option  value= "-1" selected>No Encryption/Signature</option>
+							<option value="symmetric">Symmetrically Encrypt</option>
+							<option value="asymmetric">Asymmetrically Encrypt</option>
+							<option value="signed">Sign</option>
+						</select>
+					</div>
+					with
+					<div class="col">
+						<select id="key_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key2">
+							<option id='default_key_select2' value= "-1" selected>No Key Selected</option>
+							{% set current_user_name =  current_user.username  -%}
+							{% for username,_ in usernames %}
+								{% if current_user_name != username %}
+								<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+								{% endif %}
+							{% endfor %}
+							{% for username,_ in usernames %}
+								<option value="public_{{username}}">{{username}}'s Public Key</option>
+								{% if current_user_name == username %}
+								<option value="private_{{username}}">{{username}}'s Private Key </option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div id="error-message-2" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
+				<br/>
+			</div>
+			<div id="error-message-3" hidden="hidden"><p>No more add-on encryption because this message has been already encrypted!</p></div>
+			<div class="form-group" style="margin:10px 0px;">
+				<!-- previous, next, delete, and submit buttons for message editing -->
+				{{ adv_msg_edit_form.delete_msg(class="btn btn-outline-info") }}
+				{{ adv_msg_edit_form.submit_edits(class="btn btn-outline-info") }}
+				<!-- {{ adv_msg_edit_form.send_no_change(class="btn btn-outline-info") }} -->
+				{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
+				{{ adv_msg_edit_form.not_editable(id="not_editable", type="hidden") }}
+			</div>
+				
+			</fieldset>
+			</form>
+			</div>  
+	</div>
+		  
+</div>
+<script>
+	function prevent_outer(e){
+		// prvent trigger slect_msg() due to bubble effect
+		window.event.stopPropagation();
+	}
+	function select_msg(ele, num) {
+		document.getElementById('edit_form').scrollIntoView();
+		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
+		
+		id = "content-" + num + "-adv";
+		console.log(id)
+		const content_box = document.getElementById(id);
+		var text ="--CANNOT DECRYPT--";
+		var encrypt_button = document.getElementById("encryption-panel");
+		var error_dis3 = document.getElementById("error-message-3");
+		// null means it is encrypted, the value will be default value: "--CANNOT DECRYPT--"
+		console.log(window.getComputedStyle(content_box).display);
+		if (content_box !== null && window.getComputedStyle(content_box).display !== "none"){
+			text = document.getElementById(id).innerHTML;
+			console.log(text);
+		}		
+		document.getElementById('adv_msg_edit_form').value = text; 
+		if(text == "--CANNOT DECRYPT--"){
+			document.getElementById('adv_msg_edit_form').disabled = true;
+			encrypt_button.style.display = "none";
+			error_dis3.removeAttribute("hidden");
+			document.getElementById('not_editable').value = true; 
+		}
+		else{
+			document.getElementById('adv_msg_edit_form').disabled = false;
+			encrypt_button.style.display = "block";
+			error_dis3.setAttribute("hidden", "hidden");
+			document.getElementById('not_editable').value = false; 
+		}
+		document.getElementById('msg_num').value = num; 	
+	}
+	
+	</script>
+
+<!-- Sender can ONLY send to ONE recipients at a time -->
+<!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->
+<script>
+	// For onlyOne click
+	$('input[type="checkbox"]').on('change', function() {
+		$('input[name="' + this.name + '"]').not(this).prop('checked', false);
+	});
+</script>
+
 <script>
 	// Add an event listener to simulate a click on "User 2" tab when the page loads
 	window.addEventListener('load', function () {
@@ -274,450 +584,4 @@
 	   evt.currentTarget.className += " active";
 	}
  </script>	
-<script>
-   var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
-   
-   // Add event listener to all selected elements
-   dropboxes.forEach(function(dropbox) {
-      dropbox.addEventListener('change', function() {
-    
-         // if one of the value is selected
-         var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
-         return db.value !== '-1';
-         });
-
-         // Check if all selected values are selected
-         //console.log(dropboxes);
-         var allSelectedValues = Array.from(dropboxes).every(function(dbb) {
-            //console.log(dbb.value);
-            return dbb.value !== '-1';
-         });
-         //console.log(allSelectedValues);
-         var submitButton = document.getElementById('submitButton');
-         var error_dis = document.getElementById("error-message");
-         let hidden = error_dis.getAttribute("hidden");
-		 //console.log(allSelectedValues);
-		 //console.log(allSelectedValuesNotMinusOne);
-         if(allSelectedValuesNotMinusOne && !allSelectedValues){
-            error_dis.removeAttribute("hidden");
-            submitButton.disabled = true;
-         }
-         else{
-            // Enable the button
-            error_dis.setAttribute("hidden", "hidden");
-            submitButton.disabled = false;
-         }
-         
-      });
-   });
-</script>
-
-
-<script>
-function prevent_outer(e){
-	// prvent trigger slect_msg() due to bubble effect
-	window.event.stopPropagation();
-}
-
-function select_msg(ele, num) {
-	document.getElementById('edit_form').scrollIntoView();
-	$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
-	
-	id = "content-" + num + "-adv";
-	console.log(id)
-	const content_box = document.getElementById(id);
-	var text ="--CANNOT DECRYPT--";
-	var encrypt_button = document.getElementById("encryption-panel");
-	var error_dis3 = document.getElementById("error-message-3");
-	// null means it is encrypted, the value will be default value: "--CANNOT DECRYPT--"
-	console.log(window.getComputedStyle(content_box).display);
-	if (content_box !== null && window.getComputedStyle(content_box).display !== "none"){
-		text = document.getElementById(id).innerHTML;
-		console.log(text);
-	}		
-	document.getElementById('adv_msg_edit_form').value = text; 
-	if(text == "--CANNOT DECRYPT--"){
-		document.getElementById('adv_msg_edit_form').disabled = true;
-		encrypt_button.style.display = "none";
-		error_dis3.removeAttribute("hidden");
-		document.getElementById('not_editable').value = true; 
-	}
-	else{
-		document.getElementById('adv_msg_edit_form').disabled = false;
-		encrypt_button.style.display = "block";
-		error_dis3.setAttribute("hidden", "hidden");
-		document.getElementById('not_editable').value = false; 
-	}
-	document.getElementById('msg_num').value = num; 	
-}
-
-</script>
-	
-<script>
-$(document).ready(function(){ 
-	var keys = Object.keys(localStorage);
-	var i =0;
-	for (i=0;i<keys.length; i++) {
-		var key = keys[i];
-		const containerState = localStorage.getItem(key);
-		const item_found = document.getElementById(key);
-		if(!Object.is(item_found, null)){
-			switch (containerState) {
-				case 'visible':
-				item_found.style.display = "";
-				break;
-				case 'hidden':
-				item_found.style.display = "none";
-				break;
-				default:
-			}
-		}
-
-	}
-	document.getElementById('adv_msg_edit_form').value = ""; 
-	document.getElementById('adv_msg_edit_form').disabled = true;
-});
-</script>
-<script>
-function decrypt_adv(id_button){
-	const msg_id = id_button.split("-")[1];
-	const sender = id_button.split("-")[2];
-	const recipent = id_button.split("-")[3];
-	const encryption_type = id_button.split("-")[4];
-	const encryption_key = id_button.split("-")[5];
-	var current_user_username = "{{ current_user.username }}";
-	//console.log(msg_id);
-	//console.log(sender);
-	//console.log(recipent);
-	//console.log(encryption_type);
-	//console.log(encryption_key);
-	//console.log("aaaa")
-	//console.log(current_user_username);
-	const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
-	const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
-	console.log(decryption_key);
-	console.log(decryption_type);
-	var socket = io();
-	if (encryption_type === "symmetric") {
-		// Not select correct decryption type
-		if (decryption_type !=="symmetric" ){
-			alert("Please select symmetric decryption for the type!");
-			return;
-		}
-		// correct Key, the decrypt button will only show if adv could decrypt it
-		// Therefore, decryption_key must be shared adv_name _sender
-		if (decryption_key === "Shared_".concat(current_user_username,"_",sender)){
-			document.getElementById(`content-${msg_id}-adv`).style.display = "";
-			document.getElementById(`${id_button}`).style.display = "none";
-			document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
-			localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
-			localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-			localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
-			socket.emit('decrypted', { message: msg_id });
-		}
-		// Wrong key
-		else{
-			alert("Please select correct Key for symmetric encryption");
-		}
-	}
-	else if (encryption_type === "asymmetric") {
-		// Wrong decryption Type
-		if (decryption_type !=="asymmetric" ){
-			alert("Please select asymmetric decryption for the type!");
-			return;
-		}
-		// Asymmetric encryption : encrypt with Receiver's public key
-		if (encryption_key === "public_".concat(current_user_username)){
-			// use reciever's private key
-			if (decryption_key === "private_".concat(current_user_username)){
-				document.getElementById(`content-${msg_id}-adv`).style.display = "";
-				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				socket.emit('decrypted', { message: msg_id });
-			}
-			else{
-				alert("Please select correct Key for asymmetric encryption");
-			}
-		}
-		// Wrong way to do asymmetric encryption: use sender's public key
-		if (encryption_key === "private_".concat(sender)){
-			// use sender's public key
-			if (decryption_key === "public_".concat(sender)){
-				document.getElementById(`content-${msg_id}-adv`).style.display = "";
-				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				socket.emit('decrypted', { message: msg_id });
-			}
-			else{
-				alert("Please select correct Key for asymmetric encryption");
-			}
-		}
-	} 
-	else if (encryption_type === "signed"){
-		// Wrong decryption Type
-		if (decryption_type !=="signed" ){
-			alert("Please select Verification of Signature for the type!");
-			return;
-		}
-		// correct way to do signature :sign with sender's private key
-		if (encryption_key === "private_".concat(sender)){
-			// use sender's public key
-			if (decryption_key === "public_".concat(sender)){
-				document.getElementById(`content-${msg_id}-adv`).style.display = "";
-				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				socket.emit('decrypted', { message: msg_id });
-			}
-			else{
-				alert("Please select correct Key for asymmetric encryption");
-			}
-		}
-		// Wrong way to do signature: use reciever's public key
-		if (encryption_key === "public_".concat(current_user_username)){
-			// use own private key
-			if (decryption_key === "private_".concat(current_user_username)){
-				document.getElementById(`content-${msg_id}-adv`).style.display = "";
-				document.getElementById(`${id_button}`).style.display = "none";
-				document.getElementById(`decryption-${ msg_id }-${ recipent }-adv`).style.display = "none";
-				localStorage.setItem(`content-${msg_id}-adv`, document.getElementById(`content-${msg_id}-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`${id_button}`, document.getElementById(`${id_button}`).style.display !== "none" ? 'visible' : 'hidden');
-				localStorage.setItem(`decryption-${ msg_id }-${ recipent }-adv`, document.getElementById(`decryption-${ msg_id }-${recipent }-adv`).style.display !== "none" ? 'visible' : 'hidden');
-				socket.emit('decrypted', { message: msg_id });
-			}
-			else{
-				alert("Please select correct Key for asymmetric encryption");
-			}
-		}
-	} 
-	else{
-		alert("Error");
-	}
-
-}
-
-</script>
-
-<script>
-
-// This script will limit the permission of certain key
-var options_for_decrypt = document.querySelectorAll('[data-group="decrypt_options"]');
-for (let i = 0; i < options_for_decrypt.length; i++) {
-	msg_id = options_for_decrypt[i].id.split("-")[1];
-	current_user_username = options_for_decrypt[i].id.split("-")[2].replace(',', '');
-	decryption_type_select = document.getElementById(`decryption_type_select-${msg_id}-adv`);
-	de_key_select = document.getElementById(`decryption_key_select-${msg_id}-adv`);
-	
-	//var decrytion_type = decryption_type_select.value;
-	decryption_type_select.addEventListener("change", function() {
-		msg_id = options_for_decrypt[i].id.split("-")[1];
-		// Get the selected user from the dropdown
-		new_decryption_type_select =  document.getElementById(`decryption_type_select-${msg_id}-adv`);
-		de_default_key = document.getElementById(`default_key_select-${msg_id}-adv`);
-		de_key_select = document.getElementById(`decryption_key_select-${msg_id}-adv`);
-		all_options = de_key_select.querySelectorAll('option');
-		if (new_decryption_type_select.value === "symmetric") {
-			all_options.forEach((single_option) => {
-				single_option.disabled = true;
-			});
-			let shared = de_key_select.querySelectorAll('option[value^=Shared]');
-			shared.forEach((userItem) => {
-				userItem.disabled = false;
-			});
-			de_default_key.disabled = false
-		}
-		else if(new_decryption_type_select.value  === 'asymmetric' || new_decryption_type_select.value  === 'signed' ){
-			all_options.forEach((single_option) => {
-				single_option.disabled = false;
-			});
-			let shared = de_key_select.querySelectorAll('option[value^=Shared]');
-			shared.forEach((userItem) => {
-				userItem.disabled = true;
-			});
-		}
-		else{
-			all_options.forEach((single_option) => {
-				single_option.disabled = false;
-			});
-		}  
-
-	});
-}
-
-</script>
-	
-	<script type="text/javascript" charset="utf-8">
-	$(document).ready(function() {
-	
-		// Connect to the Socket.IO server.
-        // The connection URL has the following format, relative to the current page:
-        //     http[s]://<domain>:<port>[/<namespace>]
-		var advVoteModal = new bootstrap.Modal(document.getElementById("advVoteModal"), {});
-		
-        var socket = io();
-		socket.on('update', function () {
-            $.get(document.URL, function (data) {
-               var elem = $(data).find('#Received');
-               $('#Received').replaceWith(elem);
-            });
-            $.get(document.URL, function (data) {
-               var elem = $(data).find('#Sent');
-               $('#Sent').replaceWith(elem);
-            });
-         });
-
-		socket.on('adv_show', function () {
-            advVoteModal.show();
-         });
-		
-		socket.on('return_result_for_adv', function (msg) {
-			console.log(msg);
-			switch (msg) {
-			   case "PlayerWin":
-				  $("#staticBackdropLabeladv").text("You Lost. The agents successfully met in a safe location and time!");
-				  break;
-			   case "PlayerLose":
-				  $("#staticBackdropLabeladv").text("You Won. You were able to thwart the player's meeting.");
-				  break;
-			   default: $("#staticBackdropLabeladv").text("Wait for agents to vote!");
-			}
-		 });
-		
-	});
-
-</script> 
-<script>
-	var select = document.getElementById("locations");
-   	var image = document.getElementById("location-image");
-
-   select.addEventListener("change", function() {
-     switch (select.value) {
-        case "Cafe":
-            image.src = "/images/Arts/Locations/Cafe_new.png";
-            break;
-         case "Track":
-            image.src = "/images/Arts/Locations/Track_new.png";
-            break;
-         case "Alley":
-            image.src = "/images/Arts/Locations/Alley_new.png";
-            break;
-         case "Dorm":
-            image.src = "/images/Arts/Locations/Dorm_new.png";
-            break;
-         case "Garage":
-            image.src = "/images/Arts/Locations/Garage_new.png";
-            break;
-         case "Lab":
-            image.src = "/images/Arts/Locations/Lab_new.png";
-            break;
-         case "Park":
-            image.src = "/images/Arts/Locations/Park_new.png";
-            break;
-         default:
-            image.src = "/images/Cafe_new.png";
-     }
-   });
-
-</script>	
-
-<!-- Sender can ONLY send to ONE recipients at a time -->
-<!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->
-<script>
-	// For onlyOne click
-	$('input[type="checkbox"]').on('change', function() {
-		$('input[name="' + this.name + '"]').not(this).prop('checked', false);
-	});
-</script>
-
-<script>
-	// This script will limit the permission of certain key
-	const encryptionTypeSelect2 = document.getElementById("encryption_sign_type_select2");
-	const encryptionKeySelect2 = document.getElementById("key_select2");
- 
-	encryptionTypeSelect2.addEventListener("change", () => {
-	if (encryptionTypeSelect2.value === "-1") {
-	   encryptionKeySelect2.value = "-1";
-	}
-	});
- 
-	// Get the current user's username from the backend
-	var current_user_username2 = "{{ current_user.username }}";
- 
-	// Select the dropdowns for the encryption and signature keys
-	var key_select2 = document.getElementById("key_select2");
-	var encryption_type_select2 = document.getElementById("encryption_sign_type_select2");
-	var default_key2 = document.getElementById("default_key_select2");
-	// Listen for changes in the encryption user dropdown
-	encryption_type_select2.addEventListener("change", function() {
-	   // Get the selected user from the dropdown
-	   let all_options2 = key_select2.querySelectorAll('option');
-	   var encrytion_type2 =  encryption_type_select2.value;
-	   if (encrytion_type2 === 'symmetric') {
-		  all_options2.forEach((single_option2) => {
-			 single_option2.disabled = true;
-		  });
-		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
-		  shared2.forEach((userItem2) => {
-			 userItem2.disabled = false;
-		  });
-		  default_key2.disabled = false
-	   }
-	   else if(encrytion_type2 === 'asymmetric' || encrytion_type2 === 'signed' ){
-		  all_options2.forEach((single_option2) => {
-			 single_option2.disabled = false;
-		  });
-		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
-		  shared2.forEach((userItem2) => {
-			 userItem2.disabled = true;
-		  });
-	   }
-	   else{
-		  all_options2.forEach((single_option2) => {
-			 single_option2.disabled = true;
-		  });
-	   }  
- 
-	});	 
-
-	var dropboxes2 = document.querySelectorAll('#encryption_sign_type_select2, #key_select2');
-   
-	// Add event listener to all selected elements
-	dropboxes2.forEach(function(dropbox2) {
-	   dropbox2.addEventListener('change', function() {
-	 
-		  // if one of the value is selected
-		  var allSelectedValuesNotMinusOne2 = Array.from(dropboxes2).some(function(db2) {
-		  return db2.value !== '-1';
-		  });
- 
-		  // Check if all selected values are selected
-		  //console.log(dropboxes);
-		  var allSelectedValues2 = Array.from(dropboxes2).every(function(dbb2) {
-			 //console.log(dbb.value);
-			 return dbb2.value !== '-1';
-		  });
-		  //console.log(allSelectedValues);
-		  var error_dis2 = document.getElementById("error-message-2");
-		  let hidden2 = error_dis2.getAttribute("hidden");
-		  console.log(allSelectedValues2);
-		  console.log(allSelectedValuesNotMinusOne2);
-		  if(allSelectedValuesNotMinusOne2 && !allSelectedValues2){
-			 error_dis2.removeAttribute("hidden");
-		  }
-		  else{
-			 // Enable the button
-			 error_dis2.setAttribute("hidden", "hidden");
-		  }
-		  
-	   });
-	});
-</script>
 {% endblock content %}

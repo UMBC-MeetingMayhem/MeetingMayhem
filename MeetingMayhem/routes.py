@@ -236,12 +236,6 @@ def multiLevelMessages():
 def adv_messages_page():
     #setup the current_game so that we can pull information from it
     current_game = Game.query.filter_by(adversary=current_user.username, is_running=True).first()
-
-    # #setup variables for the forms the adversary needs to use
-    # msg_form = MessageForm()
-    # adv_msg_edit_form = AdversaryMessageEditForm()
-    # adv_next_round_form = AdversaryAdvanceRoundForm()
-
     #create list of usernames for checkboxes
     users = User.query.filter_by(role=4, game=current_game.id).all()
     usernames = []
@@ -260,6 +254,8 @@ def adv_messages_page():
     pretend_name = [other_name[-1], other_name[0]]
     #messages not being processed yet
     forms = {key: MessageForm() for key, _ in zip(other_name,range(len(other_name)))}#use the standard message form
+    forms[other_name[0]+ "_" + other_name[1]] = AdversaryMessageEditForm()
+    adv_msg_edit_form = forms[other_name[0]+ "_" + other_name[1]]
     #sent and recieved messages
     sent_msg = [Message.query.filter_by(sender=current_user.username, recipient = name, game=current_game.id,adv_submitted=False).all() for name in other_name]
     #print(sent_msg)
@@ -287,7 +283,7 @@ def adv_messages_page():
     #setup message flag to tell template if it should display messages or not
     msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
     msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
-
+    
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -297,49 +293,55 @@ def adv_messages_page():
             if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
                 flash(f'Please select a time and location.', 'danger')
                 return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
-                                msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                                 msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                                 usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
 
             #ensure keys entered are keys of actual recipients chosen
             curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
             update()
-            #msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
+            msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
             return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
-                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
     #adversary message editing
-    '''
-    elif (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
+    is_submit_edits = adv_msg_edit_form.submit_edits.data
+    is_delete_msg = adv_msg_edit_form.delete_msg.data
+    display_message = None
+    messageToBeProcessed12 = Message.query.filter_by(sender=other_name[0], recipient = other_name[1], game=current_game.id).all()
+    messageToBeProcessed21 = Message.query.filter_by(sender=other_name[1], recipient = other_name[0], game=current_game.id).all()
+    editMessage = []
+    for msg in messageToBeProcessed12:
+        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
+    for msg in messageToBeProcessed21:
+        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
+
+    print(editMessage)
+    if (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
         can_decrypt_curr_message = decrypt_button_show_for_adv(display_message,current_user.username,display_message.encryption_details, display_message.is_encrypted or display_message.is_signed)
-        #TODO: some sort of validation here? - not sure if needed cause users are chosen from dropdown/checkboxes
-        #capture the list of players from the checkboxes and make it into a string delimited by commas
         new_recipients = request.form.getlist('newrecipients')
         new_senders= request.form.getlist('newsenders')
-        #ensure the lists aren't empty
-
-        #if is_submit_edits and adv_msg_edit_form.validate(): #if the submit button is clicked
+        new_recipients = new_recipients[0]
+        new_senders = new_senders[0]
         if is_submit_edits:
+            #! Validation
             if not new_recipients :
                 flash(f'Please select one recipient.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                                       adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-                                       current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+                return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
+                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
             if not new_senders:
                 flash(f'Please select one sender.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                                       adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-                                       current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
-
-            new_recipients = new_recipients[0]
-            new_senders = new_senders[0]
-            #print(new_senders,new_recipients)
+                return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
+                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
             if new_senders == new_recipients:
                 flash(f'Please do not select same sender and recipient.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                                   adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game,
-                                   current_msg=(current_game.adv_current_msg+1), msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple, sent_msgs=sent_msgs,sent_flag=sent_flag, usernames=usernames, msgs=msgs_tuple)
+                return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
+                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
+            
             #setup the changes to be made to the current message
             encryption_type = request.form.get("encryption_type_select2")
             encrypted_key = request.form.get("encryption_key2")
@@ -425,10 +427,13 @@ def adv_messages_page():
             display_message.adv_submitted = True
             
             #print(display_message)
-            messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
-            msgs_tuple = []
-            for message in messages:
-                msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
+            messageToBeProcessed12 = Message.query.filter_by(sender=other_name[0], recipient = other_name[1], game=current_game.id).all()
+            messageToBeProcessed21 = Message.query.filter_by(sender=other_name[1], recipient = other_name[0], game=current_game.id).all()
+            editMessage = []
+            for msg in messageToBeProcessed12:
+                editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
+            for msg in messageToBeProcessed21:
+                editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
             db.session.commit()
         elif is_delete_msg: #if the delete message button is clicked
             #flag the message as edited and deleted
@@ -460,11 +465,8 @@ def adv_messages_page():
         #render the webpage
 
         update()
-        return render_template('adversary_messages.html', title='Messages', msg_form=msg_form, adv_msg_edit_form=adv_msg_edit_form,
-                               adv_next_round_form=adv_next_round_form, message=display_message, can_decrypt = can_decrypt_curr_message, game=current_game, msg_list_size=current_game.adv_current_msg_list_size, prev_msgs=prev_msgs_tuple,  sent_msgs=sent_msgs,sent_flag=sent_flag,usernames=usernames, msgs=msgs_tuple)
-    '''
     return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
-                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
 
 # game setup route for the game master
