@@ -296,7 +296,6 @@
 		<h2>{{other_names[0]}} <img src="{{profile1}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
 		<h2>{{other_names[1]}} <img src="{{profile2}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 100px; background-color:#0dcaf0;" /> </h2> 
 		<!-- left recieved-->
-		{% if msgs_flag[0] %}
 			{% for message in editMessage %}
 				{% if message[3] %} 
 				<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
@@ -395,7 +394,6 @@
 		        </div>
 				</article>
 			{% endfor %}
-	    {% endif %}	
 	</div>	
 			<!-- right side -->
 		    <div id = "edit_form" class="inactive" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
