@@ -294,8 +294,8 @@ def adv_messages_page():
         editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
     for msg in messageToBeProcessed21:
         editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
-    print("!!!!!!!!!!!!!")
-    print(editMessage)
+    # print("!!!!!!!!!!!!!")
+    # print(editMessage)
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -321,11 +321,11 @@ def adv_messages_page():
     if (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
         can_decrypt_curr_message = decrypt_button_show_for_adv(display_message,current_user.username,display_message.encryption_details, display_message.is_encrypted or display_message.is_signed)
-        new_recipients = request.form.getlist('newrecipients')
-        new_senders= request.form.getlist('newsenders')
-        new_recipients = new_recipients[0]
-        new_senders = new_senders[0]
         if is_submit_edits:
+            new_recipients = request.form.getlist('newrecipients')
+            new_senders= request.form.getlist('newsenders')
+            new_recipients = new_recipients[0]
+            new_senders = new_senders[0]
             #! Validation
             if not new_recipients :
                 flash(f'Please select one recipient.', 'danger')
@@ -442,29 +442,9 @@ def adv_messages_page():
             display_message.is_edited = True
             display_message.is_deleted = True
             db.session.commit()
-            #pull the messages again since the messages we want to display has changed
-            messages = Message.query.filter_by(adv_submitted=False, adv_created=False, game=current_game.id).all()
-            msgs_tuple = []
-            for message in messages:
-                msgs_tuple.append((message, decrypt_button_show_for_adv(message,current_user.username,message.encryption_details, message.is_encrypted or message.is_signed)))
-            #current_game.adv_current_msg = 0
-            #current_game.adv_current_msg_list_size = len(messages)
-            #commit the messages to the database
-            db.session.commit()
 
         is_submit_edits = False
         is_delete_msg = False
-        prev_messages = Message.query.filter_by(game=current_game.id, adv_submitted=True,adv_created=False).all() #grab all the previous messages for this game
-
-        #reset prev msgs tuple before filling it with new messages
-        prev_msgs_tuple = []
-
-        for message in prev_messages:
-            prev_msgs_tuple.append((message, decrypt_button_show(message))) # append it to the tuple
-
-        prev_msgs_tuple.reverse()
-        #render the webpage
-
         update()
     return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,

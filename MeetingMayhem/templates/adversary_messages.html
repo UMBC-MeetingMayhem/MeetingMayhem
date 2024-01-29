@@ -297,51 +297,47 @@
 		<h2>{{other_names[1]}} <img src="{{profile2}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2> 
 		<!-- left recieved-->
 			{% for message in editMessage %}
+				<!-- Set all properties-->
+				<!-- Message on left-->
 				{% if message[3] %} 
-				<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
-				   <div  class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-
-					  <p>{{ message[2]}} From User1</p>
-					  {% if message[0].adv_submitted %}
-					  	<p>Has been Processed</p>
-					  {% endif %}
-					  <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-					  <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
-					  border-color:#0dcaf0;
-					  border-radius: 10px;
-					  padding: 0.5cm;
-					  border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
-					  {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
-						 <div id="content-{{ message[0].id }}-adv" class="article-content"> #######################</div>
-					  {% else %}
-						 <div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].content }}</div>
-					  {% endif %}
-					  </div>
-				<!-- right send-->
-				{% else %} 
-				<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
-				   <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-					
-					  <p>{{ message[2]}}</p> 
-					  {% if message[0].adv_created and message[0].new_sender %}
-						  <p>{{ message[0].new_sender}}</p> 
-					  {% endif %}
-					  {% if message[0].adv_submitted %}
-					  	<p>Has been Processed</p>
-					  {% endif %}
-					  <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-					  <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
-					  border-color:#0dcaf0;
-					  border-radius: 10px;
-					  padding: 0.5cm;
-					  border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
-					  {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
-						 <div id="content-{{ message[0].id }}-adv" class="article-content"> #######################</div>
-					  {% else %}
-						 <div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].content }}</div>
-					  {% endif %}
-					  </div>
+					{% set leftmargin = 20 %}
+				{% else %}
+					{% set leftmargin = 410 %}
+				{%  endif %}
+				{% if message[0].adv_submitted %}
+					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section">
+					{% if message[0].is_deleted %}
+						{% set bordercolor = "#f00d0d" %}
+						{% set status = "Deleted" %}
+					{% elif message[0].is_edited %}
+						{% set bordercolor = "#f09d0d" %}
+						{% set status = "Forward with edition" %}
+					{% else %}
+						{% set bordercolor = "#e1f00d" %}
+						{% set status = "Forward with edition" %}
+					{% endif %}
+				{% else %}
+					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
+					{% set bordercolor = "#0dcaf0" %}
+					{% set status = "" %}
 				{% endif %}
+				   <div  class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+						<p> From {{message[0].sender}}</p>
+						{% if message[0].adv_submitted %}
+							<p>{{ status }}</p>
+						{% endif %}
+						<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+						border-color: #0dcaf0;
+						border-radius: 10px;
+						padding: 0.5cm;
+						border-width: 2px; border: thick double {{ bordercolor }}; width: auto; height: auto">
+						{% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
+							<div id="content-{{ message[0].id }}-adv" class="article-content"> #######################</div>
+						{% else %}
+							<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].content }}</div>
+						{% endif %}
+					</div>
 				{% if message[0].initial_is_encrypted %}
 				   <div class="m-1 row ">
 					  {% if 'Warning' not in message[0].initial_encryption_details %}
