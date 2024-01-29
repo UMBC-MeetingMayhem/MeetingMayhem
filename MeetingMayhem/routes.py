@@ -283,7 +283,19 @@ def adv_messages_page():
     #setup message flag to tell template if it should display messages or not
     msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
     msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
+    display_message = None
+    is_submit_edits = adv_msg_edit_form.submit_edits.data
+    is_delete_msg = adv_msg_edit_form.delete_msg.data
     
+    messageToBeProcessed12 = Message.query.filter_by(sender=other_name[0], recipient = other_name[1], game=current_game.id).all()
+    messageToBeProcessed21 = Message.query.filter_by(sender=other_name[1], recipient = other_name[0], game=current_game.id).all()
+    editMessage = []
+    for msg in messageToBeProcessed12:
+        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
+    for msg in messageToBeProcessed21:
+        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
+    print("!!!!!!!!!!!!!")
+    print(editMessage)
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -305,18 +317,7 @@ def adv_messages_page():
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
     #adversary message editing
-    is_submit_edits = adv_msg_edit_form.submit_edits.data
-    is_delete_msg = adv_msg_edit_form.delete_msg.data
-    display_message = None
-    messageToBeProcessed12 = Message.query.filter_by(sender=other_name[0], recipient = other_name[1], game=current_game.id).all()
-    messageToBeProcessed21 = Message.query.filter_by(sender=other_name[1], recipient = other_name[0], game=current_game.id).all()
-    editMessage = []
-    for msg in messageToBeProcessed12:
-        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
-    for msg in messageToBeProcessed21:
-        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
-
-    print(editMessage)
+    
     if (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
         can_decrypt_curr_message = decrypt_button_show_for_adv(display_message,current_user.username,display_message.encryption_details, display_message.is_encrypted or display_message.is_signed)
