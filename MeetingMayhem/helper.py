@@ -98,52 +98,59 @@ def create_message(user, game, request, form, recipients, time_stamp):
         return False,None
     if user.role != 3 and user.role != 4:
         return False,None
-
-    signed_keys = [] # list to keep track of digital signatures
-    encrypted_keys = [] # list to keep track of encryption keys
     prentendSender = None # if adv pretend as others
     # Code for determining whether entered keys are warning or not
     if request.get("Pretend") != None:
         new_recipients = request.get("Pretend")
-        prentendSender = "Pretend as " + new_recipients
+        prentendSender =  new_recipients
         
     encryption_type = request.get("encryption_type_select")
     encrypted_key = request.get("encryption_key")
+    initial_help_message = ""
+    initial_is_cyptographic = 0
     print(encryption_type,encrypted_key)
     if  encryption_type == 'symmetric':
+        initial_is_cyptographic = 1
         if recipients in encrypted_key:
-            encrypted_keys.append(encrypted_key)
+            initial_help_message = "Looks Good =)"
         else:
-            encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+            initial_help_message = 'Warning: Recipient cannot decrypt the message with this key.'
     elif encryption_type  == 'asymmetric':
+        initial_is_cyptographic = 2
         if encrypted_key == 'public_' + recipients:
-            encrypted_keys.append(encrypted_key)
+            initial_help_message = "Looks Good =)"
         elif encrypted_key == 'private_' + str(user.username):
-            encrypted_keys.append('Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key.")
+            initial_help_message = 'Warning: ' + encrypted_key + " but an asymmetric encryption usually encrypts with the receiver's public key."
         else:
-            encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+           initial_help_message = 'Warning: Recipient cannot decrypt the message with this key.'
     elif encryption_type  == 'signed':
+        initial_is_cyptographic = 3
         if encrypted_key == 'private_' + str(user.username):
-            signed_keys.append(encrypted_key)
+            initial_help_message = "Looks Good =)"
         elif encrypted_key == 'public_' + recipients:
-            signed_keys.append('Warning: ' + encrypted_key + " but a signature usually requires the sender's private key.")
+            initial_help_message = 'Warning: ' + encrypted_key + " but a signature usually requires the sender's private key."
         else:
-            signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+            initial_help_message = 'Warning: Recipient cannot decrypt the message with this key.'
 
-    signed_keys_string = ", ".join(map(str, signed_keys))
-    encrypted_keys_string = ", ".join(map(str, encrypted_keys))
     #create the message and add it to the db
-    new_message = Message(is_decrypted=False,
-                            encryption_type=encryption_type, key = encrypted_key, 
+    new_message = Message(
                             round=game.current_round+1, game=game.id, 
-                            sender=user.username, recipient=recipients, content=form.content.data, 
-                            is_edited=False, new_sender=prentendSender, new_recipient=None, edited_content=None, 
-                            is_deleted=False, adv_created= (user.role==3) , 
-                            is_encrypted=len(encrypted_keys) > 0, encryption_details = encrypted_keys_string, 
-                            is_signed = len(signed_keys) > 0, signed_details = signed_keys_string, 
-                            initial_is_encrypted=len(encrypted_keys) > 0, initial_encryption_details = encrypted_keys_string, 
-                            initial_is_signed=len(signed_keys) > 0, initial_signed_details = signed_keys_string, 
-                            time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data)
+                            # Initial Content
+                            time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data,
+                            initial_sender=user.username, initial_recipient=recipients, initial_content=form.content.data, 
+                            adv_created= (user.role==3) , 
+                            initial_is_cyptographic = initial_is_cyptographic,
+                            initial_encryption_type=encryption_type, initial_key = encrypted_key, 
+                            initial_help_message = initial_help_message,
+                            # Edited content (kept as same as initial, but not processed)
+                            adv_processed = (user.role==3) , is_edited=False, is_deleted=False, 
+                            edited_sender=prentendSender, edited_recipient=recipients, edited_content=form.content.data, 
+                            edited_is_cyptographic = initial_is_cyptographic,
+                            edited_encryption_type=encryption_type, edited_key = encrypted_key, 
+                            edited_help_message = initial_help_message,
+                            # Decrypted
+                            is_decryptable=False,has_been_decrypted = False
+                            )
     db.session.add(new_message)
     db.session.commit()
     #display success to user

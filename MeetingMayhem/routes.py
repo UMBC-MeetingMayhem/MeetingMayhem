@@ -177,9 +177,9 @@ def messages():
     forms = {key: MessageForm() for key, _ in zip(other_name,range(len(other_name)))}#use the standard message form
 
     #sent and recieved messages
-    sent_msg = [Message.query.filter_by(sender=current_user.username, recipient = name, game=current_game.id,adv_submitted=False).all() for name in other_name]
+    sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id,adv_processed=False).all() for name in other_name]
     #print(sent_msg)
-    recieved_msg = [Message.query.filter_by(new_recipient=current_user.username,sender=name,adv_submitted=True, is_deleted=False, game=current_game.id).all() for name in other_name]
+    recieved_msg = [Message.query.filter_by(edited_recipient=current_user.username,edited_sender=name,adv_processed=True, is_deleted=False, game=current_game.id).all() for name in other_name]
    
     # Organize messages by chatbox
     msgs_tuple = []
@@ -218,8 +218,8 @@ def messages():
             #ensure keys entered are keys of actual recipients chosen
             curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
-            update()
             msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
+            update()
     
     #print(msg_flag)
     return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
@@ -318,75 +318,68 @@ def adv_messages_page():
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
     #adversary message editing
     
-    if (is_submit_edits or is_delete_msg): #if any of the prev/next/submit buttons are clicked
+    if is_submit_edits : #if any of the prev/next/submit buttons are clicked
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
-        can_decrypt_curr_message = decrypt_button_show_for_adv(display_message,current_user.username,display_message.encryption_details, display_message.is_encrypted or display_message.is_signed)
-        if is_submit_edits:
-            new_recipients = request.form.getlist('newrecipients')
-            new_senders= request.form.getlist('newsenders')
-            new_recipients = new_recipients[0]
-            new_senders = new_senders[0]
-            #! Validation
-            if not new_recipients :
-                flash(f'Please select one recipient.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
-                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
-                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
-            if not new_senders:
-                flash(f'Please select one sender.', 'danger')
-                return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
-                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
-                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
-            if new_senders == new_recipients:
+        new_recipients = request.form.getlist('newrecipients')
+        new_senders= request.form.getlist('newsenders')
+        new_recipients = new_recipients[0]
+        new_senders = new_senders[0]
+        #! Validation
+        if not new_recipients :
+            flash(f'Please select one recipient.', 'danger')
+            return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
+                        msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
+                        usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
+        if not new_senders:
+            flash(f'Please select one sender.', 'danger')
+            return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
+                        msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
+                        usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
+        if new_senders == new_recipients:
                 flash(f'Please do not select same sender and recipient.', 'danger')
                 return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
             
-            #setup the changes to be made to the current message
-            encryption_type = request.form.get("encryption_type_select2")
-            encrypted_key = request.form.get("encryption_key2")
-            display_message.new_sender = new_senders
-            display_message.new_recipient = new_recipients
-            display_message.edited_content = display_message.content
-            #print(adv_msg_edit_form.not_editable.data)
-            #print(encrypted_key,encryption_type)
-            if not adv_msg_edit_form.not_editable.data:
-                #display_message.is_edited = True
-                display_message.edited_content = adv_msg_edit_form.edited_content.data
-                encrypted_keys = []
-                signed_keys = []
-                if  encryption_type == 'symmetric':
-                    display_message.encryption_type = encryption_type
-                    display_message.key = encrypted_key
-                    if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
-                        encrypted_keys.append(encrypted_key)
-                    else:
-                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-                elif encryption_type  == 'asymmetric':
-                    display_message.encryption_type = encryption_type
-                    display_message.key = encrypted_key
-                    if encrypted_key == 'public_' + new_recipients:
-                        encrypted_keys.append(encrypted_key)
-                    elif encrypted_key == 'private_' + str(new_senders):
-                        encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
-                    else:
-                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-                elif encryption_type  == 'signed':
-                    display_message.encryption_type = encryption_type
-                    display_message.key = encrypted_key
-                    if encrypted_key == 'private_' + str(new_senders):
-                        signed_keys.append(encrypted_key)
-                    elif encrypted_key == 'public_' + new_recipients:
-                        signed_keys.append("Warning: but a signature usually requires the sender's private key.")
-                    else:
-                        signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-                else:
+        #setup the changes to be made to the current message
+        encryption_type = request.form.get("encryption_type_select2")
+        encrypted_key = request.form.get("encryption_key2")
+        display_message.new_sender = new_senders
+        display_message.new_recipient = new_recipients
+        display_message.edited_content = adv_msg_edit_form.edited_content.data if not adv_msg_edit_form.not_editable.data else display_message.content
+        encrypted_keys = []
+        signed_keys = []
+        if  encryption_type == 'symmetric':
+            display_message.encryption_type = encryption_type
+            display_message.key = encrypted_key
+            if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
+                encrypted_keys.append(encrypted_key)
+            else:
+                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+        elif encryption_type  == 'asymmetric':
+            display_message.encryption_type = encryption_type
+            display_message.key = encrypted_key
+            if encrypted_key == 'public_' + new_recipients:
+                encrypted_keys.append(encrypted_key)
+            elif encrypted_key == 'private_' + str(new_senders):
+                encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
+            else:
+                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+        elif encryption_type  == 'signed':
+            display_message.encryption_type = encryption_type
+            display_message.key = encrypted_key
+            if encrypted_key == 'private_' + str(new_senders):
+                signed_keys.append(encrypted_key)
+            elif encrypted_key == 'public_' + new_recipients:
+                signed_keys.append("Warning: but a signature usually requires the sender's private key.")
+            else:
+                signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+        else:
                     # no-add on: not edited
-                    display_message.is_edited = False
+            display_message.is_edited = False
 
-                if display_message.edited_content != display_message.content or display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
-                    display_message.is_edited = True
+            if display_message.edited_content != display_message.content or display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
+                display_message.is_edited = True
 
                 display_message.is_signed = len(signed_keys) > 0
                 display_message.is_encrypted = len(encrypted_keys) > 0
@@ -426,26 +419,18 @@ def adv_messages_page():
                 display_message.signed_details = ", ".join(map(str, signed_keys))
             
             display_message.adv_submitted = True
-            
-            #print(display_message)
-            messageToBeProcessed12 = Message.query.filter_by(sender=other_name[0], recipient = other_name[1], game=current_game.id).all()
-            messageToBeProcessed21 = Message.query.filter_by(sender=other_name[1], recipient = other_name[0], game=current_game.id).all()
-            editMessage = []
-            for msg in messageToBeProcessed12:
-                editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
-            for msg in messageToBeProcessed21:
-                editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
             db.session.commit()
-        elif is_delete_msg: #if the delete message button is clicked
-            #flag the message as edited and deleted
-            display_message.adv_submitted = True
-            display_message.is_edited = True
-            display_message.is_deleted = True
-            db.session.commit()
+    elif is_delete_msg: #if the delete message button is clicked
+        #flag the message as edited and deleted
+        display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
+        display_message.adv_submitted = True
+        display_message.is_edited = True
+        display_message.is_deleted = True
+        db.session.commit()
 
-        is_submit_edits = False
-        is_delete_msg = False
-        update()
+    is_submit_edits = False
+    is_delete_msg = False
+    update()
     return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)

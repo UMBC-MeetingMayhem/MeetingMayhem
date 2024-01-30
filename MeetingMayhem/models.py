@@ -96,33 +96,38 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     round = db.Column(db.Integer, nullable=False) #keeps track of which round the message needs to be displayed for users in
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
-    sender = db.Column(db.String, nullable=False)
-    recipient = db.Column(db.String, nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    is_edited = db.Column(db.Boolean, nullable=False)
-    new_sender = db.Column(db.String, nullable=True)
-    new_recipient = db.Column(db.String, nullable=True)
-    edited_content = db.Column(db.Text, nullable=True)
-    is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
-    adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
-    is_encrypted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is encrypted or not
-    encryption_details = db.Column(db.String, nullable=False, default="Null") #keeps track of username of recipient(s) and which key was used to encrypt
-    is_signed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether the message is signed or not
-    signed_details = db.Column(db.String, nullable=False, default="Null") #keeps track of username of sender and which key was used to sign
-    adv_submitted = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether message has been seen and forwarded by the adv so user can see it
-    time_sent = db.Column(db.String, nullable=False, default="Null") # keeps track of when a message was sent by initial sender
-    time_recieved = db.Column(db.String, nullable=False, default="Null") # keeps track of when a message has been recieved by intended recipient
-    initial_is_encrypted = db.Column(db.Boolean, nullable=False, default=False) # keeps track of whether message was initially encrypted or not
-    initial_encryption_details = db.Column(db.String, nullable=False, default="Null") # keeps track of original encryption details
-    initial_is_signed = db.Column(db.Boolean, nullable=False, default=False) # keeps track of whether message was initially signed or not
-    initial_signed_details = db.Column(db.String, nullable=False, default="Null") # keeps track of original signed details
+    # Message INFO NOT CHANGEABLE
     time_meet = db.Column(db.String, default="Null") # keeps track of the time user chooses to meet
     location_meet = db.Column(db.String, default="Null") # keeps track of the location user chooses to meet
     time_am_pm = db.Column(db.String, default="Null") # keeps track of the choice between am and pm for time
-    encryption_type = db.Column(db.String, nullable=False,default="Null") # Encryption type: Symmatrically Encryption, Asymmetrically Encryption, Signature
-    key = db.Column(db.String, nullable=False,default="Null") # Key select
-    is_decrypted = db.Column(db.Boolean, nullable=False) #keeps track of decrypted message
-    #adv_details = db.Column(db.String, nullable=False, default="Null") #kepp track of adv
+    time_sent = db.Column(db.String, nullable=False, default="Null") # keeps track of when a message was sent by initial sender
+    time_recieved = db.Column(db.String, nullable=False, default="Null") # keeps track of when a message has been recieved by intended recipient
+    # Initial Message Info
+    initial_content = db.Column(db.Text, nullable=False)
+    initial_sender = db.Column(db.String, nullable=False)
+    initial_recipient = db.Column(db.String, nullable=False)
+    adv_created = db.Column(db.Boolean, nullable=False) #keeps track if the adversary made this message
+    initial_is_cyptographic = db.Column(db.Integer, nullable=False, default=0) # 0 = Plain Text, 1 = Symmetric Encryption, 2 = Asymmetric Encryption, 3 = Signature
+    initial_help_message= db.Column(db.String, nullable=False, default="Null") # keeps track of original encryption details
+    initial_encryption_type = db.Column(db.String, nullable=False,default="Null") # Encryption type: Symmtrically Encryption, Asymmetrically Encryption, Signature
+    initial_key = db.Column(db.String, nullable=False,default="Null") # Key select
+    # ADV Processing 
+    adv_processed = db.Column(db.Boolean, nullable=False, default=False) #keeps track of whether message has been processed
+    is_edited = db.Column(db.Boolean, nullable=False) # If the message content/sender/recipient has been edited
+    is_deleted = db.Column(db.Boolean, nullable=False) #keeps track if the adversary "deleted" the message
+    edited_sender = db.Column(db.String, nullable=True)
+    edited_recipient = db.Column(db.String, nullable=True)
+    edited_content = db.Column(db.Text, nullable=True)
+   
+    edited_is_cyptographic = db.Column(db.Integer, nullable=False, default=0) # 0 = Plain Text, 1 = Symmetric Encryption, 2 = Asymmetric Encryption, 3 = Signature
+    edited_help_message= db.Column(db.String, nullable=False, default="Null") # keeps track of original encryption details
+    edited_encryption_type = db.Column(db.String, nullable=False,default="Null") # Encryption type: Symmatrically Encryption, Asymmetri
+    edited_key = db.Column(db.String, nullable=False,default="Null") # Key select
+    
+    # Decryption
+    is_decryptable = db.Column(db.Boolean, nullable=False) # can be decryptable: the decrypt button will show up
+    has_been_decrypted =  db.Column(db.Boolean, nullable=False) # Already been decrypted
+
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return f"Message(key = '{self.key}', encryption_type = '{self.encryption_type}',ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM={self.time_am_pm}, Edited ='{self.is_edited}',Decrypt='{self.is_decrypted}')\n"
 

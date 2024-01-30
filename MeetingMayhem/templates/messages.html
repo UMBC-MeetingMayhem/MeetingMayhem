@@ -100,84 +100,50 @@ function onlyOne(checkbox) {
                {% for message in msgs_tuple[index] %}
                   <!-- left recieved-->
                   {% if message[3] %} 
-                     <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-                        <p>{{ message[2]}}</p>
-                        <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-                        <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
-                        border-color:#0dcaf0;
-                        border-radius: 10px;
-                        padding: 0.5cm;
-                        border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
-                        {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
-                           <p class="article-content"> #######################</p>
-                        {% else %}
-                           <p class="article-content">{{ message[0].content }}</p>
-                        {% endif %}
-                        </div>
-                     <!-- right send-->
-                  {% else %} 
-                     <div class="chatbox" style="width: 325px; height: auto; margin-left:410px; margin-top: 70px;">
-                        <p>{{ message[2]}}</p>
-                        <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-                        <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
-                        border-color:#0dcaf0;
-                        border-radius: 10px;
-                        padding: 0.5cm;
-                        border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
-                        {% if message[0].initial_is_encrypted or message[0].initial_is_signed %}
-                           <p class="article-content"> #######################</p>
-                        {% else %}
-                           <p class="article-content">{{ message[0].content }}</p>
-                        {% endif %}
-                        </div>
-                  {% endif %}
-                  {% if message[0].initial_is_encrypted %}
-                     <div class="m-1 row ">
-                        {% if 'Warning' not in message[0].initial_encryption_details %}
-                           {% if message[0].encryption_type == 'symmetric' %}
-                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                 Symmetrically encrypted with:</div>
-                           {% elif message[0].encryption_type == 'asymmetric' %}
-                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                 Asymmetrically encrypted with:</div>
-                           {% endif %}
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                              message[0].initial_encryption_details }}</div>
-                        {% elif 'but' in message[0].initial_encryption_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           {% if message[0].encryption_type == 'symmetric' %}
-                              <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                 Symmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
-                           {% elif message[0].encryption_type == 'asymmetric' %}
-                                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                    Asymmetrically encrypted with {{message[0].initial_encryption_details[9:] }}</div>
-                           {% endif %}
-                        {% else %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                              message[0].initial_encryption_details[9:] }}</div>
-                        {% endif %}  
+                     {% set leftmargin = -10 %}
+                  <!-- right send-->
+                  {% else %}
+                     {% set leftmargin = 380 %}
+                  {%  endif %}
+                  <div class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+                     <p>{{ message[2]}}</p>
+                     <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+                     <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+                     border-color:#0dcaf0;
+                     border-radius: 10px;
+                     padding: 0.5cm;
+                     border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+                     {% if message[0].is_edited and message[3]%}
+                        <p class="article-content"> {{ message[0].edited_content }}</p>
+                     {% else %}
+                        <p class="article-content">{{ message[0].initial_content }}</p>
+                     {% endif %}
+                      <!-- can decrypt and is recieved -->
+                     {% if message[0].is_decrytable and message[3] %}
+                        <!-- TODO: Add decryption here -->
+                        <p> DECRYPT</p>
+                     {% endif %}
                      </div>
-                  {% elif message[0].initial_is_signed %}
+                  {% if message[0].initial_is_cyptographic != 0 %}
+                     {% if 'Warning' not in message[0].initial_help_message %} 
+                        {% set isBorderSucess = "success" %}
+                     {% else %}
+                        {% set isBorderSucess = "warning" %}
+                     {%  endif %}
                      <div class="m-1 row ">
-                        {% if 'Warning' not in message[0].initial_signed_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
+                        {% if message[0].initial_encryption_type == 'symmetric' %}
+                        <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
+                           Symmetrically encrypted with:</div>
+                        {% elif message[0].initial_encryption_type == 'asymmetric' %}
+                           <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
+                              Asymmetrically encrypted with:</div>
+                        {% elif message[0].initial_encryption_type == 'signed' %}
+                           <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
                               Signed by:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                              message[0].initial_signed_details }}</div>
-                        {% elif 'but' in message[0].initial_signed_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                              Signed by {{message[0].initial_signed_details[9:] }}</div>
-                        {% else %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                              message[0].initial_signed_details[9:] }}</div>
                         {% endif %}
+                        <div class="rounded-end d-inline col-md-auto border border-3 border-{{ isBorderSucess }}">{{
+                           message[0].initial_key }} <span title="{{ message[0].initial_help_message}}">&#9432;</span></div>
+                        
                      </div>
                   {% endif %}
             </div>
@@ -260,129 +226,37 @@ function onlyOne(checkbox) {
 </div>
 {% endfor %}
 
-      <script>
-         // Add an event listener to simulate a click on "User 2" tab when the page loads
-         window.addEventListener('load', function () {
-            document.querySelector(".tablinks:first-child").click(); // Click the first tab (User 2)
-         });
-      
-         function openUser(evt, user) {
-            // Declare variables
-            var i, tabcontent, tablinks;
-      
-            // Get all elements with class="tabcontent" and hide them
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-               tabcontent[i].style.display = "none";
-            }
-      
-            // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-               tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-      
-            // Show the current tab and add an "active" class to the button that opened the tab
-            document.getElementById(user).style.display = "block";
-            evt.currentTarget.className += " active";
-         }
-      </script>
-      
+<script>
+   // Add an event listener to simulate a click on "User 2" tab when the page loads
+   window.addEventListener('load', function () {
+      document.querySelector(".tablinks:first-child").click(); // Click the first tab (User 2)
+   });
 
+   function openUser(evt, user) {
+      // Declare variables
+      var i, tabcontent, tablinks;
 
+      // Get all elements with class="tabcontent" and hide them
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+         tabcontent[i].style.display = "none";
+      }
 
-<!-- NOT needed for now-->
-<!-- <div class="row "> -->
-   <!-- <div id="Received" class="col"> -->
-      <!-- {% if msg_flag %} this checks if the passed message var has content in it -->
-      <!-- <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Received messages:</legend> -->
-      <!-- {{ messages.print_msgs(msgs,usernames) }} -->
-      <!-- {% else %} -->
-      <!-- <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages</legend> -->
-      <!-- {% endif %} -->
-   <!-- </div> -->
+      // Get all elements with class="tablinks" and remove the class "active"
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+         tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
 
-   <!-- TODO: Embedded within the chatbox -->
-   <!-- <div id="Sent" class="col">
-      {% if sent_msgs %}
-         <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">Messages sent by you:</legend>
-         {% for sent_msg in sent_msgs %}
-            {% if not sent_msg.adv_created %}
-               <article class="media content-section">
-                  <div class="media-body">
-                     <div class="article-metadata">
-                        <a>Sender: {{ sent_msg.sender }} | </a>
-                        <a>Recipient: {{ sent_msg.recipient }}</a>
-                        <a> | Time Sent: {{ sent_msg.time_sent }} </a>
-                     </div>
-                     <div id="content-{{ sent_msg.id }}">
-                        <p style="margin: 0; display:inline; color:#0dcaf0;">@{{ sent_msg.location_meet }} {{
-                           sent_msg.time_meet}}{{ sent_msg.time_am_pm }}</p>
-                        {% if sent_msg.initial_is_encrypted or sent_msg.initial_is_signed %}
-                           <p class="article-content"> #######################</p>
-                        {% else %}
-                           <p class="article-content">{{ sent_msg.content }}</p>
-                        {% endif %}
-                     </div>
-                     {% if sent_msg.initial_is_encrypted %}
-                     <div class="m-1 row ">
-                        {% if 'Warning' not in sent_msg.initial_encryption_details %}
-                           {% if sent_msg.encryption_type == 'symmetric' %}
-                              <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                 Symmetrically encrypted with:</div>
-                           {% elif sent_msg.encryption_type == 'asymmetric' %}
-                                 <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                                    Asymmetrically encrypted with:</div>
-                           {% endif %}
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                                 sent_msg.initial_encryption_details }}</div>
-                        {% elif 'but' in sent_msg.initial_encryption_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                           Warning:</div>
-                           {% if sent_msg.encryption_type == 'symmetric' %}
-                              <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                 Symmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
-                           {% elif sent_msg.encryption_type == 'asymmetric' %}
-                                 <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                                    Asymmetrically encrypted with {{sent_msg.initial_encryption_details[9:] }}</div>
-                           {% endif %}
-                        {% else %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                              sent_msg.initial_encryption_details[9:] }}</div>
-                        {% endif %}  
-                     </div>
-                     {% elif sent_msg.initial_is_signed %}
-                     <div class="m-1 row ">
-                        {% if 'Warning' not in sent_msg.initial_signed_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-success text-dark border border-3 border-success">
-                              Signed by:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-success">{{
-                              sent_msg.initial_signed_details }}</div>
-                        {% elif 'but' in sent_msg.initial_signed_details %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">
-                              Signed by {{sent_msg.initial_signed_details[9:] }}</div>
-                        {% else %}
-                           <div class="rounded-start d-inline col-md-auto bg-warning text-dark border border-3 border-warning">
-                              Warning:</div>
-                           <div class="rounded-end d-inline col-md-auto border border-3 border-warning">{{
-                              sent_msg.initial_signed_details[9:] }}</div>
-                        {% endif %}
-                     </div>
-                     {% endif %}
-                  </div>
-               </article>
-            {% endif %}
-         {% endfor %}
-      {% else %}
-         <legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-weight: bold; text-shadow: 2px 2px 2px black;">No messages sent</legend>
-      {% endif %}
-   </div>
-</div>
-    -->
+      // Show the current tab and add an "active" class to the button that opened the tab
+      document.getElementById(user).style.display = "block";
+      evt.currentTarget.className += " active";
+      // Save the active tab in sessionStorage
+      sessionStorage.setItem('activeTab', user);
+   }
+   
+</script>
+      
 <script>
     const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
    const encryptionKeySelect = document.getElementById("key_select");
