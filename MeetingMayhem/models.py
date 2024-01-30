@@ -129,7 +129,18 @@ class Message(db.Model):
     has_been_decrypted =  db.Column(db.Boolean, nullable=False) # Already been decrypted
 
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
-        return f"Message(key = '{self.key}', encryption_type = '{self.encryption_type}',ID='{self.id}', Round='{self.round}', Game='{self.game}' Sender='{self.sender}', Recipient='{self.recipient}', Content='{self.content}', Edited='{self.is_edited}', New Sender='{self.new_sender}', New Recipient='{self.new_recipient}', New Content='{self.edited_content}', Deleted='{self.is_deleted}', Adv Created='{self.adv_created}', Encrypted='{self.is_encrypted}', Encryption Key='{self.encryption_details}', Signed='{self.is_signed}', Signature='{self.signed_details}', adv_submitted='{self.adv_submitted}', Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM={self.time_am_pm}, Edited ='{self.is_edited}',Decrypt='{self.is_decrypted}')\n"
+        return (
+        f"Message("
+        f"ID='{self.id}', Round='{self.round}', Game='{self.game}'\n"
+        f"Meet Location='{self.location_meet}', Meet Time='{self.time_meet}', Meet AM/PM='{self.time_am_pm}', Time Sent='{self.time_sent}', Time Received='{self.time_recieved}'\n"
+        f"Initial Content='{self.initial_content}', Initial Sender='{self.initial_sender}', Initial Recipient='{self.initial_recipient}',\n"
+        f"Adversary Created='{self.adv_created}', Initial Is Cryptographic='{self.initial_is_cyptographic}', Initial Help Message='{self.initial_help_message}', Initial Encryption Type='{self.initial_encryption_type}', Initial Key='{self.initial_key}'\n"
+        f"Edited Content='{self.edited_content}', Edited Sender='{self.edited_sender}', Edited Recipient='{self.edited_recipient}',\n"
+        f"Edited Is Cryptographic='{self.edited_is_cyptographic}', Edited Help Message='{self.edited_help_message}', Edited Encryption Type='{self.edited_encryption_type}', Edited Key='{self.edited_key}'\n"
+        f"Edited='{self.is_edited}', Deleted='{self.is_deleted}',\n"
+        f"Is Decryptable='{self.is_decryptable}', Has Been Decrypted='{self.has_been_decrypted}')\n"
+        f"====================================================================================================================="
+    )
 
 #game table
 #include information about the game in here so it can by dynamically pulled

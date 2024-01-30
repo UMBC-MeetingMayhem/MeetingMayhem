@@ -103,6 +103,8 @@ def create_message(user, game, request, form, recipients, time_stamp):
     if request.get("Pretend") != None:
         new_recipients = request.get("Pretend")
         prentendSender =  new_recipients
+    else:
+        prentendSender =  user.username
         
     encryption_type = request.get("encryption_type_select")
     encrypted_key = request.get("encryption_key")

@@ -191,7 +191,7 @@ def messages():
                 if message.time_recieved == "Null":
                     message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
                 # False means to this message is on the right (recieved)
-                msg_tuple_list.append((message, decrypt_button_show(message),message.time_recieved,True))
+                msg_tuple_list.append((message, None,message.time_recieved,True))
                 db.session.commit()
         if sent_msg[index]:
             for message in sent_msg[index]:
@@ -220,8 +220,11 @@ def messages():
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
             msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
             update()
+            return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+                            usernames=usernames,other_names=other_name,image_url=image_url)
     
-    #print(msg_flag)
+
     return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
                             usernames=usernames,other_names=other_name,image_url=image_url)
@@ -257,13 +260,14 @@ def adv_messages_page():
     forms[other_name[0]+ "_" + other_name[1]] = AdversaryMessageEditForm()
     adv_msg_edit_form = forms[other_name[0]+ "_" + other_name[1]]
     #sent and recieved messages
-    sent_msg = [Message.query.filter_by(sender=current_user.username, recipient = name, game=current_game.id,adv_submitted=False).all() for name in other_name]
+    sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id).all() for name in other_name]
     #print(sent_msg)
-    recieved_msg = [Message.query.filter_by(new_recipient=current_user.username,sender=name,adv_submitted=True, is_deleted=False, game=current_game.id).all() for name in other_name]
-   
+    recieved_msg = [Message.query.filter_by(edited_recipient=current_user.username,edited_sender=name,is_deleted=False, game=current_game.id).all() for name in other_name]
+    all_msg = Message.query.filter_by(game=current_game.id).all()
+    print(all_msg)
     # Organize messages by chatbox
     msgs_tuple = []
-    
+    decrypt_button_show2 = None
     for index in range(len(other_name)):
         msg_tuple_list = []
         if recieved_msg[index]:
@@ -271,7 +275,7 @@ def adv_messages_page():
                 if message.time_recieved == "Null":
                     message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
                 # False means to this message is on the right (recieved)
-                msg_tuple_list.append((message, decrypt_button_show(message),message.time_recieved,True))
+                msg_tuple_list.append((message, decrypt_button_show2,message.time_recieved,True))
                 db.session.commit()
         if sent_msg[index]:
             for message in sent_msg[index]:
@@ -287,15 +291,16 @@ def adv_messages_page():
     is_submit_edits = adv_msg_edit_form.submit_edits.data
     is_delete_msg = adv_msg_edit_form.delete_msg.data
     
-    messageToBeProcessed12 = Message.query.filter_by(sender=other_name[0], recipient = other_name[1], game=current_game.id).all()
-    messageToBeProcessed21 = Message.query.filter_by(sender=other_name[1], recipient = other_name[0], game=current_game.id).all()
+    messageToBeProcessed12 = Message.query.filter_by(initial_sender=other_name[0], initial_recipient = other_name[1], game=current_game.id).all()
+    messageToBeProcessed21 = Message.query.filter_by(initial_sender=other_name[1], initial_recipient = other_name[0], game=current_game.id).all()
     editMessage = []
+
     for msg in messageToBeProcessed12:
-        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,True))
+        editMessage.append((msg,decrypt_button_show2, msg.initial_is_cyptographic, True,msg.time_sent))
     for msg in messageToBeProcessed21:
-        editMessage.append((msg, decrypt_button_show_for_adv(msg,current_user.username,msg.encryption_details, msg.is_encrypted or msg.is_signed),None,False))
-    # print("!!!!!!!!!!!!!")
-    # print(editMessage)
+        editMessage.append((msg, decrypt_button_show2, msg.initial_is_cyptographic, False,msg.time_sent))
+
+    editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[4], "%b.%d.%Y-%H.%M"),reverse=False) 
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -340,90 +345,57 @@ def adv_messages_page():
                 return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
-            
+        print(new_senders)
+        print(new_recipients)
         #setup the changes to be made to the current message
         encryption_type = request.form.get("encryption_type_select2")
         encrypted_key = request.form.get("encryption_key2")
-        display_message.new_sender = new_senders
-        display_message.new_recipient = new_recipients
+        display_message.edited_encryption_type = encryption_type
+        display_message.edited_key = encrypted_key
+        display_message.edited_sender = new_senders
+        display_message.edited_recipient = new_recipients
         display_message.edited_content = adv_msg_edit_form.edited_content.data if not adv_msg_edit_form.not_editable.data else display_message.content
-        encrypted_keys = []
-        signed_keys = []
+        db.session.commit()
         if  encryption_type == 'symmetric':
-            display_message.encryption_type = encryption_type
-            display_message.key = encrypted_key
+            display_message.is_edited = True
             if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
-                encrypted_keys.append(encrypted_key)
+                display_message.edited_help_message = "Looks Good =)"
             else:
-                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                display_message.edited_help_message = 'Warning: Recipient cannot decrypt the message with this key.'
         elif encryption_type  == 'asymmetric':
-            display_message.encryption_type = encryption_type
-            display_message.key = encrypted_key
+            display_message.is_edited = True
             if encrypted_key == 'public_' + new_recipients:
-                encrypted_keys.append(encrypted_key)
+                display_message.edited_help_message = "Looks Good =)"
             elif encrypted_key == 'private_' + str(new_senders):
-                encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
+                display_message.edited_help_message ='Warning: Wrong way to execute asymmetric encryption.'
             else:
-                encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                display_message.edited_help_message ='Warning: Recipient cannot decrypt the message with this key.'
         elif encryption_type  == 'signed':
-            display_message.encryption_type = encryption_type
-            display_message.key = encrypted_key
+            display_message.is_edited = True
             if encrypted_key == 'private_' + str(new_senders):
-                signed_keys.append(encrypted_key)
+                display_message.edited_help_message = "Looks Good =)"
             elif encrypted_key == 'public_' + new_recipients:
-                signed_keys.append("Warning: but a signature usually requires the sender's private key.")
+                display_message.edited_help_message ="Warning: but a signature usually requires the sender's private key."
             else:
-                signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
+                display_message.edited_help_message ='Warning: Recipient cannot decrypt the message with this key.'
         else:
-                    # no-add on: not edited
-            display_message.is_edited = False
-
-            if display_message.edited_content != display_message.content or display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
+            if  (display_message.edited_sender     == display_message.initial_sender and 
+                display_message.edited_recipient  == display_message.initial_recipient and 
+                display_message.edited_content    == display_message.initial_content   and 
+                display_message.is_edited         == False):
+                display_message.is_edited = False
+            else:
                 display_message.is_edited = True
+            display_message.edited_help_message = ""
 
-                display_message.is_signed = len(signed_keys) > 0
-                display_message.is_encrypted = len(encrypted_keys) > 0
-                display_message.encryption_details = ", ".join(map(str, encrypted_keys))
-                display_message.signed_details = ", ".join(map(str, signed_keys))
-
-            elif display_message.sender != display_message.new_sender or   display_message.recipient != display_message.new_recipient:
-                display_message.is_edited = True
-                encrypted_keys = []
-                signed_keys = []
-                encrypted_key = display_message.key
-                encryption_type = display_message.encryption_type
-                if  encryption_type == 'symmetric':
-                    if (new_recipients in encrypted_key):
-                        encrypted_keys.append(encrypted_key)
-                    else:
-                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-                elif encryption_type  == 'asymmetric':
-                    if encrypted_key == 'public_' + new_recipients:
-                        encrypted_keys.append(encrypted_key)
-                    elif "private" in encrypted_key:
-                    #elif encrypted_key == 'private_' + str(new_senders):
-                        encrypted_keys.append('Warning: Wrong way to execute asymmetric encryption.')
-                    else:
-                        encrypted_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-                elif encryption_type  == 'signed':
-                    if "private" in encrypted_key:
-                    #if encrypted_key == 'private_' + str(new_senders):
-                        signed_keys.append(encrypted_key)
-                    elif encrypted_key == 'public_' + new_recipients:
-                        signed_keys.append("Warning: but a signature usually requires the sender's private key.")
-                    else:
-                        signed_keys.append('Warning: Recipient cannot decrypt the message with this key.')
-                display_message.is_signed = len(signed_keys) > 0
-                display_message.is_encrypted = len(encrypted_keys) > 0
-                display_message.encryption_details = ", ".join(map(str, encrypted_keys))
-                display_message.signed_details = ", ".join(map(str, signed_keys))
-            
-            display_message.adv_submitted = True
+        
+            display_message.adv_processed = True
+            print(display_message)
             db.session.commit()
     elif is_delete_msg: #if the delete message button is clicked
         #flag the message as edited and deleted
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
-        display_message.adv_submitted = True
+        display_message.adv_processed = True
         display_message.is_edited = True
         display_message.is_deleted = True
         db.session.commit()
