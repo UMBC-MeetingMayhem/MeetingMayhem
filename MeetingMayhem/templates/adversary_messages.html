@@ -294,15 +294,15 @@
 		{% set profile1 = image_url[0] %}
 		{% set profile2 = image_url[1] %}
 		<h2>{{other_names[0]}} <img src="{{profile1}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
-		<h2>{{other_names[1]}} <img src="{{profile2}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 100px; background-color:#0dcaf0;" /> </h2> 
+		<h2 style = "margin-right:10px;margin-left:430px;margin-top:-67px;">{{other_names[1]}} <img src="{{profile2}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 100px;background-color:#0dcaf0;" /> </h2> 
 		<!-- left recieved-->
 			{% for message in editMessage %}
 				<!-- Set all properties-->
 				<!-- Message on left-->
 				{% if message[3] %} 
-					{% set leftmargin = 20 %}
+					{% set leftmargin = -10 %}
 				{% else %}
-					{% set leftmargin = 410 %}
+					{% set leftmargin = 380 %}
 				{%  endif %}
 				{% if message[0].adv_submitted %}
 					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section">
