@@ -279,7 +279,7 @@
 						{% set status = "Forward without edition" %}
 					{% endif %}
 				{% else %}
-					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}')">
+					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">
 					{% set bordercolor = "#0dcaf0" %}
 					{% set status = "To be processed" %}
 				{% endif %}
@@ -449,13 +449,17 @@
 		// prvent trigger slect_msg() due to bubble effect
 		window.event.stopPropagation();
 	}
-	function select_msg(ele, num) {
+	function select_msg(ele, num,sender,recipient) {
 		document.getElementById('edit_form').scrollIntoView();
 		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
-		
 		id = "content-" + num + "-adv";
-		console.log(id)
+		senderCheckBoxName = "inlineCheckbox1-" + sender + "-newsenders";
+		recipientCheckBoxName = "inlineCheckbox1-" + recipient + "-newrecipients";
+		//console.log(id)
+		//console.log(sender,recipient)
 		const content_box = document.getElementById(id);
+		document.getElementById(senderCheckBoxName).checked = true;
+		document.getElementById(recipientCheckBoxName).checked = true;
 		var text ="--CANNOT DECRYPT--";
 		var encrypt_button = document.getElementById("encryption-panel");
 		var error_dis3 = document.getElementById("error-message-3");

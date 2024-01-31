@@ -571,85 +571,49 @@ function onlyOne(checkbox) {
    });
 
 </script>
-   <script>
-   var other_names_str = "{{ other_names |safe }}".replaceAll("\'","\"");
-   var other_names = Array.from(JSON.parse(other_names_str))
 
-   for (let name = 0; name < other_names.length; name++){
-      //console.log(other_names);
-      //console.log(other_names[name]);
-      const select = document.getElementById(`locations_${other_names[name]}`);
-      const image = document.getElementById(`location-image_${other_names[name]}`);
+<script>
+// Change Image when select DropDown
+var other_names_str = "{{ other_names |safe }}".replaceAll("\'","\"");
+var other_names = Array.from(JSON.parse(other_names_str))
 
-      select.addEventListener("change", function () {
-         //console.log(select.value)
-         //console.log(select)
-         
-         switch (select.value) {
-            case "Cafe":
-               image.src = "/images/Arts/Locations/Cafe_new.png";
-               break;
-            case "Track":
-               image.src = "/images/Arts/Locations/Track_new.png";
-               break;
-            case "Alley":
-               image.src = "/images/Arts/Locations/Alley_new.png";
-               break;
-            case "Dorm":
-               image.src = "/images/Arts/Locations/Dorm_new.png";
-               break;
-            case "Garage":
-               image.src = "/images/Arts/Locations/Garage_new.png";
-               break;
-            case "Lab":
-               image.src = "/images/Arts/Locations/Lab_new.png";
-               break;
-            case "Park":
-               image.src = "/images/Arts/Locations/Park_new.png";
-               break;
-            default:
-               image.src = "/images/Arts/Locations/Cafe_new.png";
-         }
-      });
-   }
+for (let name = 0; name < other_names.length; name++){
+   //console.log(other_names);
+   //console.log(other_names[name]);
+   const select = document.getElementById(`locations_${other_names[name]}`);
+   const image = document.getElementById(`location-image_${other_names[name]}`);
+
+   select.addEventListener("change", function () {
+      //console.log(select.value)
+      //console.log(select)
       
-   </script>
-
-   <script>
-   <!--
-       var dropboxes = document.querySelectorAll('#encryption_sign_type_select, #key_select');
+      switch (select.value) {
+         case "Cafe":
+            image.src = "/images/Arts/Locations/Cafe_new.png";
+            break;
+         case "Track":
+            image.src = "/images/Arts/Locations/Track_new.png";
+            break;
+         case "Alley":
+            image.src = "/images/Arts/Locations/Alley_new.png";
+            break;
+         case "Dorm":
+            image.src = "/images/Arts/Locations/Dorm_new.png";
+            break;
+         case "Garage":
+            image.src = "/images/Arts/Locations/Garage_new.png";
+            break;
+         case "Lab":
+            image.src = "/images/Arts/Locations/Lab_new.png";
+            break;
+         case "Park":
+            image.src = "/images/Arts/Locations/Park_new.png";
+            break;
+         default:
+            image.src = "/images/Arts/Locations/Cafe_new.png";
+      }
+   });
+}
    
-   // Add event listener to all selected elements
-   dropboxes.forEach(function(dropbox) {
-      dropbox.addEventListener('change', function() {
-    
-         // if one of the value is selected
-         var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
-         return db.value !== '-1';
-         });
-
-         // Check if all selected values are selected
-         //console.log(dropboxes);
-         var allSelectedValues = Array.from(dropboxes).every(function(dbb) {
-            //console.log(dbb.value);
-            return dbb.value !== '-1';
-         });
-         //console.log(allSelectedValues);
-         var submitButton = document.getElementsByClassName("btn btn-outline-info");
-         var error_dis = document.getElementById("error-message");
-         let hidden = error_dis.getAttribute("hidden");
-         if(allSelectedValuesNotMinusOne && !allSelectedValues){
-            // Disable the button
-            error_dis.removeAttribute("hidden");
-            submitButton.disabled = true;
-         }
-         else{
-            // Enable the button
-            error_dis.setAttribute("hidden", "hidden");
-            submitButton.disabled = false;
-         }
-         
-      });
-   }); //-->
-   </script>
+</script>
    {% endblock content %}
