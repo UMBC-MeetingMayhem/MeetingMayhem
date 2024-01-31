@@ -261,7 +261,7 @@
 			{% for message in editMessage %}
 				<!-- Set all properties-->
 				<!-- Message on left-->
-				{% if message[3] %} 
+				{% if message[2] %} 
 					{% set leftmargin = -10 %}
 				{% else %}
 					{% set leftmargin = 380 %}
@@ -284,7 +284,7 @@
 					{% set status = "To be processed" %}
 				{% endif %}
 				   <div  class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
-						<p>{{ message[4]}} | {{ status }}</p>	
+						<p>{{ message[1]}} | {{ status }}</p>	
 						{% if message[0].adv_processed %}
 							<p> From {{message[0].edited_sender}}</p>
 						{% else %}
@@ -296,16 +296,58 @@
 						border-radius: 10px;
 						padding: 0.5cm;
 						border-width: 2px; border: thick double {{ bordercolor }}; width: auto; height: auto">
-						{% if message[0].is_edited and message[3] %}
-						<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }}</div>
+						<!-- message is decrytable but not done yet -->
+						{% if message[0].initial_is_cyptographic!=0 and not message[0].adv_processed %}
+							{% if message[0].has_been_decrypted %}
+								{% if message[0].is_edited %}
+									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }}</div>
+								{% else %}
+									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div>
+								{% endif %}
+							{% elif message[0].is_decryptable %}
+								<div id="decryption-{{ message[0].id }}-{{ message[0].recipient }}-adv" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
+									<div class="col">
+										<select id="decryption_type_select-{{message[0].id}}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="decryption_type_select-{{message[0].id}}">
+											<option value= "-1" selected>No Decryption/Verification of Signature</option>
+											<option value="symmetric">Symmetrically Decrypt</option>
+											<option value="asymmetric">Asymmetrically Decrypt</option>
+											<option value="signed">Verify Signature</option>
+										</select>
+									</div>
+									with
+									<div class="col">
+										<select id="decryption_key_select-{{ message[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+											<option value= "-1" selected id="default_key_select-{{ message[0].id }}">No Key Selected</option>
+											{% set current_user_name = current_user.username -%}
+											{% for username,_ in usernames %}
+												{% if current_user_name != username %}
+												<option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+												{% endif %}
+											{% endfor %}
+											{% for username,_ in usernames %}
+												<option value="public_{{username}}">{{username}}'s Public Key</option>
+												{% if current_user_name == username %}
+												<option value="private_{{username}}">{{username}}'s Private Key </option>
+												{% endif %}
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+								<button id="decryptadv-{{message[0].id}}-{{message[0].initial_sender}}-{{message[0].initial_recipient}}-{{message[0].initial_encryption_type}}-{{message[0].initial_key}}" class="btn btn-secondary decrypt-button" onclick="decrypt_adv(this.id)">Decrypt</button> 
+							{% else %}
+								<div id="content-{{ message[0].id }}-adv" class="article-content">--CANNOT DECRYPT--</div>
+							{% endif %}
+						<!-- adv already forward the message but not decrypt it -->
+						{% elif message[0].initial_is_cyptographic!=0 and ((message[0].is_decryptable and not message[0].has_been_decrypted) or (not message[0].is_decryptable)) %}
+							<div id="content-{{ message[0].id }}-adv" class="article-content">--CANNOT DECRYPT--</div>
 						{% else %}
-						<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div>
+							{% if message[0].is_edited %}
+								<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }}</div>
+							{% else %}
+								<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div>
+							{% endif %}
 						{% endif %}
-						<!-- can decrypt and is recieved -->
-						{% if message[0].is_decrytable and message[3] %}
-							<!-- TODO: Add decryption here -->
-							<p> DECRYPT</p>
-						{% endif %}
+
 					</div>
 					{% if message[0].initial_is_cyptographic != 0 %}
 						{% if 'Warning' not in message[0].initial_help_message %} 
@@ -325,7 +367,7 @@
 								Signed by:</div>
 						{% endif %}
 						<div class="rounded-end d-inline col-md-auto border border-3 border-{{ isBorderSucess }}">{{
-							message[0].initial_key }} <span title="{{ message[0].initial_help_message}}">&#9432;</span></div>
+							message[0].initial_key }} </div>
 						</div>
 			 		{% endif %}
 		        </div>
@@ -437,7 +479,6 @@
 				{{ adv_msg_edit_form.msg_num(id="msg_num", type="hidden") }}
 				{{ adv_msg_edit_form.not_editable(id="not_editable", type="hidden") }}
 			</div>
-				
 			</fieldset>
 			</form>
 			</div>  
@@ -468,7 +509,7 @@
 		var encrypt_button = document.getElementById("encryption-panel");
 		var error_dis3 = document.getElementById("error-message-3");
 		// null means it is encrypted, the value will be default value: "--CANNOT DECRYPT--"
-		console.log(window.getComputedStyle(content_box).display);
+		//console.log(window.getComputedStyle(content_box).display);
 		if (content_box !== null && window.getComputedStyle(content_box).display !== "none"){
 			text = document.getElementById(id).innerHTML;
 			console.log(text);
@@ -499,7 +540,25 @@
 		$('input[name="' + this.name + '"]').not(this).prop('checked', false);
 	});
 </script>
-
+<script>
+	function decrypt_adv(id_button){
+		const msg_id = id_button.split("-")[1];
+		console.log(msg_id);
+		const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
+		const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
+		var current_user_username = "{{ current_user.username }}";
+		var socket = io();
+		socket.emit('advdecrypted', {message: msg_id,decryption_key:decryption_key,decryption_type:decryption_type,curname:current_user_username});
+		socket.on('finish_decrypt',(arg1) => {
+			if (arg1 !== "Good Job!"){
+				alert(arg1); // 1
+			}	
+		});
+		socket.on('redirect', function (data) {
+			window.location = data.url;
+		});
+	}
+</script>
 <script>
 	// Add an event listener to simulate a click on "User 2" tab when the page loads
 	window.addEventListener('load', function () {

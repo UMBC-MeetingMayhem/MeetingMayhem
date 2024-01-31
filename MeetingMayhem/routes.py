@@ -267,7 +267,6 @@ def adv_messages_page():
     print(all_msg)
     # Organize messages by chatbox
     msgs_tuple = []
-    decrypt_button_show2 = None
     for index in range(len(other_name)):
         msg_tuple_list = []
         if recieved_msg[index]:
@@ -275,7 +274,7 @@ def adv_messages_page():
                 if message.time_recieved == "Null":
                     message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
                 # False means to this message is on the right (recieved)
-                msg_tuple_list.append((message, decrypt_button_show2,message.time_recieved,True))
+                msg_tuple_list.append((message, None,message.time_recieved,True))
                 db.session.commit()
         if sent_msg[index]:
             for message in sent_msg[index]:
@@ -296,11 +295,13 @@ def adv_messages_page():
     editMessage = []
 
     for msg in messageToBeProcessed12:
-        editMessage.append((msg,decrypt_button_show2, msg.initial_is_cyptographic, True,msg.time_sent))
+        decrypt_button_show_for_adv(msg,current_user.username)
+        editMessage.append((msg,msg.time_sent, True))
     for msg in messageToBeProcessed21:
-        editMessage.append((msg, decrypt_button_show2, msg.initial_is_cyptographic, False,msg.time_sent))
+        decrypt_button_show_for_adv(msg,current_user.username)
+        editMessage.append((msg,msg.time_sent,False))
 
-    editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[4], "%b.%d.%Y-%H.%M"),reverse=False) 
+    editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H.%M"),reverse=False) 
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -853,15 +854,38 @@ def ready_to_vote(json):
 def serve_images(filename):
     return send_from_directory('images', filename)
 
-@socketio.on('decrypted')
-def decrypted(json):
-    display_message =  Message.query.filter_by(id=json["message"]).first()
-    display_message.is_decrypted = True
-    #display_message.is_edited = True
-    db.session.commit()
-    # print("*******************************************")
-    # print(display_message)
-    # print("*******************************************")
+@socketio.on('advdecrypted')
+def adv_decrypted(json):
+    msg_id = json["message"]
+    display_message =  Message.query.filter_by(id=msg_id).first()
+    decryption_type = json["decryption_type"]
+    decryption_key = json["decryption_key"]
+    curname = json["curname"]
+    Help_msg = ""
+    print(decryption_key,"Shared" + curname + "_" + display_message.initial_sender)
+    if display_message.initial_encryption_type != decryption_type:
+        Help_msg = 'Please select correct decryption type!'
+        #render_adv_message(curname)
+    else:
+        if decryption_type == "symmetric":
+            # Success
+            if decryption_key == "Shared_" + curname + "_" + display_message.initial_sender:
+                display_message.has_been_decrypted = True
+                db.session.commit()
+                update()
+                Help_msg = 'Good Job!'
+                socketio.emit('redirect', {'url': url_for('messages') })
+            else:
+                flash(f"Please select correct Key for symmetric encryptio!","danger")
+        elif decryption_type == "asymmetric":
+            if display_message.initial_key == "public_" + curname and decryption_key == "private_" + display_message.initial_sender:
+                display_message.has_been_decrypted = True
+            elif display_message.initial_key == "pravite_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
+                display_message.has_been_decrypted = True
+            else:
+                flash("Please select correct Key for asymmetric encryption")
+    socketio.emit('finish_decrypt',Help_msg)
+    
 
 @socketio.on('Generate_Log')
 def Generate_Log():
@@ -911,3 +935,70 @@ def Generate_Log():
     worksheet.write(row, 6, str(current_game.who_voted))
     worksheet.write(row, 7, str(current_game.end_result))
     workbook.close()
+
+def render_adv_message(curname):
+    current_game = Game.query.filter_by(adversary=curname, is_running=True).first()
+    #create list of usernames for checkboxes
+    users = User.query.filter_by(role=4, game=current_game.id).all()
+    usernames = []
+    other_name = [] # Agents name
+    image_url = []
+    adversaries = User.query.filter_by(role=3, game=current_game.id).all()
+    for user in users:
+        usernames.append((user.username,user.image_url))
+    for adversary in adversaries:
+        usernames.append((adversary.username,adversary.image_url))
+    usernames = sorted(usernames)
+    for username,url_image in usernames:
+        if current_user.username != username:
+            other_name.append(username)
+            image_url.append(url_image)
+    pretend_name = [other_name[-1], other_name[0]]
+    #messages not being processed yet
+    forms = {key: MessageForm() for key, _ in zip(other_name,range(len(other_name)))}#use the standard message form
+    forms[other_name[0]+ "_" + other_name[1]] = AdversaryMessageEditForm()
+    adv_msg_edit_form = forms[other_name[0]+ "_" + other_name[1]]
+    #sent and recieved messages
+    sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id).all() for name in other_name]
+    #print(sent_msg)
+    recieved_msg = [Message.query.filter_by(edited_recipient=current_user.username,edited_sender=name,is_deleted=False, game=current_game.id).all() for name in other_name]
+    all_msg = Message.query.filter_by(game=current_game.id).all()
+    print(all_msg)
+    # Organize messages by chatbox
+    msgs_tuple = []
+    for index in range(len(other_name)):
+        msg_tuple_list = []
+        if recieved_msg[index]:
+            for message in recieved_msg[index]:
+                if message.time_recieved == "Null":
+                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                # False means to this message is on the right (recieved)
+                msg_tuple_list.append((message, None,message.time_recieved,True))
+                db.session.commit()
+        if sent_msg[index]:
+            for message in sent_msg[index]:
+                msg_tuple_list.append((message, None,message.time_sent,False))
+                db.session.commit()
+        msgs_tuple.append(msg_tuple_list)
+
+
+    #setup message flag to tell template if it should display messages or not
+    msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
+    msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
+    display_message2 = None
+    
+    messageToBeProcessed12 = Message.query.filter_by(initial_sender=other_name[0], initial_recipient = other_name[1], game=current_game.id).all()
+    messageToBeProcessed21 = Message.query.filter_by(initial_sender=other_name[1], initial_recipient = other_name[0], game=current_game.id).all()
+    editMessage = []
+    for msg in messageToBeProcessed12:
+        decrypt_button_show_for_adv(msg,current_user.username)
+        editMessage.append((msg,msg.time_sent, True))
+    for msg in messageToBeProcessed21:
+        decrypt_button_show_for_adv(msg,current_user.username)
+        editMessage.append((msg,msg.time_sent,False))
+    editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H.%M"),reverse=False) 
+    db.session.commit()
+    update()
+    return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
+                            msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message2,editMessage=editMessage,
+                            usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
