@@ -541,6 +541,7 @@
 	});
 </script>
 <script>
+	// TODO: https://stackoverflow.com/questions/51135498/flask-update-the-page-content-without-redirection-in-ajax-jquery
 	function decrypt_adv(id_button){
 		const msg_id = id_button.split("-")[1];
 		console.log(msg_id);
@@ -555,7 +556,9 @@
 			}	
 		});
 		socket.on('redirect', function (data) {
-			window.location = data.url;
+			console.log(data.url)
+			window.location.reload(true);
+			window.location.href = data.url;
 		});
 	}
 </script>

@@ -874,7 +874,8 @@ def adv_decrypted(json):
                 db.session.commit()
                 update()
                 Help_msg = 'Good Job!'
-                socketio.emit('redirect', {'url': url_for('messages') })
+                print(url_for('messages')+"#disp-msg-"+ msg_id)
+                socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
             else:
                 flash(f"Please select correct Key for symmetric encryptio!","danger")
         elif decryption_type == "asymmetric":
@@ -884,6 +885,7 @@ def adv_decrypted(json):
                 display_message.has_been_decrypted = True
             else:
                 flash("Please select correct Key for asymmetric encryption")
+    
     socketio.emit('finish_decrypt',Help_msg)
     
 
