@@ -95,7 +95,7 @@
                   	{% else %}
                      	{% set leftmargin = 380 %}
                   	{%  endif %}
-					<div class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+					<div class="chatbox" style="width: 100px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
 						<p>{{ message[2]}}</p>
 						<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
@@ -264,7 +264,7 @@
 				{% if message[2] %} 
 					{% set leftmargin = -10 %}
 				{% else %}
-					{% set leftmargin = 380 %}
+					{% set leftmargin = 400 %}
 				{%  endif %}
 				{% if message[0].adv_processed %}
 					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section">
@@ -283,7 +283,7 @@
 					{% set bordercolor = "#0dcaf0" %}
 					{% set status = "To be processed" %}
 				{% endif %}
-				   <div  class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+				   <div  class="chatbox" style="width: 200px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
 						<p>{{ message[1]}} | {{ status }}</p>	
 						{% if message[0].adv_processed %}
 							<p> From {{message[0].edited_sender}}</p>
@@ -496,7 +496,8 @@
 	function select_msg(ele, num,sender,recipient) {
 		uncheckAll();
 		document.getElementById('edit_form').scrollIntoView();
-		$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
+		$(ele).addClass("border border-5 border-info circle w-50").siblings().removeClass("border border-5 border-primary rounded");
+		$(ele).addClass("w-50");
 		id = "content-" + num + "-adv";
 		senderCheckBoxName = "inlineCheckbox1-" + sender + "-newsenders";
 		recipientCheckBoxName = "inlineCheckbox1-" + recipient + "-newrecipients";
