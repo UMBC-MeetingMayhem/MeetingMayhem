@@ -102,7 +102,7 @@
 						border-color:#0dcaf0;
 						border-radius: 10px;
 						padding: 0.5cm;
-						border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+						border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto;  word-wrap: break-word;">
 						{% if message[0].is_edited and message[3]%}
 							<p class="article-content"> {{ message[0].edited_content }}</p>
 						{% else %}
@@ -281,7 +281,7 @@
 				{% else %}
 					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">
 					{% set bordercolor = "#0dcaf0" %}
-					{% set status = "To be processed" %}
+					{% set status = "blah -- To be processed" %}
 				{% endif %}
 				   <div  class="chatbox" style="width: 200px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
 						<p>{{ message[1]}} | {{ status }}</p>	
@@ -295,14 +295,14 @@
 						border-color: #0dcaf0;
 						border-radius: 10px;
 						padding: 0.5cm;
-						border-width: 2px; border: thick double {{ bordercolor }}; width: auto; height: auto">
+						border-width: 2px; border: thick double {{ bordercolor }}; width: auto; height: auto;  word-wrap: break-word;">
 						<!-- message is decrytable but not done yet -->
 						{% if message[0].initial_is_cyptographic!=0 and not message[0].adv_processed %}
 							{% if message[0].has_been_decrypted %}
 								{% if message[0].is_edited %}
-									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }}</div>
+									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }} </div>
 								{% else %}
-									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div>
+									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div> 	
 								{% endif %}
 							{% elif message[0].is_decryptable %}
 								<div id="decryption-{{ message[0].id }}-{{ message[0].recipient }}-adv" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">

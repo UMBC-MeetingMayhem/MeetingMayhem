@@ -112,7 +112,7 @@ function onlyOne(checkbox) {
                      border-color:#0dcaf0;
                      border-radius: 10px;
                      padding: 0.5cm;
-                     border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto">
+                     border-width: 2px; border: thick double #0dcaf0; width: auto; height: auto;  word-wrap: break-word;">
                      {% if message[0].is_edited and message[3]%}
                         <p class="article-content"> {{ message[0].edited_content }}</p>
                      {% else %}
@@ -487,7 +487,7 @@ function onlyOne(checkbox) {
          game_id: "{{game.id}}",
          vote: vote
       });
-      //Atmika - disable button and change images upon selected location
+      //disable button and change images upon selected location
       document.getElementById(`submt_vote-${username}`).style.display="none";
       document.getElementById(`places_select-${username}`).style.display="none";
       document.getElementById(`time_s1-${username}`).style.display="none";
