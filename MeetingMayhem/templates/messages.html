@@ -100,10 +100,10 @@ function onlyOne(checkbox) {
                {% for message in msgs_tuple[index] %}
                   <!-- left recieved-->
                   {% if message[3] %} 
-                     {% set leftmargin = -10 %}
+                     {% set leftmargin = 5 %}
                   <!-- right send-->
                   {% else %}
-                     {% set leftmargin = 380 %}
+                     {% set leftmargin = 400 %}
                   {%  endif %}
                   <div class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
                      <p>{{ message[2]}}</p>
@@ -178,13 +178,13 @@ function onlyOne(checkbox) {
                {{ form.meet_time (class="gray-blue",id=id_time)}}
                {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
             </div>
-            <div class="content-section" style="color: #0dcaf0">
+            <div class="content-section" style="color: #0dcaf0;">
                <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
-               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
-               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: small;">Cryptographic Operation&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options</p>
+               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold; width:auto;">Encrypt or Sign Message:</p>
+               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: small; width:350px;">Cryptographic Operation Key Options</p>
                <div class="row g-2 align-items-center">
                   <div class="col">
-                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width:auto;">
                         <option value="-1" selected>No Encryption/Signature</option>
                         <option value="symmetric">Symmetrically Encrypt</option>
                         <option value="asymmetric">Asymmetrically Encrypt</option>
@@ -193,7 +193,7 @@ function onlyOne(checkbox) {
                   </div>
                   &emsp;with&emsp;
          <div class="col">
-            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:200px;">
                <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
                {% set current_user_name =  current_user.username  -%}
                {% for username,_ in usernames %}

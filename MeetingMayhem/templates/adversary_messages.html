@@ -90,12 +90,12 @@
 				 {% for message in msgs_tuple[index] %}
 					<!-- left recieved-->
 					{% if message[3] %} 
-                     	{% set leftmargin = -10 %}
+                     	{% set leftmargin = 5 %}
                   	<!-- right send-->
                   	{% else %}
-                     	{% set leftmargin = 380 %}
+                     	{% set leftmargin = 450 %}
                   	{%  endif %}
-					<div class="chatbox" style="width: 100px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+					<div class="chatbox" style="width: auto; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
 						<p>{{ message[2]}}</p>
 						<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
@@ -272,24 +272,28 @@
 						{% set bordercolor = "#f00d0d" %}
 						{% set status = "Deleted" %}
 					{% elif message[0].is_edited %}
-						{% set bordercolor = "#f09d0d" %}
+						{% set bordercolor = "#dad707" %}
 						{% set status = "Forward with edition" %}
 					{% else %}
-						{% set bordercolor = "#e1f00d" %}
+						{% set bordercolor = "#0dca45" %}
 						{% set status = "Forward without edition" %}
 					{% endif %}
 				{% else %}
-					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">
+					<!--<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">-->
 					{% set bordercolor = "#0dcaf0" %}
-					{% set status = "To be processed" %}
+					
 				{% endif %}
-				   <div  class="chatbox" style="width: 200px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
-						<p>{{ message[1]}} | {{ status }}</p>	
+				   <div  class="chatbox" style="width: 200px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 20px;">
+					{%- if not message[0].adv_processed %}
+						<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">
+					{% endif %}	
+							<p>{{ message[1]}} | {{ status }}</p>	
 						{% if message[0].adv_processed %}
 							<p> From {{message[0].edited_sender}}</p>
 						{% else %}
 							<p> From {{message[0].initial_sender}}</p>
 						{% endif %}
+						
 						<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
 						border-color: #0dcaf0;
@@ -297,6 +301,7 @@
 						padding: 0.5cm;
 						border-width: 2px; border: thick double {{ bordercolor }}; width: 250px; height: auto;  word-wrap: break-word;">
 						<!-- message is decrytable but not done yet -->
+						
 						{% if message[0].initial_is_cyptographic!=0 and not message[0].adv_processed %}
 							{% if message[0].has_been_decrypted %}
 								{% if message[0].is_edited %}
@@ -370,13 +375,14 @@
 							message[0].initial_key }} </div>
 						</div>
 			 		{% endif %}
+						
 		        </div>
 				</article>
 			{% endfor %}
 	</div>	
 			<!-- right side -->
 		    <div id = "edit_form" class="inactive" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
-	   		<legend class="border-bottom mb4" style="color: black; font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.1in; padding-bottom: 5px">Edit a Message</legend>
+	   		<legend class="border-bottom mb4" style="color: rgb(250, 236, 33); font-size:30px; font-weight: bold; text-shadow: 2px 2px 2px rgb(128, 122, 4); padding-left: 0.1in; padding-bottom: 5px">Edit a Message</legend>
 			<div class="content-section">
 				<form method="POST" action="">
 				{{ adv_msg_edit_form.hidden_tag() }}
@@ -434,7 +440,7 @@
 				</fieldset>
 			</div>
 
-			<div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0">
+			<div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0; width: auto;">
 				<ul class="select2-selection__rendered" id="adv_cryptography_tags_list"></ul>
 				<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
 				<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
@@ -496,8 +502,12 @@
 	function select_msg(ele, num,sender,recipient) {
 		uncheckAll();
 		document.getElementById('edit_form').scrollIntoView();
-		$(ele).addClass("border border-5 border-info circle w-50").siblings().removeClass("border border-5 border-primary rounded");
-		$(ele).addClass("w-50");
+
+		$(".content-section").removeClass("border border-5 border-info circle");
+		$(ele).addClass("border border-5 border-info circle");
+		
+		//$(ele).addClass("border border-5 border-info circle").siblings().removeClass("border border-5 border-primary rounded");
+
 		id = "content-" + num + "-adv";
 		senderCheckBoxName = "inlineCheckbox1-" + sender + "-newsenders";
 		recipientCheckBoxName = "inlineCheckbox1-" + recipient + "-newrecipients";
