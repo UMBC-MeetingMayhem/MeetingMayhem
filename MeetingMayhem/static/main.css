@@ -89,7 +89,7 @@ body {
   }
   
   .article-content {
-    white-space: pre-line;
+    white-space: normal;
   }
   
   .article-img {
@@ -100,7 +100,7 @@ body {
   
   .article-metadata {
     padding-bottom: 1px;
-    margin-bottom: 4px;
+    margin-bottom: 1px;
     border-bottom: 1px solid #e3e3e3
   }
   
@@ -179,3 +179,4 @@ body {
       color: #333;
       outline: none; }
 
+  h1,h2,p { margin:0 }

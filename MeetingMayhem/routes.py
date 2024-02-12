@@ -355,7 +355,7 @@ def adv_messages_page():
         display_message.edited_key = encrypted_key
         display_message.edited_sender = new_senders
         display_message.edited_recipient = new_recipients
-        display_message.edited_content = adv_msg_edit_form.edited_content.data if not adv_msg_edit_form.not_editable.data else display_message.content
+        display_message.edited_content = adv_msg_edit_form.edited_content.data if not adv_msg_edit_form.not_editable.data else display_message.initial_content
         db.session.commit()
         if  encryption_type == 'symmetric':
             display_message.is_edited = True

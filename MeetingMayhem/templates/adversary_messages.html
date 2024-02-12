@@ -95,7 +95,7 @@
                   	{% else %}
                      	{% set leftmargin = 450 %}
                   	{%  endif %}
-					<div class="chatbox" style="width: auto; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+					<div class="chatbox" style="width: auto; height: auto; margin-left:{{ leftmargin }}px; margin-top: 20px;">
 						<p>{{ message[2]}}</p>
 						<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
@@ -267,7 +267,6 @@
 					{% set leftmargin = 400 %}
 				{%  endif %}
 				{% if message[0].adv_processed %}
-					<article id="disp-msg-{{(message[0]).id}}" class="option media content-section">
 					{% if message[0].is_deleted %}
 						{% set bordercolor = "#f00d0d" %}
 						{% set status = "Deleted" %}
@@ -279,29 +278,27 @@
 						{% set status = "Forward without edition" %}
 					{% endif %}
 				{% else %}
-					<!--<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">-->
 					{% set bordercolor = "#0dcaf0" %}
-					
 				{% endif %}
-				   <div  class="chatbox" style="width: 200px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 20px;">
-					{%- if not message[0].adv_processed %}
+				<div  class="chatbox" style="width: auto; height: auto; margin-left:{{ leftmargin }}px; margin-top: 0px;">
+					{% if not message[0].adv_processed %}
 						<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">
+					{% else %}
+						<article id="disp-msg-{{(message[0]).id}}" class="option media content-section">
 					{% endif %}	
-							<p>{{ message[1]}} | {{ status }}</p>	
-						{% if message[0].adv_processed %}
-							<p> From {{message[0].edited_sender}}</p>
-						{% else %}
-							<p> From {{message[0].initial_sender}}</p>
-						{% endif %}
 						
+					<p>{{ message[1]}}  <span title="{{ status }}">&#9432;</span></p>	
+					{% if message[0].adv_processed %}
+						<p>New Sender: {{message[0].edited_sender}}</p>
+						<p>New Recipient: {{message[0].edited_recipient}}</p>
+					{% endif %}
 						<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
 						border-color: #0dcaf0;
 						border-radius: 10px;
 						padding: 0.5cm;
-						border-width: 2px; border: thick double {{ bordercolor }}; width: 250px; height: auto;  word-wrap: break-word;">
+						border-width: 2px; border: thick double {{ bordercolor }}; width: 120%; height: auto;  word-wrap: break-word;">
 						<!-- message is decrytable but not done yet -->
-						
 						{% if message[0].initial_is_cyptographic!=0 and not message[0].adv_processed %}
 							{% if message[0].has_been_decrypted %}
 								{% if message[0].is_edited %}
@@ -352,32 +349,30 @@
 								<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div>
 							{% endif %}
 						{% endif %}
-
-					</div>
+					    </div>
 					{% if message[0].initial_is_cyptographic != 0 %}
 						{% if 'Warning' not in message[0].initial_help_message %} 
 							{% set isBorderSucess = "success" %}
 						{% else %}
 							{% set isBorderSucess = "warning" %}
 						{% endif %}
-						<div class="m-1 row ">
+						<div class="m-1 row " style="width: 120%;">
 						{% if message[0].initial_encryption_type == 'symmetric' %}
 						<div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
-							Symmetrically encrypted with:</div>
+							SE <span title="Symmetrically Encrypted with">&#9432;</span>:</div>
 						{% elif message[0].initial_encryption_type == 'asymmetric' %}
 							<div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
-								Asymmetrically encrypted with:</div>
+							AE <span title="Asymmetrically encrypted with">&#9432;</span>:</div>
 						{% elif message[0].initial_encryption_type == 'signed' %}
 							<div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
-								Signed by:</div>
+							Signed by:</div>
 						{% endif %}
 						<div class="rounded-end d-inline col-md-auto border border-3 border-{{ isBorderSucess }}">{{
 							message[0].initial_key }} </div>
 						</div>
 			 		{% endif %}
-						
-		        </div>
 				</article>
+			</div>
 			{% endfor %}
 	</div>	
 			<!-- right side -->
