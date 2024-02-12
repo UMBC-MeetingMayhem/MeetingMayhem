@@ -25,17 +25,17 @@
 
 <!-- Sender can ONLY send to ONE recipients at a time -->
 <!-- Refer from https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group -->
-<script>
+<!-- <script>
 function onlyOne(checkbox) {
    var checkboxes = document.getElementsByName('recipients')
    checkboxes.forEach((item) => {
        if (item !== checkbox) item.checked = false
    })
   }
-</script>        
+</script>         -->
 
 <div class="tab">
-      <button class="tablinks" name="{{other_names[0]}}" style="position:relative;top:22px;
+      <button class="tablinks" name="{{other_names[0]}}" style="
       background-color: #000000;
       color: rgb(255, 255, 255);
       font-size: 20px;
@@ -43,8 +43,8 @@ function onlyOne(checkbox) {
       border-radius: 5px;
       padding: 5px;
       padding-left: 10px; padding-right: 10px;
-      text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; " onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
-      <button class="tablinks" name="{{other_names[1]}}" style="position:relative; top:22px; 
+      border-style:solid; border-width: 2px; margin-left: 80px; " onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
+      <button class="tablinks" name="{{other_names[1]}}" style=" 
       background-color: #000000;
       color: rgb(255, 255, 255);
       font-size: 20px;
@@ -52,7 +52,7 @@ function onlyOne(checkbox) {
       border-radius: 5px;
       padding: 5px;
       padding-left: 10px; padding-right: 10px;
-      text-align: center; border-style:solid; border-width: 2px; margin-top: 50px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
+      border-style:solid; border-width: 2px; margin-top: 30px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
 </div>
 
    <!-- Tab content -->
@@ -64,7 +64,8 @@ function onlyOne(checkbox) {
          {{ form.hidden_tag() }}
       <fieldset class="form-group">
          <div class="row">
-            <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
+            <div class="column" 
+            style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
                <style>
                /* width */
                ::-webkit-scrollbar {
@@ -105,9 +106,9 @@ function onlyOne(checkbox) {
                   {% else %}
                      {% set leftmargin = 400 %}
                   {%  endif %}
-                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 30px;">
                      <p>{{ message[2]}}</p>
-                     <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+                     <div class="content" style="background-color: #333333; color: white; font-size: 15px;
                      border-color:#0dcaf0;
                      border-radius: 10px;
                      padding: 0.5cm;
@@ -129,7 +130,7 @@ function onlyOne(checkbox) {
                                     <option value="signed">Verify Signature</option>
                                  </select>
                               </div>
-                              with
+                              <!-- <p style="color:white">with</p> -->
                               <div class="col">
                                  <select id="decryption_key_select-{{ message[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                                     <option value= "-1" selected id="default_key_select-{{ message[0].id }}">No Key Selected</option>
@@ -188,7 +189,7 @@ function onlyOne(checkbox) {
                {% endfor %}
             {% endif %}
 
-            <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
+            <!-- <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
             {% set  id_content= "content_" + name %}
             {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here",id=id_content) }}
             
@@ -196,11 +197,9 @@ function onlyOne(checkbox) {
                {% set  id_button= "button_" + name %}
                {% set  id_button_form= "Send Message to " + name %}
                {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
-            </div>
-            
+            </div> -->     
          </div>
-      
-         <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
+         <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
             <h2>{{name}}</h2>
             <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large;">Message Information</p>
             </br>
@@ -211,27 +210,32 @@ function onlyOne(checkbox) {
                {{ form.content.label(class="form-control-label") }}
                <!-- i think this tells jinja to put a form box in here -->
                {{ form.meet_location (class="gray-blue",id=id_loc)}}
-               <img id="location-image_{{ name }}" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+               <img id="location-image_{{ name }}" width="300px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
                   style="display:block;margin:20px;">
                {{ form.meet_time (class="gray-blue",id=id_time)}}
                {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
             </div>
             <div class="content-section" style="color: #0dcaf0;">
                <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
-               <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold; width:auto;">Encrypt or Sign Message:</p>
-               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: small; width:350px;">Cryptographic Operation Key Options</p>
-               <div class="row g-2 align-items-center">
+               <p style="font-size: 20px; font-weight: bold; font-size: 15px">Encrypt or Sign Message:  </p> <br>
+               <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
+
+               <div class="row g-2 align-items-center" style="display: flex;
+               justify-content: space-between;">
                   <div class="col">
-                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width:auto;">
+                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width:280px;">
                         <option value="-1" selected>No Encryption/Signature</option>
                         <option value="symmetric">Symmetrically Encrypt</option>
                         <option value="asymmetric">Asymmetrically Encrypt</option>
                         <option value="signed">Sign</option>
                      </select>
+                     <a style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large; margin-left: 300px">with</a>
+
                   </div>
-                  &emsp;with&emsp;
+
          <div class="col">
-            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:200px;">
+            <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
+            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:350px;">
                <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
                {% set current_user_name =  current_user.username  -%}
                {% for username,_ in usernames %}
@@ -250,6 +254,17 @@ function onlyOne(checkbox) {
       </div>
             </div>
          </div>   
+
+         <div style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); height: auto; overflow-y: auto; overflow-x: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px" >
+            {% set  id_content= "content_" + name %}
+            {{ form.content(class="form-control form-control-lg", placeholder="Enter your message here",id=id_content) }}
+            
+            <div class="form-group" id="{{name}}_form" style="margin-left: 980px">
+               {% set  id_button= "button_" + name %}
+               {% set  id_button_form= "Send Message to " + name %}
+               {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
+            </div>
+         </div>
    <!-- <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div> -->
    {% if form.content.errors %}
       <div class="invalid-feedback">
