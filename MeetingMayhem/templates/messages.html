@@ -105,23 +105,61 @@ function onlyOne(checkbox) {
                   {% else %}
                      {% set leftmargin = 400 %}
                   {%  endif %}
-                  <div class="chatbox" style="width: 325px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
+                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 70px;">
                      <p>{{ message[2]}}</p>
-                     <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
                      <div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
                      border-color:#0dcaf0;
                      border-radius: 10px;
                      padding: 0.5cm;
                      border-width: 2px; border: thick double #0dcaf0; width: 250px; height: auto;  word-wrap: break-word;">
-                     {% if message[0].is_edited and message[3]%}
-                        <p class="article-content"> {{ message[0].edited_content }}</p>
-                     {% else %}
-                        <p class="article-content">{{ message[0].initial_content }}</p>
-                     {% endif %}
                       <!-- can decrypt and is recieved -->
-                     {% if message[0].is_decrytable and message[3] %}
-                        <!-- TODO: Add decryption here -->
-                        <p> DECRYPT</p>
+                     {% if message[3] %}
+                        {% if message[0].edited_is_cyptographic != 0 %}
+                           {% if message[0].is_decryptable_user %}
+                              {% if message[0].has_been_decrypted_user %}
+                                 <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+                                 <p class="article-content">{{ message[0].edited_content }}</p>
+                              {% else %}
+                                 <div id="decryption-{{ message[0].id }}-{{ message[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
+                              <div class="col">
+                                 <select id="decryption_type_select-{{message[0].id}}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="decryption_type_select-{{message[0].id}}">
+                                    <option value= "-1" selected>No Decryption/Verification of Signature</option>
+                                    <option value="symmetric">Symmetrically Decrypt</option>
+                                    <option value="asymmetric">Asymmetrically Decrypt</option>
+                                    <option value="signed">Verify Signature</option>
+                                 </select>
+                              </div>
+                              with
+                              <div class="col">
+                                 <select id="decryption_key_select-{{ message[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                                    <option value= "-1" selected id="default_key_select-{{ message[0].id }}">No Key Selected</option>
+                                    {% set current_user_name = current_user.username -%}
+                                    {% for username,_ in usernames %}
+                                       {% if current_user_name != username %}
+                                       <option value="Shared_{{current_user_name}}_{{username}}">Shared Symmetric Key for {{current_user_name}} and {{username}} </option>
+                                       {% endif %}
+                                    {% endfor %}
+                                    {% for username,_ in usernames %}
+                                       <option value="public_{{username}}">{{username}}'s Public Key</option>
+                                       {% if current_user_name == username %}
+                                       <option value="private_{{username}}">{{username}}'s Private Key </option>
+                                       {% endif %}
+                                    {% endfor %}
+                                 </select>
+                              </div>
+                                 </div>
+                                 <button id="decrypt-{{message[0].id}}-{{message[0].edited_sender}}-{{message[0].edited_recipient}}-{{message[0].edited_encryption_type}}-{{message[0].edited_key}}" class="btn btn-secondary decrypt-button" onclick="decrypt(this.id)">Decrypt</button> 
+                              {% endif %}
+                           {% else %}
+                              <p class="article-content">--CANNOT DECRYPT--</p>
+                           {% endif %}
+                        {% else %}
+                           <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+                           <p class="article-content">{{ message[0].edited_content }}</p>
+                        {% endif %}
+                     {% else %}
+                        <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+                        <p class="article-content">{{ message[0].initial_content }}</p>
                      {% endif %}
                      </div>
                   {% if message[0].initial_is_cyptographic != 0 %}
@@ -133,10 +171,10 @@ function onlyOne(checkbox) {
                      <div class="m-1 row ">
                         {% if message[0].initial_encryption_type == 'symmetric' %}
                         <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
-                           Symmetrically encrypted with:</div>
+                           SE <span title="Symmetrically Encrypted with">&#9432;</span>:</div>
                         {% elif message[0].initial_encryption_type == 'asymmetric' %}
                            <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
-                              Asymmetrically encrypted with:</div>
+                           AE <span title="Asymmetrically Encrypted with">&#9432;</span>:</div>
                         {% elif message[0].initial_encryption_type == 'signed' %}
                            <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
                               Signed by:</div>
@@ -615,5 +653,27 @@ for (let name = 0; name < other_names.length; name++){
    });
 }
    
+</script>
+<script>
+	// TODO: https://stackoverflow.com/questions/51135498/flask-update-the-page-content-without-redirection-in-ajax-jquery
+	function decrypt(id_button){
+		const msg_id = id_button.split("-")[1];
+		console.log(msg_id);
+		const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
+		const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
+		var current_user_username = "{{ current_user.username }}";
+		var socket = io();
+		socket.emit('decrypted', {message: msg_id,decryption_key:decryption_key,decryption_type:decryption_type,curname:current_user_username});
+		socket.on('finish_decrypt_user',(arg1) => {
+			if (arg1 !== "Good Job!"){
+				alert(arg1); // 1
+			}	
+		});
+		socket.on('redirect', function (data) {
+			console.log(data.url)
+			window.location.reload(true);
+			window.location.href = data.url;
+		});
+	}
 </script>
    {% endblock content %}

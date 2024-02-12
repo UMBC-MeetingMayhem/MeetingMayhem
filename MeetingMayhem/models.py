@@ -125,8 +125,10 @@ class Message(db.Model):
     edited_key = db.Column(db.String, nullable=False,default="Null") # Key select
     
     # Decryption
-    is_decryptable = db.Column(db.Boolean, nullable=False) # can be decryptable: the decrypt button will show up
-    has_been_decrypted =  db.Column(db.Boolean, nullable=False) # Already been decrypted
+    is_decryptable_adv = db.Column(db.Boolean, nullable=False) # can be decryptable: the decrypt button will show up
+    has_been_decrypted_adv =  db.Column(db.Boolean, nullable=False) # Already been decrypted
+    is_decryptable_user = db.Column(db.Boolean, nullable=False) # can be decryptable: the decrypt button will show up
+    has_been_decrypted_user =  db.Column(db.Boolean, nullable=False) # Already been decrypted
 
     def __repr__(self): #this is what gets printed out for the message, just spits out everything
         return (
@@ -138,8 +140,9 @@ class Message(db.Model):
         f"Edited Content='{self.edited_content}', Edited Sender='{self.edited_sender}', Edited Recipient='{self.edited_recipient}',\n"
         f"Edited Is Cryptographic='{self.edited_is_cyptographic}', Edited Help Message='{self.edited_help_message}', Edited Encryption Type='{self.edited_encryption_type}', Edited Key='{self.edited_key}'\n"
         f"Edited='{self.is_edited}', Deleted='{self.is_deleted}',\n"
-        f"Is Decryptable='{self.is_decryptable}', Has Been Decrypted='{self.has_been_decrypted}')\n"
-        f"====================================================================================================================="
+        f"Is Decryptableadv='{self.is_decryptable_adv}', Has Been Decryptedadv='{self.has_been_decrypted_adv}')\n"
+         f"Is Decryptable='{self.is_decryptable_user}', Has Been Decrypted='{self.has_been_decrypted_user}')\n"
+        f"=====================================================================================================================\n"
     )
 
 #game table

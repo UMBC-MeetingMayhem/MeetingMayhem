@@ -151,7 +151,8 @@ def create_message(user, game, request, form, recipients, time_stamp):
                             edited_encryption_type=encryption_type, edited_key = encrypted_key, 
                             edited_help_message = initial_help_message,
                             # Decrypted
-                            is_decryptable=False,has_been_decrypted = False
+                            is_decryptable_user=False,has_been_decrypted_user = False,
+                            is_decryptable_adv=False,has_been_decrypted_adv = False
                             )
     db.session.add(new_message)
     db.session.commit()
@@ -170,43 +171,42 @@ def decrypt_button_show(message):
     Returns:
         bool: whether or not decrypt button will show
     """
-    if message.is_encrypted == False and message.is_signed == False:
-        return False
-    # Case 1: shared key
-    recipient = message.new_recipient if message.new_recipient else message.recipient
-    if message.encryption_type == "symmetric" and recipient in message.key: 
-        show_result = True
-    elif message.encryption_type == "asymmetric" and "private" in message.key:
-        show_result = True
-    elif message.encryption_type == "asymmetric" and recipient in message.key:
-        show_result = True
+    # Case 1: Use sender_adv_symmetric key
+    if message.edited_encryption_type == "symmetric" and message.edited_recipient in message.edited_key:
+        message.is_decryptable_user = True
+    # Case 2: Use adv_public key, asymmetric
+    elif message.edited_encryption_type == "asymmetric" and message.edited_recipient in message.edited_key and "public" in message.edited_key:
+        message.is_decryptable_user = True
+    # Case 3: Use sender private key, asymmetric
+    elif message.edited_encryption_type == "asymmetric" and "private" in message.edited_key:
+        message.is_decryptable_user = True
     # Case 3: Use sender private key, sign
-    elif  message.encryption_type == "signed" and "private" in message.key:
-        show_result = True
+    elif  message.edited_encryption_type == "signed" and "private" in message.edited_key:
+        message.is_decryptable_user = True
     # Case 4: Use adv_public key, sign
-    elif  message.encryption_type == "signed" and recipient in message.key:
-        show_result = True
+    elif  message.edited_encryption_type == "signed" and message.edited_recipient in message.edited_key and "public" in message.edited_key:
+        message.is_decryptable_user = True
     else:
-        show_result = False
+        message.is_decryptable_user = False
+    db.session.commit()
 
-    return show_result
 
 def decrypt_button_show_for_adv(message, adv_name):
     # Case 1: Use sender_adv_symmetric key
     if message.initial_encryption_type == "symmetric" and adv_name in message.initial_key:
-        message.is_decryptable = True
+        message.is_decryptable_adv = True
     # Case 2: Use adv_public key, asymmetric
     elif message.initial_encryption_type == "asymmetric" and adv_name in message.initial_key:
-        message.is_decryptable = True
+        message.is_decryptable_adv = True
     # Case 3: Use sender private key, asymmetric
     elif message.initial_encryption_type == "asymmetric" and "private" in message.initial_key:
-        message.is_decryptable = True
+        message.is_decryptable_adv = True
     # Case 3: Use sender private key, sign
     elif  message.initial_encryption_type == "signed" and "private" in message.initial_key:
-        message.is_decryptable = True
+        message.is_decryptable_adv = True
     # Case 4: Use adv_public key, sign
     elif  message.initial_encryption_type == "signed" and adv_name in message.initial_key:
-        message.is_decryptable = True
+        message.is_decryptable_adv = True
     else:
-        message.is_decryptable = False
+        message.is_decryptable_adv = False
     db.session.commit()
