@@ -370,6 +370,7 @@ def adv_messages_page():
         #setup the changes to be made to the current message
         encryption_type = request.form.get("encryption_type_select2")
         encrypted_key = request.form.get("encryption_key2")
+        display_message.edited_is_cyptographic = display_message.initial_is_cyptographic
         display_message.edited_encryption_type = encryption_type
         display_message.edited_key = encrypted_key
         display_message.edited_sender = new_senders
@@ -891,6 +892,7 @@ def adv_decrypted(json):
             # Success
             if decryption_key == "Shared_" + curname + "_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
+                display_message.initial_is_cyptographic = 0
                 db.session.commit()
                 update()
                 Help_msg = 'Good Job!'
@@ -901,8 +903,10 @@ def adv_decrypted(json):
         elif decryption_type == "asymmetric":
             if display_message.initial_key == "public_" + curname and decryption_key == "private_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
+                display_message.initial_is_cyptographic = 0
             elif display_message.initial_key == "pravite_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
+                display_message.initial_is_cyptographic = 0
             else:
                 flash("Please select correct Key for asymmetric encryption")
     
