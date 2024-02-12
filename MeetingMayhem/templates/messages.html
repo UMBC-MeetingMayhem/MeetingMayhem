@@ -215,7 +215,7 @@ function onlyOne(checkbox) {
                {{ form.meet_time (class="gray-blue",id=id_time)}}
                {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
             </div>
-            <div class="content-section" style="color: #0dcaf0;">
+            <div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0; width: auto; margin-top: 20px">
                <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
                <p style="font-size: 20px; font-weight: bold; font-size: 15px">Encrypt or Sign Message:  </p> <br>
                <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
@@ -235,7 +235,7 @@ function onlyOne(checkbox) {
 
          <div class="col">
             <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
-            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:350px;">
+            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:400px;">
                <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
                {% set current_user_name =  current_user.username  -%}
                {% for username,_ in usernames %}
