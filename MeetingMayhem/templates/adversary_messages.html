@@ -15,7 +15,7 @@
 <h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
     <!-- this part here is just copied from messages.html -->
 	<div class="tab">
-		<button class="tablinks" style="position:relative; left:-180px; top:22px;
+		<button class="tablinks" name="{{other_names[0]}}"style="position:relative; left:-180px; top:22px;
 		background-color: #333333;
 		color: #0dcaf0;
 		font-size: 20px;
@@ -24,7 +24,7 @@
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
 		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
-		<button class="tablinks" style="position:relative; left:-189px; top:22px; 
+		<button class="tablinks" name="{{other_names[1]}}" style="position:relative; left:-189px; top:22px; 
 		background-color: #333333;
 		color: #0dcaf0;
 		font-size: 20px;
@@ -33,7 +33,7 @@
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
 		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
-		<button class="tablinks" style="position:relative; left:-189px; top:22px; 
+		<button class="tablinks" name="editTab" style="position:relative; left:-189px; top:22px; 
 		background-color: #333333;
 		color: #0dcaf0;
 		font-size: 20px;
@@ -623,8 +623,18 @@
 <script>
 	// Add an event listener to simulate a click on "User 2" tab when the page loads
 	window.addEventListener('load', function () {
-	   document.querySelector(".tablinks:first-child").click(); // Click the first tab (User 2)
-	});
+		var activeTab = sessionStorage.getItem('activeTab');
+		console.log("Active Tab:", activeTab)
+		// If there is an active tab, simulate a click on it
+		if (activeTab) {
+			var selector = '[name="' + activeTab + '"]';
+			console.log(selector);
+			document.querySelector(selector).click();
+		} else {
+			// Otherwise, click the first tab by default
+			document.querySelector(".tablinks:first-child").click();
+		}
+	 });
  
 	function openUser(evt, user) {
 	   // Declare variables
@@ -645,6 +655,7 @@
 	   // Show the current tab and add an "active" class to the button that opened the tab
 	   document.getElementById(user).style.display = "block";
 	   evt.currentTarget.className += " active";
+	   sessionStorage.setItem('activeTab', user);
 	}
  </script>	
  <script>
