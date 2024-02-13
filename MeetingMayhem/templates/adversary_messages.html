@@ -490,7 +490,7 @@
 								{% if can_decrypt %}
 									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
 								{% else %}
-									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true)}}
+									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true, style="width:400px")}}
 								{% endif %}
 							{% endif %}
 						{% endif %}
