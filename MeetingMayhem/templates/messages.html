@@ -104,14 +104,14 @@ function onlyOne(checkbox) {
                      {% set leftmargin = 5 %}
                   <!-- right send-->
                   {% else %}
-                     {% set leftmargin = 400 %}
+                     {% set leftmargin = 480 %}
                   {%  endif %}
-                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 30px;">
+                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 5px; font-size: 12px">
                      <p>{{ message[2]}}</p>
                      <div class="content" style="background-color: #333333; color: white; font-size: 15px;
                      border-color:#0dcaf0;
                      border-radius: 10px;
-                     padding: 0.5cm;
+                     padding: 5px;
                      border-width: 2px; border: thick double #0dcaf0; width: 250px; height: auto;  word-wrap: break-word;">
                       <!-- can decrypt and is recieved -->
                      {% if message[3] %}
