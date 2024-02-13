@@ -220,18 +220,18 @@ function onlyOne(checkbox) {
                <p style="font-size: 20px; font-weight: bold; font-size: 15px">Encrypt or Sign Message:  </p> <br>
                <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
 
-               <div class="row g-2 align-items-center" style="display: flex;
-               justify-content: space-between;">
-                  <div class="col">
-                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width:280px;">
+               <div class="row g-2 align-items-center">
+                  <div class="col" style="width:230px; float:left">
+                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width: 230px"  >
                         <option value="-1" selected>No Encryption/Signature</option>
                         <option value="symmetric">Symmetrically Encrypt</option>
                         <option value="asymmetric">Asymmetrically Encrypt</option>
                         <option value="signed">Sign</option>
                      </select>
-                     <a style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large; margin-left: 300px">with</a>
 
                   </div>
+                  <div style="color: #0dcaf0; font-size: large; width: 100px; float: right; margin-right: 60px;">with</div> 
+
 
          <div class="col">
             <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
@@ -255,11 +255,12 @@ function onlyOne(checkbox) {
             </div>
          </div>   
 
-         <div style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); height: auto; overflow-y: auto; overflow-x: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px" >
+         <div style="background-color: #000000;  border: thick double rgb(201, 191, 12); height: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px; width: 1500px" >
+            <div style="width: 950px; float: left; color: #fff9f9;">
             {% set  id_content= "content_" + name %}
             {{ form.content(class="form-control form-control-lg", placeholder="Enter your message here",id=id_content) }}
-            
-            <div class="form-group" id="{{name}}_form" style="margin-left: 980px">
+            </div>
+            <div class="form-group" id="{{name}}_form" style="width: 200px; float: right; margin-right: 80px">
                {% set  id_button= "button_" + name %}
                {% set  id_button_form= "Send Message to " + name %}
                {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
