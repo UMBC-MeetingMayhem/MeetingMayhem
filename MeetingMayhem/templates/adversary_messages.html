@@ -217,14 +217,14 @@
 				 {{ form.meet_time (class="gray-blue",id=id_time)}}
 				 {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
 			  </div>
-			  <div class="content-section" style="color: #0dcaf0">
-				 <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
+			  <div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0; width: auto;margin-top: 20px">
+				<ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
 				 <p style="font-size: 20px; font-weight: bold; font-size: 15px;">Encrypt or Sign Message:</p><br>
 				 <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
 				 
 				 <div class="row g-2 align-items-center">
-					<div class="col" style="width:200px; float:left">
-					   <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width: 200px">
+					<div class="col" style="width:220px; float:left">
+					   <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width: 220px">
 						  <option value="-1" selected>No Encryption/Signature</option>
 						  <option value="symmetric">Symmetrically Encrypt</option>
 						  <option value="asymmetric">Asymmetrically Encrypt</option>
@@ -232,7 +232,7 @@
 					   </select>
 					</div>
 					
-					<div style="color: #0dcaf0; font-size: large; width: 100px; float: right;">with</div> 
+					<div style="color: #0dcaf0; font-size: large; width: 100px; float: right; margin-right: 60px">with</div> 
 
 		   <div class="col">
 			<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
