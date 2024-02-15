@@ -322,9 +322,9 @@ function onlyOne(checkbox) {
 </script>
       
 <script>
-    const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
-   const encryptionKeySelect = document.getElementById("key_select");
-   const defaultKeySelect = document.getElementById("default_key_select");
+   const encryptionTypeSelect = document.getElementById("encryption_sign_type_select_{{other_names[0]}}");
+   const encryptionKeySelect = document.getElementById("key_select_{{other_names[0]}}");
+   const defaultKeySelect = document.getElementById("default_key_select_{{other_names[0]}}");
 
    encryptionTypeSelect.addEventListener("change", () => {
       if (encryptionTypeSelect.value === "-1") {
@@ -332,10 +332,10 @@ function onlyOne(checkbox) {
       }
    });
 
-   var current_user_username = "{{ current_user.username }}";
-   var key_select = document.getElementById("key_select");
-   var encryption_type_select = document.getElementById("encryption_sign_type_select");
-   var default_key = document.getElementById("default_key_select");
+   var current_user_username = "{{ other_names[0] }}";
+   var key_select = document.getElementById("key_select_{{other_names[0]}}");
+   var encryption_type_select = document.getElementById("encryption_sign_type_select_{{other_names[0]}}");
+   var default_key = document.getElementById("default_key_select_{{other_names[0]}}");
 
    encryption_type_select.addEventListener("change", function () {
       let all_options = key_select.querySelectorAll('option');
@@ -365,8 +365,52 @@ function onlyOne(checkbox) {
       }
    });
 
-   </script>
+</script>
+<script>
+   const encryptionTypeSelect1 = document.getElementById("encryption_sign_type_select_{{other_names[1]}}");
+   const encryptionKeySelect1 = document.getElementById("key_select_{{other_names[1]}}");
+   const defaultKeySelect1 = document.getElementById("default_key_select_{{other_names[1]}}");
 
+   encryptionTypeSelect1.addEventListener("change", () => {
+      if (encryptionTypeSelect1.value === "-1") {
+         encryptionKeySelect1.value = "-1";
+      }
+   });
+
+   var current_user_username1 = "{{ other_names[1] }}";
+   var key_select1 = document.getElementById("key_select_{{other_names[1]}}");
+   var encryption_type_select1 = document.getElementById("encryption_sign_type_select_{{other_names[1]}}");
+   var default_key1 = document.getElementById("default_key_select_{{other_names[1]}}");
+
+   encryption_type_select1.addEventListener("change", function () {
+      let all_options1 = key_select1.querySelectorAll('option');
+      var encryption_type1 = encryption_type_select1.value;
+
+      if (encryption_type1 === 'symmetric') {
+         all_options1.forEach((single_option1) => {
+            single_option1.disabled = true;
+         });
+         let shared1 = key_select1.querySelectorAll('option[value^=Shared]');
+         shared1.forEach((userItem1) => {
+            userItem1.disabled = false;
+         });
+         default_key1.disabled = false;
+      } else if (encryption_type1 === 'asymmetric' || encryption_type1 === 'signed') {
+         all_options1.forEach((single_option1) => {
+            single_option1.disabled = false;
+         });
+         let shared1 = key_select1.querySelectorAll('option[value^=Shared]');
+         shared1.forEach((userItem1) => {
+            userItem1.disabled = true;
+         });
+      } else {
+         all_options1.forEach((single_option1) => {
+            single_option1.disabled = true;
+         });
+      }
+   });
+
+</script>
    <script>
       function special_chars(length) {
          var chars = "!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
