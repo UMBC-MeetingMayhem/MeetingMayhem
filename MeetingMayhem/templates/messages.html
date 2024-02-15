@@ -121,9 +121,9 @@ function onlyOne(checkbox) {
                                  <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
                                  <p class="article-content">{{ message[0].edited_content }}</p>
                               {% else %}
-                                 <div id="decryption-{{ message[0].id }}-{{ message[0].recipient }}" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
+                                 <div id="decryption-{{ message[0].id }}-{{ message[0].edited_recipient }}" class="row g-2 align-items-center" data-group="decrypt_options" >
                               <div class="col">
-                                 <select id="decryption_type_select-{{message[0].id}}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="decryption_type_select-{{message[0].id}}">
+                                 <select id="decryption_type_select-{{message[0].id}}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="decryption_type_select-{{message[0].id}}">
                                     <option value= "-1" selected>No Decryption/Verification of Signature</option>
                                     <option value="symmetric">Symmetrically Decrypt</option>
                                     <option value="asymmetric">Asymmetrically Decrypt</option>
@@ -132,7 +132,7 @@ function onlyOne(checkbox) {
                               </div>
                               <!-- <p style="color:white">with</p> -->
                               <div class="col">
-                                 <select id="decryption_key_select-{{ message[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
+                                 <select id="decryption_key_select-{{ message[0].id }}"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
                                     <option value= "-1" selected id="default_key_select-{{ message[0].id }}">No Key Selected</option>
                                     {% set current_user_name = current_user.username -%}
                                     {% for username,_ in usernames %}
@@ -706,8 +706,8 @@ for (let name = 0; name < other_names.length; name++){
 	function decrypt(id_button){
 		const msg_id = id_button.split("-")[1];
 		console.log(msg_id);
-		const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
-		const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
+		const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
+		const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
 		const current_user_username = id_button.split("-")[3];
 		var socket = io();
 		socket.emit('decrypted', {message: msg_id,decryption_key:decryption_key,decryption_type:decryption_type,curname:current_user_username});
@@ -723,4 +723,52 @@ for (let name = 0; name < other_names.length; name++){
 		});
 	}
 </script>
+<script>
+
+   // This script will limit the permission of certain key
+   var options_for_decrypt = document.querySelectorAll('[data-group="decrypt_options"]');
+   for (let i = 0; i < options_for_decrypt.length; i++) {
+       msg_id = options_for_decrypt[i].id.split("-")[1];
+       current_user_username = options_for_decrypt[i].id.split("-")[2].replace(',', '');
+       decryption_type_select = document.getElementById(`decryption_type_select-${msg_id}`);
+       de_key_select = document.getElementById(`decryption_key_select-${msg_id}`);
+      
+       //var decrytion_type = decryption_type_select.value;
+       decryption_type_select.addEventListener("change", function() {
+           msg_id = options_for_decrypt[i].id.split("-")[1];
+           new_decryption_type_select =  document.getElementById(`decryption_type_select-${msg_id}`);
+            de_default_key = document.getElementById(`default_key_select-${msg_id}`);
+            de_key_select = document.getElementById(`decryption_key_select-${msg_id}`);
+            all_options = de_key_select.querySelectorAll('option');
+            if (new_decryption_type_select.value === "symmetric") {
+                all_options.forEach((single_option) => {
+                    single_option.disabled = true;
+                });
+                let shared = de_key_select.querySelectorAll('option[value^=Shared]');
+                shared.forEach((userItem) => {
+                    userItem.disabled = false;
+                });
+                de_default_key.disabled = false
+            }
+            else if(new_decryption_type_select.value  === 'asymmetric' || new_decryption_type_select.value  === 'signed' ){
+                all_options.forEach((single_option) => {
+                    single_option.disabled = false;
+                });
+                let shared = de_key_select.querySelectorAll('option[value^=Shared]');
+                shared.forEach((userItem) => {
+                    userItem.disabled = true;
+                });
+            }
+            else{
+                all_options.forEach((single_option) => {
+                    single_option.disabled = false;
+                });
+            }  
+
+        });
+    }
+
+   </script>
+
+
    {% endblock content %}
