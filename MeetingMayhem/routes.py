@@ -895,21 +895,37 @@ def adv_decrypted(json):
                 display_message.initial_is_cyptographic = 0
                 db.session.commit()
                 update()
-                Help_msg = 'Good Job!'
-                print(url_for('messages')+"#disp-msg-"+ msg_id)
-                socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
             else:
                 flash(f"Please select correct Key for symmetric encryptio!","danger")
         elif decryption_type == "asymmetric":
-            if display_message.initial_key == "public_" + curname and decryption_key == "private_" + display_message.initial_sender:
+            if display_message.initial_key == "public_" + curname and decryption_key == "private_" + curname:
                 display_message.has_been_decrypted_adv = True
                 display_message.initial_is_cyptographic = 0
-            elif display_message.initial_key == "pravite_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
+                db.session.commit()
+                update()
+            elif display_message.initial_key == "private_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
                 display_message.initial_is_cyptographic = 0
             else:
                 flash("Please select correct Key for asymmetric encryption")
-    
+        elif decryption_type == "signed":
+            if display_message.initial_key == "public_" + curname and decryption_key == "private_" + curname:
+                display_message.has_been_decrypted_adv = True
+                display_message.initial_is_cyptographic = 0
+                db.session.commit()
+                update()
+            elif display_message.initial_key == "private_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
+                display_message.has_been_decrypted_adv = True
+                display_message.initial_is_cyptographic = 0
+                db.session.commit()
+                update()
+            else:
+                flash("Please select correct Key for signature")
+    if display_message.has_been_decrypted_adv:
+        Help_msg = 'Good Job!'
+        print(url_for('messages')+"#disp-msg-"+ msg_id)
+        socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
+
     socketio.emit('finish_decrypt',Help_msg)
     
 @socketio.on('decrypted')
@@ -920,28 +936,47 @@ def decrypted(json):
     decryption_key = json["decryption_key"]
     curname = json["curname"]
     Help_msg = ""
-    print(decryption_key,"Shared_" + curname + "_" + display_message.initial_sender)
-    if display_message.initial_encryption_type != decryption_type:
+    print(decryption_key,decryption_type,curname)
+    print(display_message)
+    if display_message.edited_encryption_type != decryption_type:
         Help_msg = 'Please select correct decryption type!'
     else:
         if decryption_type == "symmetric":
             # Success
-            if decryption_key == "Shared_" + curname + "_" + display_message.initial_sender:
+            if decryption_key == "Shared_" + curname + "_" + display_message.edited_sender:
                 display_message.has_been_decrypted_user = True
                 db.session.commit()
                 update()
-                Help_msg = 'Good Job!'
-                print(url_for('messages')+"#disp-msg-"+ msg_id)
-                socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
             else:
                 flash(f"Please select correct Key for symmetric encryptio!","danger")
         elif decryption_type == "asymmetric":
-            if display_message.initial_key == "public_" + curname and decryption_key == "private_" + display_message.initial_sender:
+            if display_message.edited_key == "public_" + curname and decryption_key == "private_" + curname:
                 display_message.has_been_decrypted_user = True
-            elif display_message.initial_key == "pravite_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
+                db.session.commit()
+                update()
+            elif display_message.edited_key == "private_" + display_message.edited_sender and decryption_key == "public_" + display_message.edited_sender:
                 display_message.has_been_decrypted_user = True
+                db.session.commit()
+                update()
             else:
                 flash("Please select correct Key for asymmetric encryption")
+        elif decryption_type == "signed":
+            if display_message.edited_key == "public_" + curname and decryption_key == "private_" + curname:
+                display_message.has_been_decrypted_user = True
+                db.session.commit()
+                update()
+            elif display_message.edited_key == "private_" + display_message.edited_sender and decryption_key == "public_" + display_message.edited_sender:
+                display_message.has_been_decrypted_user = True
+                db.session.commit()
+                update()
+            else:
+                flash("Please select correct Key for signature")
+
+    if display_message.has_been_decrypted_user:
+        Help_msg = 'Good Job!'
+        print(url_for('messages')+"#disp-msg-"+ msg_id)
+        socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
+
     socketio.emit('finish_decrypt_user',Help_msg)
     
 
