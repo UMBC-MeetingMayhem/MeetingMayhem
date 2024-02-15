@@ -104,14 +104,14 @@ function onlyOne(checkbox) {
                      {% set leftmargin = 5 %}
                   <!-- right send-->
                   {% else %}
-                     {% set leftmargin = 400 %}
+                     {% set leftmargin = 480 %}
                   {%  endif %}
-                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 30px;">
+                  <div class="chatbox" style="width: 400px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 5px; font-size: 12px">
                      <p>{{ message[2]}}</p>
                      <div class="content" style="background-color: #333333; color: white; font-size: 15px;
                      border-color:#0dcaf0;
                      border-radius: 10px;
-                     padding: 0.5cm;
+                     padding: 5px;
                      border-width: 2px; border: thick double #0dcaf0; width: 250px; height: auto;  word-wrap: break-word;">
                       <!-- can decrypt and is recieved -->
                      {% if message[3] %}
@@ -215,27 +215,27 @@ function onlyOne(checkbox) {
                {{ form.meet_time (class="gray-blue",id=id_time)}}
                {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
             </div>
-            <div class="content-section" style="color: #0dcaf0;">
+            <div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0; width: auto; margin-top: 20px">
                <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
                <p style="font-size: 20px; font-weight: bold; font-size: 15px">Encrypt or Sign Message:  </p> <br>
                <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
 
-               <div class="row g-2 align-items-center" style="display: flex;
-               justify-content: space-between;">
-                  <div class="col">
-                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width:280px;">
+               <div class="row g-2 align-items-center">
+                  <div class="col" style="width:230px; float:left">
+                     <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width: 230px"  >
                         <option value="-1" selected>No Encryption/Signature</option>
                         <option value="symmetric">Symmetrically Encrypt</option>
                         <option value="asymmetric">Asymmetrically Encrypt</option>
                         <option value="signed">Sign</option>
                      </select>
-                     <a style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large; margin-left: 300px">with</a>
 
                   </div>
+                  <div style="color: #0dcaf0; font-size: large; width: 100px; float: right; margin-right: 60px;">with</div> 
+
 
          <div class="col">
             <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
-            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:350px;">
+            <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:400px;">
                <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
                {% set current_user_name =  current_user.username  -%}
                {% for username,_ in usernames %}
@@ -255,11 +255,12 @@ function onlyOne(checkbox) {
             </div>
          </div>   
 
-         <div style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); height: auto; overflow-y: auto; overflow-x: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px" >
+         <div style="background-color: #000000;  border: thick double rgb(201, 191, 12); height: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px; width: 1500px" >
+            <div style="width: 950px; float: left; color: #fff9f9;">
             {% set  id_content= "content_" + name %}
             {{ form.content(class="form-control form-control-lg", placeholder="Enter your message here",id=id_content) }}
-            
-            <div class="form-group" id="{{name}}_form" style="margin-left: 980px">
+            </div>
+            <div class="form-group" id="{{name}}_form" style="width: 200px; float: right; margin-right: 80px">
                {% set  id_button= "button_" + name %}
                {% set  id_button_form= "Send Message to " + name %}
                {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
@@ -321,9 +322,9 @@ function onlyOne(checkbox) {
 </script>
       
 <script>
-    const encryptionTypeSelect = document.getElementById("encryption_sign_type_select");
-   const encryptionKeySelect = document.getElementById("key_select");
-   const defaultKeySelect = document.getElementById("default_key_select");
+   const encryptionTypeSelect = document.getElementById("encryption_sign_type_select_{{other_names[0]}}");
+   const encryptionKeySelect = document.getElementById("key_select_{{other_names[0]}}");
+   const defaultKeySelect = document.getElementById("default_key_select_{{other_names[0]}}");
 
    encryptionTypeSelect.addEventListener("change", () => {
       if (encryptionTypeSelect.value === "-1") {
@@ -331,10 +332,10 @@ function onlyOne(checkbox) {
       }
    });
 
-   var current_user_username = "{{ current_user.username }}";
-   var key_select = document.getElementById("key_select");
-   var encryption_type_select = document.getElementById("encryption_sign_type_select");
-   var default_key = document.getElementById("default_key_select");
+   var current_user_username = "{{ other_names[0] }}";
+   var key_select = document.getElementById("key_select_{{other_names[0]}}");
+   var encryption_type_select = document.getElementById("encryption_sign_type_select_{{other_names[0]}}");
+   var default_key = document.getElementById("default_key_select_{{other_names[0]}}");
 
    encryption_type_select.addEventListener("change", function () {
       let all_options = key_select.querySelectorAll('option');
@@ -364,8 +365,52 @@ function onlyOne(checkbox) {
       }
    });
 
-   </script>
+</script>
+<script>
+   const encryptionTypeSelect1 = document.getElementById("encryption_sign_type_select_{{other_names[1]}}");
+   const encryptionKeySelect1 = document.getElementById("key_select_{{other_names[1]}}");
+   const defaultKeySelect1 = document.getElementById("default_key_select_{{other_names[1]}}");
 
+   encryptionTypeSelect1.addEventListener("change", () => {
+      if (encryptionTypeSelect1.value === "-1") {
+         encryptionKeySelect1.value = "-1";
+      }
+   });
+
+   var current_user_username1 = "{{ other_names[1] }}";
+   var key_select1 = document.getElementById("key_select_{{other_names[1]}}");
+   var encryption_type_select1 = document.getElementById("encryption_sign_type_select_{{other_names[1]}}");
+   var default_key1 = document.getElementById("default_key_select_{{other_names[1]}}");
+
+   encryption_type_select1.addEventListener("change", function () {
+      let all_options1 = key_select1.querySelectorAll('option');
+      var encryption_type1 = encryption_type_select1.value;
+
+      if (encryption_type1 === 'symmetric') {
+         all_options1.forEach((single_option1) => {
+            single_option1.disabled = true;
+         });
+         let shared1 = key_select1.querySelectorAll('option[value^=Shared]');
+         shared1.forEach((userItem1) => {
+            userItem1.disabled = false;
+         });
+         default_key1.disabled = false;
+      } else if (encryption_type1 === 'asymmetric' || encryption_type1 === 'signed') {
+         all_options1.forEach((single_option1) => {
+            single_option1.disabled = false;
+         });
+         let shared1 = key_select1.querySelectorAll('option[value^=Shared]');
+         shared1.forEach((userItem1) => {
+            userItem1.disabled = true;
+         });
+      } else {
+         all_options1.forEach((single_option1) => {
+            single_option1.disabled = true;
+         });
+      }
+   });
+
+</script>
    <script>
       function special_chars(length) {
          var chars = "!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";

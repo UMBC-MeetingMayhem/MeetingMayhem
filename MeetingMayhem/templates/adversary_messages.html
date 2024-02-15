@@ -15,33 +15,30 @@
 <h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
     <!-- this part here is just copied from messages.html -->
 	<div class="tab">
-		<button class="tablinks" name="{{other_names[0]}}"style="position:relative; left:-180px; top:22px;
-		background-color: #333333;
-		color: #0dcaf0;
+		<button class="tablinks" name="{{other_names[0]}}"style="background-color: #000000;
+		color: rgb(255, 255, 255);
 		font-size: 20px;
-		border-color:#0dcaf0;
+		border-color:rgb(201, 191, 12);
 		border-radius: 5px;
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
-		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
-		<button class="tablinks" name="{{other_names[1]}}" style="position:relative; left:-189px; top:22px; 
-		background-color: #333333;
-		color: #0dcaf0;
+		border-style:solid; border-width: 2px; margin-left: 80px; " onclick="openUser(event, '{{other_names[0]}}')">{{other_names[0]}}</button>
+		<button class="tablinks" name="{{other_names[1]}}" style=" background-color: #000000;
+		color: rgb(255, 255, 255);
 		font-size: 20px;
-		border-color:#0dcaf0;
+		border-color:rgb(201, 191, 12);
 		border-radius: 5px;
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
-		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
-		<button class="tablinks" name="editTab" style="position:relative; left:-189px; top:22px; 
-		background-color: #333333;
-		color: #0dcaf0;
+		border-style:solid; border-width: 2px; margin-top: 30px;" onclick="openUser(event, '{{other_names[1]}}')">{{other_names[1]}}</button>
+		<button class="tablinks" name="editTab" style= "background-color: #000000;
+		color: rgb(255, 255, 255);
 		font-size: 20px;
-		border-color:#0dcaf0;
+		border-color:rgb(201, 191, 12);
 		border-radius: 5px;
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
-		text-align: center; border-style:solid; border-width: 2px; margin-top: 50px; margin-bottom: -100px;" onclick="openUser(event, 'editTab')">{{other_names[0]}}_{{other_names[1]}}</button>
+		border-style:solid; border-width: 2px; margin-top: 30px;" onclick="openUser(event, 'editTab')">{{other_names[0]}}_{{other_names[1]}}</button>
   </div>
   
 	 <!-- Tab content -->
@@ -54,7 +51,7 @@
 		   {{ form.hidden_tag() }}
 		<fieldset class="form-group">
 		   <div class="row">
-			  <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
+			  <div class="column" style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
 				 <style>
 				 /* width */
 				 ::-webkit-scrollbar {
@@ -93,20 +90,20 @@
                      	{% set leftmargin = 5 %}
                   	<!-- right send-->
                   	{% else %}
-                     	{% set leftmargin = 420 %}
+                     	{% set leftmargin = 480 %}
                   	{%  endif %}
 					{% if message[0].adv_processed and not message[0].adv_created %}
 					  {% set bordercolor = "#dad707" %}
 					{% else %}
 					  {% set bordercolor ="#0dcaf0" %}
 				   	{%  endif %}
-					<div class="chatbox" style="width: 300px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 20px;">
+					<div class="chatbox" style="width: 220px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 5px; font-size: 12px">
 						<p>{{ message[2]}}</p>
-						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
+						<div class="content" style="background-color: #333333; color: white; font-size: 15px;
 						border-color: #0dcaf0;
 						border-radius: 10px;
-						padding: 0.5cm;
-						border-width: 2px; border: thick double {{ bordercolor }}; width: 100%; height: auto;  word-wrap: break-word;">
+						padding: 5px;
+						border-width: 2px; border: thick double {{ bordercolor }}; width: 250px; height: auto;  word-wrap: break-word;">
 						<!-- adv fake as message sent to others-->
 						<!-- can decrypt and is recieved -->
 						{% if message[3] %}
@@ -188,7 +185,7 @@
 				 {% endfor %}
 			  {% endif %}
   
-			  <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
+			  <!-- <hr class="rounded" style="border: thick double ; background-color: rgb(201, 191, 12); margin-top: 500px;">
 			  {% set  id_content= "content_" + name %}
 			  {{ form.content(class="form-control form-control-lg", style="margin:10px;", placeholder="Enter your message here",id=id_content) }}
 			  
@@ -196,13 +193,13 @@
 				 {% set  id_button= "button_" + name %}
 				 {% set  id_button_form= "Send Message to " + name %}
 				 {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
-			  </div>
+			  </div> -->
 			  
 		   </div>
 		
-		   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 750px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
+		   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
 			  <h2>{{name}}</h2>
-			  <p>Message Information</p>
+			  <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large;">Message Information</p>
 			  <input class="form-check-input" type="checkbox" id="{{name}}_pretend" name="Pretend"
 			  value="{{ pname }}" >
 			  <label class="form-check-label" for="inlineCheckbox1-{{name}}"> Pretend as {{ pname }}</label>
@@ -215,27 +212,32 @@
 				 {{ form.content.label(class="form-control-label") }}
 				 <!-- i think this tells jinja to put a form box in here -->
 				 {{ form.meet_location (class="gray-blue",id=id_loc)}}
-				 <img id="location-image_{{ name }}" width="250px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
+				 <img id="location-image_{{ name }}" width="300px" height="180px" src="/images/Arts/Locations/Cafe_new.png"
 					style="display:block;margin:20px;">
 				 {{ form.meet_time (class="gray-blue",id=id_time)}}
 				 {{ form.meet_am_pm (class="gray-blue",id=id_am) }}
 			  </div>
-			  <div class="content-section" style="color: #0dcaf0">
-				 <ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
-				 <p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
-				 <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+			  <div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0; width: auto;margin-top: 20px">
+				<ul class="select2-selection__rendered" id="cryptography_tags_list_{{ name }}"></ul>
+				 <p style="font-size: 20px; font-weight: bold; font-size: 15px;">Encrypt or Sign Message:</p><br>
+				 <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
+				 
 				 <div class="row g-2 align-items-center">
-					<div class="col">
-					   <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select">
+					<div class="col" style="width:220px; float:left">
+					   <select id="encryption_sign_type_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select" style="width: 220px">
 						  <option value="-1" selected>No Encryption/Signature</option>
 						  <option value="symmetric">Symmetrically Encrypt</option>
 						  <option value="asymmetric">Asymmetrically Encrypt</option>
 						  <option value="signed">Sign</option>
 					   </select>
 					</div>
-					with
+					
+					<div style="color: #0dcaf0; font-size: large; width: 100px; float: right; margin-right: 60px">with</div> 
+
 		   <div class="col">
-			  <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key">
+			<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
+
+			  <select id="key_select_{{ name }}" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_key" style="width:400px;">
 				 <option id='default_key_select_{{ name }}' value="-1" selected>No Key Selected</option>
 				 {% set current_user_name =  current_user.username  -%}
 				 {% for username,_ in usernames %}
@@ -254,6 +256,19 @@
 		</div>
 			  </div>
 		   </div>   
+
+		   <div style="background-color: #000000;  border: thick double rgb(201, 191, 12); height: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px; width: 1500px" >
+			<div style="width: 950px; float: left; color: #fff9f9;">
+
+			{% set  id_content= "content_" + name %}
+            {{ form.content(class="form-control form-control-lg", placeholder="Enter your message here",id=id_content) }}
+            </div>
+            <div class="form-group" id="{{name}}_form" style="width: 200px; float: right; margin-right: 80px">
+				{% set  id_button= "button_" + name %}
+               {% set  id_button_form= "Send Message to " + name %}
+               {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
+            </div>
+         </div>
 	 <!-- <div id="error-message_{{ name }}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div> -->
 	 {% if form.content.errors %}
 		<div class="invalid-feedback">
@@ -313,7 +328,7 @@
 				{% if message[2] %} 
 					{% set leftmargin = -10 %}
 				{% else %}
-					{% set leftmargin = 400 %}
+					{% set leftmargin = 460 %}
 				{%  endif %}
 				{% if message[0].adv_processed %}
 					{% if message[0].is_deleted %}
@@ -329,7 +344,7 @@
 				{% else %}
 					{% set bordercolor = "#0dcaf0" %}
 				{% endif %}
-				<div  class="chatbox" style="width: 300px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 0px;">
+				<div  class="chatbox" style="width: 130px; height: auto; margin-left:{{ leftmargin }}px; margin-top: 5px; font-size: 12px">
 					{% if not message[0].adv_processed %}
 						<article id="disp-msg-{{(message[0]).id}}" class="option media content-section" onclick="select_msg(this, '{{(message[0]).id}}','{{(message[0]).initial_sender}}','{{(message[0]).initial_recipient}}')">
 					{% else %}
@@ -344,8 +359,8 @@
 						<div class="content" style="background-color: #333333; color: #0dcaf0; font-size: 15px;
 						border-color: #0dcaf0;
 						border-radius: 10px;
-						padding: 0.5cm;
-						border-width: 2px; border: thick double {{ bordercolor }}; width: 120%; height: auto;  word-wrap: break-word;">
+						padding: 5px;
+						border-width: 2px; border: thick double {{ bordercolor }}; width: 250px; height: auto;  word-wrap: break-word;">
 						<!-- message is decrytable but not done yet -->
 						{% if message[0].initial_is_cyptographic!=0 and not message[0].adv_processed %}
 							{% if message[0].has_been_decrypted_adv %}
@@ -366,7 +381,6 @@
 											<option value="signed">Verify Signature</option>
 										</select>
 									</div>
-									with
 									<div class="col">
 										<select id="decryption_key_select-{{ message[0].id }}-adv"  class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example">
 											<option value= "-1" selected id="default_key_select-{{ message[0].id }}">No Key Selected</option>
@@ -460,7 +474,7 @@
 							{% set current_user_name =  current_user.username  -%}
 							{{messages.user_interface(usernames,"newrecipients",true,current_user_name)}}
 					</div> <br/>
-					<div class="form-group">
+					<div class="form-group" style="margin-bottom: -50px">
 						{{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
 						{% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
 							{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
@@ -476,7 +490,7 @@
 								{% if can_decrypt %}
 									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.content) }}
 								{% else %}
-									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true)}}
+									{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true, style="width:400px")}}
 								{% endif %}
 							{% endif %}
 						{% endif %}
@@ -490,20 +504,24 @@
 			<div id="encryption-panel" class="content-section bg-dark" style="color: #0dcaf0; width: auto;">
 				<ul class="select2-selection__rendered" id="adv_cryptography_tags_list"></ul>
 				<ul class="select2-selection__rendered" id="cryptography_tags_list"></ul>
-				<p style="color: #0dcaf0;; font-size: 20px; font-weight: bold;">Encrypt or Sign Message:</p>
-				<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0">Cryptographic Operation:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Key Options for Selected Cryptographic Operation:</p>
+				<p style="font-size: 20px; font-weight: bold; font-size: 15px">Encrypt or Sign Message:</p> <br>
+				<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Cryptographic Operation</p>
 				<div class="row g-2 align-items-center">
-					<div class="col">
-						<select id="encryption_sign_type_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select2">
+					<div class="col" style="width:230px; float:left">
+						<select id="encryption_sign_type_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example" name="encryption_type_select2" style="width: 230px">
 							<option  value= "-1" selected>No Encryption/Signature</option>
 							<option value="symmetric">Symmetrically Encrypt</option>
 							<option value="asymmetric">Asymmetrically Encrypt</option>
 							<option value="signed">Sign</option>
 						</select>
+
 					</div>
-					with
+					<div style="color: #0dcaf0; font-size: large; width: 100px; float: right; margin-right: 60px;">with</div> 
+
 					<div class="col">
-						<select id="key_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key2">
+						<p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: medium;">Key Options</p>
+
+						<select id="key_select2" class="form-select form-select-sm mb-3 gray-blue" aria-label=".form-select-lg example"  name="encryption_key2" style="width:400px">
 							<option id='default_key_select2' value= "-1" selected>No Key Selected</option>
 							{% set current_user_name =  current_user.username  -%}
 							{% for username,_ in usernames %}
@@ -680,4 +698,138 @@
 		});
 	}
 </script>
+<script>
+	const encryptionTypeSelect = document.getElementById("encryption_sign_type_select_{{other_names[0]}}");
+	const encryptionKeySelect = document.getElementById("key_select_{{other_names[0]}}");
+	const defaultKeySelect = document.getElementById("default_key_select_{{other_names[0]}}");
+ 
+	encryptionTypeSelect.addEventListener("change", () => {
+	   if (encryptionTypeSelect.value === "-1") {
+		  encryptionKeySelect.value = "-1";
+	   }
+	});
+ 
+	var current_user_username = "{{ other_names[0] }}";
+	var key_select = document.getElementById("key_select_{{other_names[0]}}");
+	var encryption_type_select = document.getElementById("encryption_sign_type_select_{{other_names[0]}}");
+	var default_key = document.getElementById("default_key_select_{{other_names[0]}}");
+ 
+	encryption_type_select.addEventListener("change", function () {
+	   let all_options = key_select.querySelectorAll('option');
+	   var encryption_type = encryption_type_select.value;
+ 
+	   if (encryption_type === 'symmetric') {
+		  all_options.forEach((single_option) => {
+			 single_option.disabled = true;
+		  });
+		  let shared = key_select.querySelectorAll('option[value^=Shared]');
+		  shared.forEach((userItem) => {
+			 userItem.disabled = false;
+		  });
+		  default_key.disabled = false;
+	   } else if (encryption_type === 'asymmetric' || encryption_type === 'signed') {
+		  all_options.forEach((single_option) => {
+			 single_option.disabled = false;
+		  });
+		  let shared = key_select.querySelectorAll('option[value^=Shared]');
+		  shared.forEach((userItem) => {
+			 userItem.disabled = true;
+		  });
+	   } else {
+		  all_options.forEach((single_option) => {
+			 single_option.disabled = true;
+		  });
+	   }
+	});
+ 
+ </script>
+ <script>
+	const encryptionTypeSelect1 = document.getElementById("encryption_sign_type_select_{{other_names[1]}}");
+	const encryptionKeySelect1 = document.getElementById("key_select_{{other_names[1]}}");
+	const defaultKeySelect1 = document.getElementById("default_key_select_{{other_names[1]}}");
+ 
+	encryptionTypeSelect1.addEventListener("change", () => {
+	   if (encryptionTypeSelect1.value === "-1") {
+		  encryptionKeySelect1.value = "-1";
+	   }
+	});
+ 
+	var current_user_username1 = "{{ other_names[1] }}";
+	var key_select1 = document.getElementById("key_select_{{other_names[1]}}");
+	var encryption_type_select1 = document.getElementById("encryption_sign_type_select_{{other_names[1]}}");
+	var default_key1 = document.getElementById("default_key_select_{{other_names[1]}}");
+ 
+	encryption_type_select1.addEventListener("change", function () {
+	   let all_options1 = key_select1.querySelectorAll('option');
+	   var encryption_type1 = encryption_type_select1.value;
+ 
+	   if (encryption_type1 === 'symmetric') {
+		  all_options1.forEach((single_option1) => {
+			 single_option1.disabled = true;
+		  });
+		  let shared1 = key_select1.querySelectorAll('option[value^=Shared]');
+		  shared1.forEach((userItem1) => {
+			 userItem1.disabled = false;
+		  });
+		  default_key1.disabled = false;
+	   } else if (encryption_type1 === 'asymmetric' || encryption_type1 === 'signed') {
+		  all_options1.forEach((single_option1) => {
+			 single_option1.disabled = false;
+		  });
+		  let shared1 = key_select1.querySelectorAll('option[value^=Shared]');
+		  shared1.forEach((userItem1) => {
+			 userItem1.disabled = true;
+		  });
+	   } else {
+		  all_options1.forEach((single_option1) => {
+			 single_option1.disabled = true;
+		  });
+	   }
+	});
+ 
+ </script>
+ <script>
+	const encryptionTypeSelect2 = document.getElementById("encryption_sign_type_select2");
+	const encryptionKeySelect2 = document.getElementById("key_select2");
+	const defaultKeySelect2 = document.getElementById("default_key_select2");
+ 
+	encryptionTypeSelect2.addEventListener("change", () => {
+	   if (encryptionTypeSelect2.value === "-1") {
+		  encryptionKeySelect2.value = "-1";
+	   }
+	});
+ 
+	var key_select2 = document.getElementById("key_select2");
+	var encryption_type_select2 = document.getElementById("encryption_sign_type_select2");
+	var default_key2 = document.getElementById("default_key_select2");
+ 
+	encryption_type_select2.addEventListener("change", function () {
+	   let all_options2 = key_select2.querySelectorAll('option');
+	   var encryption_type2 = encryption_type_select2.value;
+ 
+	   if (encryption_type2 === 'symmetric') {
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = true;
+		  });
+		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
+		  shared2.forEach((userItem2) => {
+			 userItem2.disabled = false;
+		  });
+		  default_key2.disabled = false;
+	   } else if (encryption_type2 === 'asymmetric' || encryption_type2 === 'signed') {
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = false;
+		  });
+		  let shared2 = key_select2.querySelectorAll('option[value^=Shared]');
+		  shared2.forEach((userItem2) => {
+			 userItem2.disabled = true;
+		  });
+	   } else {
+		  all_options2.forEach((single_option2) => {
+			 single_option2.disabled = true;
+		  });
+	   }
+	});
+ 
+ </script>
 {% endblock content %}
