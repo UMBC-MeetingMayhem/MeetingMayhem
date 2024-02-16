@@ -163,23 +163,23 @@ function onlyOne(checkbox) {
                         <p class="article-content">{{ message[0].initial_content }}</p>
                      {% endif %}
                      </div>
-                  {% if message[0].initial_is_cyptographic != 0 %}
-                     {% if 'Warning' not in message[0].initial_help_message %} 
+                  {% if not message[3] %}
+                     {% set is_cyptographic = message[0].initial_is_cyptographic %}
+                     {% set encryption_type = message[0].initial_encryption_type %}
+                     {% set encryption_key = message[0].initial_key %}
+                     {% set help_message = message[0].initial_help_message %}
+                  {% else %} 
+                     {% set is_cyptographic = message[0].edited_is_cyptographic %}
+                     {% set encryption_type = message[0].edited_encryption_type %}
+                     {% set encryption_key = message[0].edited_key %}
+                     {% set help_message = message[0].edited_help_message %}
+                  {% endif %}
+                  {% if is_cyptographic != 0 %}
+                     {% if 'Warning' not in help_message %} 
                         {% set isBorderSucess = "success" %}
                      {% else %}
                         {% set isBorderSucess = "warning" %}
                      {%  endif %}
-                     {% if not message[3] %}
-                        {% set is_cyptographic = message[0].initial_is_cyptographic %}
-                        {% set encryption_type = message[0].initial_encryption_type %}
-                        {% set encryption_key = message[0].initial_key %}
-                        {% set help_message = message[0].initial_help_message %}
-                     {% else %} 
-                        {% set is_cyptographic = message[0].edited_is_cyptographic %}
-                        {% set encryption_type = message[0].edited_encryption_type %}
-                        {% set encryption_key = message[0].edited_key %}
-                        {% set help_message = message[0].edited_help_message %}
-                     {% endif %}
                      <div class="m-1 row ">
                         {% if encryption_type == 'symmetric' %}
                         <div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
@@ -193,7 +193,6 @@ function onlyOne(checkbox) {
                         {% endif %}
                         <div class="rounded-end d-inline col-md-auto border border-3 border-{{ isBorderSucess }}">{{
                            encryption_key }} <span title="{{ help_message}}">&#9432;</span></div>
-                        
                      </div>
                   {% endif %}
             </div>

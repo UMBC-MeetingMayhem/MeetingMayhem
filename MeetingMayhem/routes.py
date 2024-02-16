@@ -384,6 +384,7 @@ def adv_messages_page():
         display_message.edited_recipient = new_recipients
         display_message.edited_content = adv_msg_edit_form.edited_content.data if not adv_msg_edit_form.not_editable.data else display_message.initial_content
         db.session.commit()
+        display_message.edited_help_message = ""
         if  encryption_type == 'symmetric':
             display_message.is_edited = True
             if (new_senders in encrypted_key) and (new_recipients in encrypted_key):
@@ -413,10 +414,7 @@ def adv_messages_page():
                 display_message.is_edited         == False):
                 display_message.is_edited = False
             else:
-                display_message.is_edited = True
-        
-        display_message.edited_help_message = ""
-
+                display_message.is_edited = True        
         
         display_message.adv_processed = True
         display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
