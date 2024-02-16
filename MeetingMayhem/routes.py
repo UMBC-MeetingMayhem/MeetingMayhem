@@ -900,29 +900,29 @@ def adv_decrypted(json):
             if decryption_key == "Shared_" + curname + "_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
             else:
-                flash(f"Please select correct Key for symmetric encryptio!","danger")
+                Help_msg = "Please select correct Key for symmetric encryptio!"
         elif decryption_type == "asymmetric":
             if display_message.initial_key == "public_" + curname and decryption_key == "private_" + curname:
                 display_message.has_been_decrypted_adv = True
             elif display_message.initial_key == "private_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
             else:
-                flash("Please select correct Key for asymmetric encryption")
+                Help_msg = "Please select correct Key for asymmetric encryption"
         elif decryption_type == "signed":
             if display_message.initial_key == "public_" + curname and decryption_key == "private_" + curname:
                 display_message.has_been_decrypted_adv = True
             elif display_message.initial_key == "private_" + display_message.initial_sender and decryption_key == "public_" + display_message.initial_sender:
                 display_message.has_been_decrypted_adv = True
             else:
-                flash("Please select correct Key for signature")
+                Help_msg = "Please select correct Key for signature"
     if display_message.has_been_decrypted_adv:
         Help_msg = 'Good Job!'
         print(url_for('messages')+"#disp-msg-"+ msg_id)
         db.session.commit()
         update()
-        socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
+        emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
 
-    socketio.emit('finish_decrypt',Help_msg)
+    emit('finish_decrypt',Help_msg)
     
 @socketio.on('decrypted')
 def decrypted(json):
@@ -941,30 +941,29 @@ def decrypted(json):
             if decryption_key == "Shared_" + curname + "_" + display_message.edited_sender:
                 display_message.has_been_decrypted_user = True
             else:
-                flash(f"Please select correct Key for symmetric encryptio!","danger")
+                Help_msg = "Please select correct Key for symmetric encryption!"
         elif decryption_type == "asymmetric":
             if display_message.edited_key == "public_" + curname and decryption_key == "private_" + curname:
                 display_message.has_been_decrypted_user = True
             elif display_message.edited_key == "private_" + display_message.edited_sender and decryption_key == "public_" + display_message.edited_sender:
                 display_message.has_been_decrypted_user = True
             else:
-                flash("Please select correct Key for asymmetric encryption")
+                Help_msg = "Please select correct Key for asymmetric encryption"
         elif decryption_type == "signed":
             if display_message.edited_key == "public_" + curname and decryption_key == "private_" + curname:
                 display_message.has_been_decrypted_user = True
             elif display_message.edited_key == "private_" + display_message.edited_sender and decryption_key == "public_" + display_message.edited_sender:
                 display_message.has_been_decrypted_user = True
             else:
-                flash("Please select correct Key for signature")
+                Help_msg =  "Please select correct Key for signature"
 
     if display_message.has_been_decrypted_user:
         Help_msg = 'Good Job!'
         print(url_for('messages')+"#disp-msg-"+ msg_id)
         db.session.commit()
         update()
-        socketio.emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
-
-    socketio.emit('finish_decrypt_user',Help_msg)
+        emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
+    emit('finish_decrypt_user',Help_msg)
     
 
 @socketio.on('Generate_Log')
