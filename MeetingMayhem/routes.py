@@ -293,7 +293,7 @@ def adv_messages_page():
                 msg_tuple_list.append((message, None,message.time_sent,False))
         msgs_tuple.append(msg_tuple_list)
 
-    print(msg_tuple_list)
+    #print(msg_tuple_list)
     #setup message flag to tell template if it should display messages or not
     msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
     msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
@@ -370,9 +370,16 @@ def adv_messages_page():
         #setup the changes to be made to the current message
         encryption_type = request.form.get("encryption_type_select2")
         encrypted_key = request.form.get("encryption_key2")
-        display_message.edited_is_cyptographic = display_message.initial_is_cyptographic
-        display_message.edited_encryption_type = encryption_type if encrypted_key != "-1" and encryption_type != "-1" else  display_message.initial_encryption_type
-        display_message.edited_key = encrypted_key if encrypted_key != "-1" and encryption_type != "-1"  else  display_message.initial_key
+        
+        display_message.edited_encryption_type = encryption_type if encrypted_key != "-1" and encryption_type != "-1" else ("-1"
+                                                                 if display_message.has_been_decrypted_adv else display_message.initial_encryption_type)
+        display_message.edited_key = encrypted_key if encrypted_key != "-1" and encryption_type != "-1"  else ("-1"
+                                                                 if display_message.has_been_decrypted_adv else  display_message.initial_key)
+        display_message.edited_is_cyptographic = 0 if display_message.edited_encryption_type == "-1" else (
+                                                 1 if display_message.edited_encryption_type == "symmetric" else (
+                                                 2 if display_message.edited_encryption_type == "asymmetric" else 3
+                                                 )
+                                                )
         display_message.edited_sender = new_senders
         display_message.edited_recipient = new_recipients
         display_message.edited_content = adv_msg_edit_form.edited_content.data if not adv_msg_edit_form.not_editable.data else display_message.initial_content
