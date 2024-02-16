@@ -307,7 +307,12 @@ function onlyOne(checkbox) {
             if (activeTab) {
                var selector = '[name="' + activeTab + '"]';
                console.log(selector);
-               document.querySelector(selector).click();
+               var selection = document.querySelector(selector);
+               if (selection){
+                  selection.click();
+               }else{
+                  document.querySelector(".tablinks:first-child").click();
+               }   
             } else {
                 // Otherwise, click the first tab by default
                document.querySelector(".tablinks:first-child").click();
