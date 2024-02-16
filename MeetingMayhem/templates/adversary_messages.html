@@ -739,8 +739,8 @@
 	function decrypt(id_button){
 		const msg_id = id_button.split("-")[1];
 		console.log(msg_id);
-		const decryption_type = document.getElementById(`decryption_type_select-${msg_id}-adv`).value;
-		const decryption_key = document.getElementById(`decryption_key_select-${msg_id}-adv`).value;
+		const decryption_type = document.getElementById(`decryption_type_select-${msg_id}`).value;
+		const decryption_key = document.getElementById(`decryption_key_select-${msg_id}`).value;
 		const current_user_username = id_button.split("-")[3];;
 		var socket = io();
 		socket.emit('decrypted', {message: msg_id,decryption_key:decryption_key,decryption_type:decryption_type,curname:current_user_username});
