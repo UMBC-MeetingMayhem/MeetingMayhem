@@ -968,35 +968,43 @@ def Generate_Log():
     time_generated= datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
     workbook = xlsxwriter.Workbook('./Data/'+time_generated+".xlsx")
     worksheet = workbook.add_worksheet()
+    header = ["Meet Time and Location", "time_sent", "time_received", "initial_content", "initial_sender", "initial_recipient", "adv_created", "initial_is_cryptographic", "initial_help_message", "initial_encryption_type", "initial_key", "adv_processed", "is_edited", "is_deleted", "edited_sender", "edited_recipient", "edited_content", "edited_is_cryptographic", "edited_help_message", "edited_encryption_type", "edited_key", "is_decryptable_adv", "has_been_decrypted_adv", "is_decryptable_user", "has_been_decrypted_user"]
 
-    header = ["Sender","Recipient","Content","Meet Time and Location","Time Sent","Time Recieved","Initial_is_encrypted","Initial_encryption_details","Initial_is_signed","Initial_signed_details","Adv_Created","Is Edited","Is Decrypted","New Sender","New Recipient","Edited Content","Is_encrypted","Encryption_details","Is_signed","Signed_details"]
     col = 0
     for item in header:
         worksheet.write(0, col, item)
         col += 1
+
     row = 1
     for msg in messages:
-        worksheet.write(row, 0, msg.sender)
-        worksheet.write(row, 1, msg.recipient)
-        worksheet.write(row, 2, msg.content)
-        worksheet.write(row, 3, msg.location_meet + " " + msg.time_meet + msg.time_am_pm)
-        worksheet.write(row, 4, msg.time_sent)
-        worksheet.write(row, 5, msg.time_recieved )
-        worksheet.write(row, 6, str(msg.initial_is_encrypted))
-        worksheet.write(row, 7, str(msg.initial_encryption_details))
-        worksheet.write(row, 8, str(msg.initial_is_signed))
-        worksheet.write(row, 9, str(msg.initial_signed_details))
-        worksheet.write(row, 10, str(msg.adv_created))
-        worksheet.write(row, 11, str(msg.is_edited))
-        worksheet.write(row, 12, str(msg.is_decrypted))
-        worksheet.write(row, 13, msg.new_sender)
-        worksheet.write(row, 14, msg.new_recipient)
-        worksheet.write(row, 15, msg.edited_content)
-        worksheet.write(row, 16, str(msg.is_encrypted))
-        worksheet.write(row, 17, str(msg.encryption_details))
-        worksheet.write(row, 18, str(msg.is_signed))
-        worksheet.write(row, 19, str(msg.signed_details))
-        row +=1
+        meet_time_location = msg.location_meet + " " + msg.time_meet + msg.time_am_pm
+        worksheet.write(row, 0, meet_time_location)
+        worksheet.write(row, 1, msg.time_sent)
+        worksheet.write(row, 2, msg.time_recieved)
+        worksheet.write(row, 3, msg.initial_content)
+        worksheet.write(row, 4, msg.initial_sender)
+        worksheet.write(row, 5, msg.initial_recipient)
+        worksheet.write(row, 6, msg.adv_created)
+        worksheet.write(row, 7, msg.initial_is_cyptographic)
+        worksheet.write(row, 8, msg.initial_help_message)
+        worksheet.write(row, 9, msg.initial_encryption_type)
+        worksheet.write(row, 10, msg.initial_key)
+        worksheet.write(row, 11, msg.adv_processed)
+        worksheet.write(row, 12, msg.is_edited)
+        worksheet.write(row, 13, msg.is_deleted)
+        worksheet.write(row, 14, msg.edited_sender)
+        worksheet.write(row, 15, msg.edited_recipient)
+        worksheet.write(row, 16, msg.edited_content)
+        worksheet.write(row, 17, msg.edited_is_cyptographic)
+        worksheet.write(row, 18, msg.edited_help_message)
+        worksheet.write(row, 19, msg.edited_encryption_type)
+        worksheet.write(row, 20, msg.edited_key)
+        worksheet.write(row, 21, msg.is_decryptable_adv)
+        worksheet.write(row, 22, msg.has_been_decrypted_adv)
+        worksheet.write(row, 23, msg.is_decryptable_user)
+        worksheet.write(row, 24, msg.has_been_decrypted_user)
+        row += 1
+
     worksheet.write(row,0, "GAME INFO")
     row += 1
     worksheet.write(row, 0, str(current_game.id))
