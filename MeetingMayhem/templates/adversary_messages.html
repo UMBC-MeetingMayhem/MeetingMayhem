@@ -428,25 +428,36 @@
 							{% endif %}
 						{% endif %}
 					    </div>
-					{% if message[0].initial_is_cyptographic != 0 and not message[0].has_been_decrypted_adv  %}
-						{% if 'Warning' not in message[0].initial_help_message %} 
+					{% if not message[0].adv_processed %}
+						{% set is_cyptographic = message[0].initial_is_cyptographic %}
+						{% set encryption_type = message[0].initial_encryption_type %}
+						{% set encryption_key = message[0].initial_key %}
+						{% set help_message = message[0].initial_help_message %}
+					{% else %} 
+						{% set is_cyptographic = message[0].edited_is_cyptographic %}
+						{% set encryption_type = message[0].edited_encryption_type %}
+						{% set encryption_key = message[0].edited_key %}
+						{% set help_message = message[0].edited_help_message %}
+					{% endif %}
+					{% if is_cyptographic != 0 and (not message[0].has_been_decrypted_adv or  message[0].adv_processed)  %}
+						{% if 'Warning' not in help_message %} 
 							{% set isBorderSucess = "success" %}
 						{% else %}
 							{% set isBorderSucess = "warning" %}
 						{% endif %}
 						<div class="m-1 row " style="width: 120%;">
-						{% if message[0].initial_encryption_type == 'symmetric' %}
+						{% if encryption_type == 'symmetric' %}
 						<div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
 							SE <span title="Symmetrically Encrypted with">&#9432;</span>:</div>
-						{% elif message[0].initial_encryption_type == 'asymmetric' %}
+						{% elif encryption_type == 'asymmetric' %}
 							<div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
 							AE <span title="Asymmetrically encrypted with">&#9432;</span>:</div>
-						{% elif message[0].initial_encryption_type == 'signed' %}
+						{% elif encryption_type == 'signed' %}
 							<div class="rounded-start d-inline col-md-auto bg-{{ isBorderSucess }} text-dark border border-3 border-{{ isBorderSucess }}">
 							Signed by:</div>
 						{% endif %}
 						<div class="rounded-end d-inline col-md-auto border border-3 border-{{ isBorderSucess }}">{{
-							message[0].initial_key }} </div>
+							encryption_key }} </div>
 						</div>
 			 		{% endif %}
 				</article>

@@ -414,13 +414,14 @@ def adv_messages_page():
                 display_message.is_edited = False
             else:
                 display_message.is_edited = True
-            display_message.edited_help_message = ""
+        
+        display_message.edited_help_message = ""
 
         
-            display_message.adv_processed = True
-            display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
-            print(display_message)
-            db.session.commit()
+        display_message.adv_processed = True
+        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+        print(display_message)
+        db.session.commit()
     elif is_delete_msg: #if the delete message button is clicked
         #flag the message as edited and deleted
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
