@@ -60,7 +60,7 @@ function onlyOne(checkbox) {
 		border-radius: 5px;
 		padding: 5px;
 		padding-left: 10px; padding-right: 10px;
-		border-style:solid; border-width: 2px; margin-top: 30px;" onclick="window.location.reload(true);"><span class=reload>&#x21bb;</span></button>
+		border-style:solid; border-width: 2px; margin-top: 30px;" onclick="Refresh()"><span class=reload>&#x21bb;</span></button>
 </div>
 
    <!-- Tab content -->
@@ -270,6 +270,7 @@ function onlyOne(checkbox) {
                </select>
             </div>
       </div>
+      <div id="error-message_{{name}}" hidden="hidden"><p>You need to select both Keys and Encryption/Signed type</p></div>
             </div>
          </div>   
 
@@ -792,6 +793,81 @@ for (let name = 0; name < other_names.length; name++){
     }
 
    </script>
+<script>
+   var dropboxes = document.querySelectorAll('#encryption_sign_type_select_{{other_names[0]}}, #key_select_{{other_names[0]}}');
+   
+   // Add event listener to all selected elements
+   dropboxes.forEach(function(dropbox) {
+      dropbox.addEventListener('change', function() {
+    
+         // if one of the value is selected
+         var allSelectedValuesNotMinusOne = Array.from(dropboxes).some(function(db) {
+         return db.value !== '-1';
+         });
 
+         // Check if all selected values are selected
+         //console.log(dropboxes);
+         var allSelectedValues = Array.from(dropboxes).every(function(dbb) {
+            //console.log(dbb.value);
+            return dbb.value !== '-1';
+         });
+         //console.log(allSelectedValues);
+         var submitButton = document.getElementById('button_{{other_names[0]}}');
+         var error_dis = document.getElementById("error-message_{{other_names[0]}}");
+         let hidden = error_dis.getAttribute("hidden");
+         if(allSelectedValuesNotMinusOne && !allSelectedValues){
+            // Disable the button
+            error_dis.removeAttribute("hidden");
+            submitButton.disabled = true;
+         }
+         else{
+            // Enable the button
+            error_dis.setAttribute("hidden", "hidden");
+            submitButton.disabled = false;
+         }
+         
+      });
+   });
+</script>
+<script>
+   var dropboxes1 = document.querySelectorAll('#encryption_sign_type_select_{{other_names[1]}}, #key_select_{{other_names[1]}}');
+   
+   // Add event listener to all selected elements
+   dropboxes1.forEach(function(dropbox) {
+      dropbox.addEventListener('change', function() {
+    
+         // if one of the value is selected
+         var allSelectedValuesNotMinusOne1 = Array.from(dropboxes).some(function(db) {
+         return db.value !== '-1';
+         });
 
+         // Check if all selected values are selected
+         //console.log(dropboxes);
+         var allSelectedValues1 = Array.from(dropboxes).every(function(dbb) {
+            //console.log(dbb.value);
+            return dbb.value !== '-1';
+         });
+         //console.log(allSelectedValues);
+         var submitButton1 = document.getElementById('button_{{other_names[1]}}');
+         var error_dis1 = document.getElementById("error-message_{{other_names[1]}}");
+         let hidden1 = error_dis1.getAttribute("hidden");
+         if(allSelectedValuesNotMinusOne1 && !allSelectedValues1){
+            // Disable the button
+            error_dis1.removeAttribute("hidden");
+            submitButton1.disabled = true;
+         }
+         else{
+            // Enable the button
+            error_dis1.setAttribute("hidden", "hidden");
+            submitButton1.disabled = false;
+         }
+         
+      });
+   });
+</script>
+<script>
+	function Refresh(){
+		window.location.href = "{{ url_for('messages') }}";
+	}
+ </script>
    {% endblock content %}
