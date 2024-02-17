@@ -177,7 +177,7 @@ def messages():
     forms = {key: MessageForm() for key, _ in zip(other_name,range(len(other_name)))}#use the standard message form
 
     #sent and recieved messages
-    sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id,adv_processed=False).all() for name in other_name]
+    sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id).all() for name in other_name]
     #print(sent_msg)
     recieved_msg = [Message.query.filter_by(edited_recipient=current_user.username,edited_sender=name,adv_processed=True, is_deleted=False, game=current_game.id).all() for name in other_name]
    
