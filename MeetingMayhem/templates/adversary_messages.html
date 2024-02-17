@@ -170,8 +170,12 @@
 							{% endif %}
 						{% else %}
 							{% if message[0].adv_processed and not message[0].adv_created %}
-								<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
-								<p class="article-content" > {{ message[0].edited_content }}</p>
+								{% if message[0].edited_is_cyptographic and not message[0].has_been_decrypted_adv %}
+									<p class="article-content">--CANNOT DECRYPT--</p>
+								{% else %}
+									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+									<p class="article-content" > {{ message[0].edited_content }}</p>
+								{% endif %}
 							{% else %}
 								<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
 								<p class="article-content">{{ message[0].initial_content }}</p>
