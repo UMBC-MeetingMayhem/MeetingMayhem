@@ -420,6 +420,65 @@ def adv_messages_page():
         display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
         print(display_message)
         db.session.commit()
+         #sent and recieved messages
+        sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id).all() for name in other_name]
+        fake_sent_msg = [Message.query.filter_by(edited_sender=current_user.username, initial_recipient = name, game=current_game.id).all() for name in other_name]
+        #print(sent_msg)
+        recieved_msg = [Message.query.filter_by(initial_recipient=current_user.username,initial_sender=name,is_deleted=False, game=current_game.id).all() for name in other_name]
+        all_msg = Message.query.filter_by(game=current_game.id).all()
+        # Organize messages by chatbox
+        msgs_tuple = []
+        for index in range(len(other_name)):
+            msg_tuple_list = []
+            if recieved_msg[index]:
+                for message in recieved_msg[index]:
+                    decrypt_button_show(message)
+                    if message.time_recieved == "Null":
+                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    db.session.commit()
+                    # True means to this message is on the right (recieved)
+                    msg_tuple_list.append((message, None,message.time_recieved,True))
+            if sent_msg[index]:
+                for message in sent_msg[index]:
+                    if message.time_recieved == "Null":
+                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    db.session.commit()
+                    msg_tuple_list.append((message, None,message.time_sent,False))
+            if fake_sent_msg[index]:
+                for message in fake_sent_msg[index]:
+                    if message.time_recieved == "Null":
+                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    db.session.commit()
+                    msg_tuple_list.append((message, None,message.time_sent,False))
+            msgs_tuple.append(msg_tuple_list)
+
+        #print(msg_tuple_list)
+        #setup message flag to tell template if it should display messages or not
+        msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
+        msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
+        display_message = None
+        is_submit_edits = adv_msg_edit_form.submit_edits.data
+        is_delete_msg = adv_msg_edit_form.delete_msg.data
+        
+        messageToBeProcessed12 = Message.query.filter_by(initial_sender=other_name[0], initial_recipient = other_name[1],adv_processed = False, game=current_game.id).all()
+        messageToBeProcessed21 = Message.query.filter_by(initial_sender=other_name[1], initial_recipient = other_name[0], adv_processed=False,game=current_game.id).all()
+        editMessage = []
+        messageBeenProcessed12 = Message.query.filter_by(edited_sender=other_name[0], edited_recipient = other_name[1],adv_processed = True, game=current_game.id).all()
+        messageBeenProcessed21 = Message.query.filter_by(edited_sender=other_name[1], edited_recipient = other_name[0], adv_processed=True,game=current_game.id).all()
+        for msg in messageToBeProcessed12:
+            decrypt_button_show_for_adv(msg,current_user.username)
+            editMessage.append((msg,msg.time_sent, True))
+        for msg in messageToBeProcessed21:
+            decrypt_button_show_for_adv(msg,current_user.username)
+            editMessage.append((msg,msg.time_sent,False))
+        for msg in messageBeenProcessed12:
+            decrypt_button_show_for_adv(msg,current_user.username)
+            editMessage.append((msg,msg.time_sent, True))
+        for msg in messageBeenProcessed21:
+            decrypt_button_show_for_adv(msg,current_user.username)
+            editMessage.append((msg,msg.time_sent,False))
+
+        editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H.%M"),reverse=False) 
     elif is_delete_msg: #if the delete message button is clicked
         #flag the message as edited and deleted
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
@@ -428,9 +487,10 @@ def adv_messages_page():
         display_message.is_deleted = True
         display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
         db.session.commit()
-
+    
     is_submit_edits = False
     is_delete_msg = False
+
     update()
     return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,

@@ -139,7 +139,7 @@ def create_message(user, game, request, form, recipients, time_stamp):
                             round=game.current_round+1, game=game.id, 
                             # Initial Content
                             time_sent=time_stamp, time_meet=form.meet_time.data, location_meet=form.meet_location.data, time_am_pm=form.meet_am_pm.data,
-                            initial_sender=user.username, initial_recipient=recipients, initial_content=form.content.data, 
+                            initial_sender=prentendSender, initial_recipient=recipients, initial_content=form.content.data, 
                             adv_created= (user.role==3) , 
                             initial_is_cyptographic = initial_is_cyptographic,
                             initial_encryption_type=encryption_type, initial_key = encrypted_key, 
