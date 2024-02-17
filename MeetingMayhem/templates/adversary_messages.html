@@ -13,6 +13,16 @@
 {% extends "layout.html" %} <!-- this tells jinja that we are using a template -->
 {% block content %} <!-- this piece of code tells jinja where to put the html for this page in the parent template -->
 <h1 class="float-start" style="color: black; font-weight: bold; text-shadow: 2px 2px 2px rgb(250, 236, 33); padding-left: 0.4in">Messages</h1>
+<button id="vote_bt-adv" style="box-shadow: none; font-size: 20px; padding: 13px !important" class="btn btn-primary btn-lg float-end gray-blue"
+   data-bs-toggle="button" autocomplete="off">Result</button>
+<script>
+	$("#vote_bt-adv").on("click", function () {
+	   var socket = io();
+       socket.emit('adv_result', {
+		game_id: "{{game.id}}"
+	 });
+	});	
+ </script>
     <!-- this part here is just copied from messages.html -->
 	<div class="tab">
 		<button class="tablinks" name="{{other_names[0]}}"style="background-color: #000000;
@@ -1066,4 +1076,57 @@
 		window.location.href = "{{ url_for('messages') }}";
 	}
  </script>
+ <div class="modal fade" id="advVoteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabeladv" aria-hidden="true">
+	<div class="modal-dialog">
+	  	<div class="modal-content">
+			<div class="modal-header">
+				<button id="close-button" class="btn btn-danger" data-bs-dismiss="modal">X</button>
+			</div>
+			<div class="modal-body">
+				<h5 class="modal-title" style="color:darkgray" id="staticBackdropLabeladv">Please Vote</h5>
+			</div>
+			<div class="modal-footer"></div>
+		</div>
+  	</div>
+</div> 
+ <script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+	
+		// Connect to the Socket.IO server.
+        // The connection URL has the following format, relative to the current page:
+        //     http[s]://<domain>:<port>[/<namespace>]
+		var advVoteModal = new bootstrap.Modal(document.getElementById("advVoteModal"), {});
+		
+        var socket = io();
+		socket.on('update', function () {
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Received');
+               $('#Received').replaceWith(elem);
+            });
+            $.get(document.URL, function (data) {
+               var elem = $(data).find('#Sent');
+               $('#Sent').replaceWith(elem);
+            });
+         });
+
+		socket.on('adv_show', function () {
+            advVoteModal.show();
+         });
+		
+		socket.on('return_result_for_adv', function (msg) {
+			console.log(msg);
+			switch (msg) {
+			   case "PlayerWin":
+				  $("#staticBackdropLabeladv").text("You Lost. The agents successfully met in a safe location and time!");
+				  break;
+			   case "PlayerLose":
+				  $("#staticBackdropLabeladv").text("You Won. You were able to thwart the player's meeting.");
+				  break;
+			   default: $("#staticBackdropLabeladv").text("Wait for agents to vote!");
+			}
+		 });
+		
+	});
+
+</script> 
 {% endblock content %}
