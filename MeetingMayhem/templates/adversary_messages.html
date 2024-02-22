@@ -221,7 +221,7 @@
 			  
 		   </div>
 		
-		   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
+		   <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 678px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
 			  <h2>{{name}}</h2>
 			  <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large;">Message Information</p>
 			  <input class="form-check-input" type="checkbox" id="{{name}}_pretend" name="Pretend"
@@ -282,13 +282,13 @@
 			  </div>
 		   </div>   
 
-		   <div style="background-color: #000000;  border: thick double rgb(201, 191, 12); height: auto; border-radius: 25px; margin-top:5px; padding-left: 20px; padding-right:20px; width: 1500px" >
-			<div style="width: 950px; float: left; color: #fff9f9;">
+		   <div style="background-color: #000000;  border: thick double rgb(201, 191, 12); height: 180px; border-radius: 25px; margin-top:-180px; padding-left: 20px; padding-right:20px; width: 778px" >
+			<div style="width: 735px; float: left; color: #fff9f9;">
 
 			{% set  id_content= "content_" + name %}
             {{ form.content(class="form-control form-control-lg", placeholder="Enter your message here",id=id_content) }}
             </div>
-            <div class="form-group" id="{{name}}_form" style="width: 200px; float: right; margin-right: 80px">
+            <div class="form-group" id="{{name}}_form" style="width: 675px; float: right; margin-right: 80px">
 				{% set  id_button= "button_" + name %}
                {% set  id_button_form= "Send Message to " + name %}
                {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
