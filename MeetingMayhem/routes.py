@@ -189,7 +189,7 @@ def messages():
         if recieved_msg[index]:
             for message in recieved_msg[index]:
                 if message.time_recieved == "Null":
-                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                 # False means to this message is on the right (recieved)
                 decrypt_button_show(message)
                 msg_tuple_list.append((message, None,message.time_recieved,True))
@@ -203,7 +203,7 @@ def messages():
 
     #setup message flag to tell template if it should display messages or not
     msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
-    msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
+    msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H:%M:%S"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
     
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -217,7 +217,7 @@ def messages():
                                 usernames=usernames,other_names=other_name,image_url=image_url)
 
             #ensure keys entered are keys of actual recipients chosen
-            curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+            curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
             msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
             update()
@@ -275,20 +275,20 @@ def adv_messages_page():
             for message in recieved_msg[index]:
                 decrypt_button_show(message)
                 if message.time_recieved == "Null":
-                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                 db.session.commit()
                 # True means to this message is on the right (recieved)
                 msg_tuple_list.append((message, None,message.time_recieved,True))
         if sent_msg[index]:
             for message in sent_msg[index]:
                 if message.time_recieved == "Null":
-                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                 db.session.commit()
                 msg_tuple_list.append((message, None,message.time_sent,False))
         if fake_sent_msg[index]:
             for message in fake_sent_msg[index]:
                 if message.time_recieved == "Null":
-                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                    message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                 db.session.commit()
                 msg_tuple_list.append((message, None,message.time_sent,False))
         msgs_tuple.append(msg_tuple_list)
@@ -296,7 +296,7 @@ def adv_messages_page():
     #print(msg_tuple_list)
     #setup message flag to tell template if it should display messages or not
     msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
-    msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
+    msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H:%M:%S"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
     display_message = None
     is_submit_edits = adv_msg_edit_form.submit_edits.data
     is_delete_msg = adv_msg_edit_form.delete_msg.data
@@ -319,7 +319,7 @@ def adv_messages_page():
         decrypt_button_show_for_adv(msg,current_user.username)
         editMessage.append((msg,msg.time_sent,False))
 
-    editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H.%M"),reverse=False) 
+    editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H:%M:%S"),reverse=False) 
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
@@ -333,7 +333,7 @@ def adv_messages_page():
                                 usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
 
             #ensure keys entered are keys of actual recipients chosen
-            curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+            curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
             update()
             msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
@@ -417,7 +417,7 @@ def adv_messages_page():
                 display_message.is_edited = True        
         
         display_message.adv_processed = True
-        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         print(display_message)
         db.session.commit()
          #sent and recieved messages
@@ -434,20 +434,20 @@ def adv_messages_page():
                 for message in recieved_msg[index]:
                     decrypt_button_show(message)
                     if message.time_recieved == "Null":
-                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                     db.session.commit()
                     # True means to this message is on the right (recieved)
                     msg_tuple_list.append((message, None,message.time_recieved,True))
             if sent_msg[index]:
                 for message in sent_msg[index]:
                     if message.time_recieved == "Null":
-                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                     db.session.commit()
                     msg_tuple_list.append((message, None,message.time_sent,False))
             if fake_sent_msg[index]:
                 for message in fake_sent_msg[index]:
                     if message.time_recieved == "Null":
-                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+                        message.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
                     db.session.commit()
                     msg_tuple_list.append((message, None,message.time_sent,False))
             msgs_tuple.append(msg_tuple_list)
@@ -455,7 +455,7 @@ def adv_messages_page():
         #print(msg_tuple_list)
         #setup message flag to tell template if it should display messages or not
         msg_flag = [True if msg_list else False for msg_list in msgs_tuple]
-        msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H.%M"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
+        msgs_tuple = [sorted(msgs_tuple_list, key=lambda x: datetime.strptime(x[2], "%b.%d.%Y-%H:%M:%S"),reverse=False) if msgs_tuple else msgs_tuple for msgs_tuple_list in msgs_tuple]
         display_message = None
         is_submit_edits = adv_msg_edit_form.submit_edits.data
         is_delete_msg = adv_msg_edit_form.delete_msg.data
@@ -478,14 +478,14 @@ def adv_messages_page():
             decrypt_button_show_for_adv(msg,current_user.username)
             editMessage.append((msg,msg.time_sent,False))
 
-        editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H.%M"),reverse=False) 
+        editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H:%M:%S"),reverse=False) 
     elif is_delete_msg: #if the delete message button is clicked
         #flag the message as edited and deleted
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()
         display_message.adv_processed = True
         display_message.is_edited = True
         display_message.is_deleted = True
-        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         db.session.commit()
     
     is_submit_edits = False
@@ -1030,7 +1030,7 @@ def Generate_Log():
     import xlsxwriter
     current_game = Game.query.filter_by(is_running=True).first()
     messages = Message.query.filter_by(game=current_game.id).all()
-    time_generated= datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H.%M")
+    time_generated= datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
     workbook = xlsxwriter.Workbook('./Data/'+time_generated+".xlsx")
     worksheet = workbook.add_worksheet()
     header = ["Meet Time and Location", "time_sent", "time_received", "initial_content", "initial_sender", "initial_recipient", "adv_created", "initial_is_cryptographic", "initial_help_message", "initial_encryption_type", "initial_key", "adv_processed", "is_edited", "is_deleted", "edited_sender", "edited_recipient", "edited_content", "edited_is_cryptographic", "edited_help_message", "edited_encryption_type", "edited_key", "is_decryptable_adv", "has_been_decrypted_adv", "is_decryptable_user", "has_been_decrypted_user"]
