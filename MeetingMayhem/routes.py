@@ -210,11 +210,11 @@ def messages():
             sent_str = request.form.get("submit")[16:]
             if sent_str.strip() != name.strip():
                 continue
-            if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
-                flash(f'Please select a time and location.', 'danger')
-                return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
-                                msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
-                                usernames=usernames,other_names=other_name,image_url=image_url)
+            # if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
+            #     flash(f'Please select a time and location.', 'danger')
+            #     return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
+            #                     msgs_tuple=msgs_tuple,msgs_flag=msg_flag, 
+            #                     usernames=usernames,other_names=other_name,image_url=image_url)
 
             #ensure keys entered are keys of actual recipients chosen
             curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
@@ -326,11 +326,11 @@ def adv_messages_page():
             sent_str = request.form.get("submit")[16:]
             if sent_str.strip() != name.strip():
                 continue
-            if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
-                flash(f'Please select a time and location.', 'danger')
-                return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
-                                 msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
-                                usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
+            # if form.data["meet_time"] == "Time" or form.data["meet_location"] == "Locations":
+            #     flash(f'Please select a time and location.', 'danger')
+            #     return render_template('messages.html', title='Messages', forms=forms, game=current_game, 
+            #                      msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
+            #                     usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
 
             #ensure keys entered are keys of actual recipients chosen
             curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")

@@ -128,7 +128,9 @@
 							{% if message[0].edited_is_cyptographic != 0 %}
 								{% if message[0].is_decryptable_user %}
 									{% if message[0].has_been_decrypted_user %}
-										<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+										{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+											<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+									 	{% endif %}
 										<p class="article-content">{{ message[0].edited_content }}</p>
 									{% else %}
 										<div id="decryption-{{ message[0].id }}-{{ message[0].edited_recipient }}" class="row g-2 align-items-center" data-group="decrypt_options" onclick="prevent_outer(this)">
@@ -165,7 +167,9 @@
 									<p class="article-content">--CANNOT DECRYPT--</p>
 								{% endif %}
 							{% else %}
-								<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+								{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+                                    <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+                                {% endif %}
 								<p class="article-content">{{ message[0].edited_content }}</p>
 							{% endif %}
 						{% else %}
@@ -173,11 +177,15 @@
 								{% if message[0].edited_is_cyptographic and not message[0].has_been_decrypted_adv %}
 									<p class="article-content">--CANNOT DECRYPT--</p>
 								{% else %}
-									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+									{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+										<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+							 		{% endif %}
 									<p class="article-content" > {{ message[0].edited_content }}</p>
 								{% endif %}
 							{% else %}
-								<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+								{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+								{% endif %}
 								<p class="article-content">{{ message[0].initial_content }}</p>
 							{% endif %}
 						{% endif %}
@@ -389,10 +397,14 @@
 						{% if message[0].initial_is_cyptographic!=0 and not message[0].adv_processed %}
 							{% if message[0].has_been_decrypted_adv %}
 								{% if message[0].is_edited %}
-									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+									{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+                                    	<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+                                 	{% endif %}
 									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }} </div>
 								{% else %}
-									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+									{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+										<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+							 		{% endif %}
 									<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div> 	
 								{% endif %}
 							{% elif message[0].is_decryptable_adv %}
@@ -432,10 +444,14 @@
 							<div id="content-{{ message[0].id }}-adv" class="article-content">--CANNOT DECRYPT--</div>
 						{% else %}
 							{% if message[0].is_edited %}
-								<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+								{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+						 		{% endif %}
 								<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].edited_content }}</div>
 							{% else %}
-							    <p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}} {{message[0].time_am_pm}}</p>
+								{% if message[0].location_meet != "Locations"  and  message[0].time_meet != "Time" %}
+									<p style="color: #0dcaf0">{{ message[0].location_meet }} @ {{message[0].time_meet}}{{message[0].time_am_pm}}</p>
+						 		{% endif %}
 								<div id="content-{{ message[0].id }}-adv" class="article-content">{{ message[0].initial_content }}</div>
 							{% endif %}
 						{% endif %}
