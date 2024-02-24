@@ -73,7 +73,7 @@ function onlyOne(checkbox) {
       <fieldset class="form-group">
          <div class="row">
             <div class="column" 
-            style="background-color: rgb(0, 0, 0); color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
+            style="background-color: rgb(0, 0, 0); color: #fff9f9; border-style: solid; border-color: rgb(201, 191, 12); padding: 0.5cm; width: 60%; height: 500px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px; scrollbar-gutter: stable;">
                <style>
                /* width */
                ::-webkit-scrollbar {
@@ -223,7 +223,7 @@ function onlyOne(checkbox) {
                {{ form.submit(class="btn btn-outline-info",id=id_button,value=id_button_form) }}
             </div> -->     
          </div>
-         <div class="column" style="background-color: #000000; color: #fff9f9; border: thick double rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 678px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
+         <div class="column" style="background-color: #000000; color: #fff9f9; border-style: solid; border-color: rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 678px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
             <h2>{{name}}</h2>
             <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large;">Message Information</p>
             </br>
@@ -280,7 +280,7 @@ function onlyOne(checkbox) {
             </div>
          </div>   
 
-         <div style="background-color: #000000;  border: thick double rgb(201, 191, 12); height: auto; border-radius: 25px; margin-top:-180px; padding-left: 20px; padding-right:20px; width: 778px" >
+         <div style="background-color: #000000;  border-style: solid; border-color: rgb(201, 191, 12); height: auto; border-radius: 25px; margin-top:-180px; padding-left: 20px; padding-right:20px; width: 778px" >
             <div style="width: 735px; float: left; color: #fff9f9;">
             {% set  id_content= "content_" + name %}
             {{ form.content(class="form-control form-control-lg", placeholder="Enter your message here",id=id_content) }}
