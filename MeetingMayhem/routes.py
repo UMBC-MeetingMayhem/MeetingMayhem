@@ -207,6 +207,10 @@ def messages():
     
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
+            sent_str = request.form.get("submit")
+            if sent_str == None:
+                #print("OHHHH")
+                break
             sent_str = request.form.get("submit")[16:]
             if sent_str.strip() != name.strip():
                 continue
@@ -323,6 +327,10 @@ def adv_messages_page():
     #! If adversary submit the form 
     for name, form in forms.items():
         if form.validate_on_submit(): #when the user submits the message form and it is valid
+            sent_str = request.form.get("submit")
+            if sent_str == None:
+                #print("OHHHH")
+                break
             sent_str = request.form.get("submit")[16:]
             if sent_str.strip() != name.strip():
                 continue
@@ -365,8 +373,8 @@ def adv_messages_page():
                 return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
                             usernames=usernames,other_names=other_name,image_url=image_url, pretend_name=pretend_name)
-        print(new_senders)
-        print(new_recipients)
+        #print(new_senders)
+        #print(new_recipients)
         #setup the changes to be made to the current message
         encryption_type = request.form.get("encryption_type_select2")
         encrypted_key = request.form.get("encryption_key2")
@@ -418,7 +426,7 @@ def adv_messages_page():
         
         display_message.adv_processed = True
         display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
-        print(display_message)
+        #print(display_message)
         db.session.commit()
          #sent and recieved messages
         sent_msg = [Message.query.filter_by(initial_sender=current_user.username, initial_recipient = name, game=current_game.id).all() for name in other_name]
@@ -784,8 +792,8 @@ def spectate_game():
         game = Game.query.filter_by(id=game_id).first()
         messages = Message.query.filter_by(game=game_id).all()
         msg_count = len(Message.query.filter_by(game=game.id).all())
-        for msg in messages:
-            print(msg)
+        # for msg in messages:
+        #     print(msg)
         return render_template('spectator_messages.html', title='Spectating', game=game, message=messages, msg_count=msg_count)
 
     # If the user is not a spectator, flash a warning and send back to home
@@ -801,8 +809,8 @@ def spectate_game():
             game = select_game_form.running_games.data
             msg_count = len(Message.query.filter_by(game=game.id).all())
             messages = Message.query.filter_by(game=game.id).all()
-            for msg in messages:
-                print(msg)
+            # for msg in messages:
+            #     print(msg)
             return render_template('spectator_messages.html', title='Spectating '+game.name, game=game, message=messages, sg_form=select_game_form, msg_count=msg_count)
         else:
             # Send list of games to template
@@ -950,7 +958,7 @@ def adv_decrypted(json):
     decryption_key = json["decryption_key"]
     curname = json["curname"]
     Help_msg = ""
-    print(decryption_key,"Shared" + curname + "_" + display_message.initial_sender)
+    #print(decryption_key,"Shared" + curname + "_" + display_message.initial_sender)
     if display_message.initial_encryption_type != decryption_type:
         Help_msg = 'Please select correct decryption type!'
     else:
@@ -976,7 +984,7 @@ def adv_decrypted(json):
                 Help_msg = "Please select correct Key for signature"
     if display_message.has_been_decrypted_adv:
         Help_msg = 'Good Job!'
-        print(url_for('messages')+"#disp-msg-"+ msg_id)
+        #print(url_for('messages')+"#disp-msg-"+ msg_id)
         db.session.commit()
         update()
         emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
@@ -985,13 +993,14 @@ def adv_decrypted(json):
     
 @socketio.on('decrypted')
 def decrypted(json):
+    #print("@@@@@@@@@@@@@@@@@@@@")
     msg_id = json["message"]
     display_message =  Message.query.filter_by(id=msg_id).first()
     decryption_type = json["decryption_type"]
     decryption_key = json["decryption_key"]
     curname = json["curname"]
     Help_msg = ""
-    print(decryption_key,decryption_type,curname)
+    #print(decryption_key,decryption_type,curname)
     if display_message.edited_encryption_type != decryption_type:
         Help_msg = 'Please select correct decryption type!'
     else:
@@ -1018,7 +1027,7 @@ def decrypted(json):
 
     if display_message.has_been_decrypted_user:
         Help_msg = 'Good Job!'
-        print(url_for('messages')+"#disp-msg-"+ msg_id)
+        #print(url_for('messages')+"#disp-msg-"+ msg_id)
         db.session.commit()
         update()
         emit('redirect', {'url': url_for('messages')+"#disp-msg-"+ msg_id })
@@ -1070,15 +1079,15 @@ def Generate_Log():
         worksheet.write(row, 24, msg.has_been_decrypted_user)
         row += 1
 
-    worksheet.write(row,0, "GAME INFO")
-    row += 1
-    worksheet.write(row, 0, str(current_game.id))
-    worksheet.write(row, 1, str(current_game.name))
-    worksheet.write(row, 2, str(current_game.adversary))
-    worksheet.write(row, 3, str(current_game.players))
-    worksheet.write(row, 4, str(current_game.vote_ready))
-    worksheet.write(row, 5, str(current_game.votes))
-    worksheet.write(row, 6, str(current_game.who_voted))
-    worksheet.write(row, 7, str(current_game.end_result))
-    workbook.close()
+        worksheet.write(row,0, "GAME INFO")
+        row += 1
+        worksheet.write(row, 0, str(current_game.id))
+        worksheet.write(row, 1, str(current_game.name))
+        worksheet.write(row, 2, str(current_game.adversary))
+        worksheet.write(row, 3, str(current_game.players))
+        worksheet.write(row, 4, str(current_game.vote_ready))
+        worksheet.write(row, 5, str(current_game.votes))
+        worksheet.write(row, 6, str(current_game.who_voted))
+        worksheet.write(row, 7, str(current_game.end_result))
+        workbook.close()
 
