@@ -311,17 +311,25 @@ def adv_messages_page():
     messageBeenProcessed12 = Message.query.filter_by(edited_sender=other_name[0], edited_recipient = other_name[1],adv_processed = True, game=current_game.id).all()
     messageBeenProcessed21 = Message.query.filter_by(edited_sender=other_name[1], edited_recipient = other_name[0], adv_processed=True,game=current_game.id).all()
     for msg in messageToBeProcessed12:
+        if msg.time_recieved == "Null":
+            msg.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         decrypt_button_show_for_adv(msg,current_user.username)
-        editMessage.append((msg,msg.time_sent, True))
+        editMessage.append((msg,msg.time_recieved, True))
     for msg in messageToBeProcessed21:
+        if msg.time_recieved == "Null":
+            msg.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         decrypt_button_show_for_adv(msg,current_user.username)
-        editMessage.append((msg,msg.time_sent,False))
+        editMessage.append((msg,msg.time_recieved,False))
     for msg in messageBeenProcessed12:
+        if msg.time_recieved == "Null":
+            msg.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         decrypt_button_show_for_adv(msg,current_user.username)
-        editMessage.append((msg,msg.time_sent, True))
+        editMessage.append((msg,msg.time_recieved, True))
     for msg in messageBeenProcessed21:
+        if msg.time_recieved == "Null":
+            msg.time_recieved  = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         decrypt_button_show_for_adv(msg,current_user.username)
-        editMessage.append((msg,msg.time_sent,False))
+        editMessage.append((msg,msg.time_recieved,False))
 
     editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H:%M:%S"),reverse=False) 
     #! If adversary submit the form 
@@ -344,7 +352,7 @@ def adv_messages_page():
             curr_time = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
             _,msg_new = create_message(current_user, current_game, request.form, form, name, curr_time)
             update()
-            msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_sent,False))
+            msgs_tuple[other_name.index(name)].append((msg_new, None,msg_new.time_recieved,False))
             db.session.commit()
             return render_template('adversary_messages.html', title='Messages', forms=forms, game=current_game, 
                             msgs_tuple=msgs_tuple,msgs_flag=msg_flag, message = display_message,editMessage=editMessage,
@@ -425,7 +433,7 @@ def adv_messages_page():
                 display_message.is_edited = True        
         
         display_message.adv_processed = True
-        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
+        display_message.time_recieved = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         #print(display_message)
         db.session.commit()
          #sent and recieved messages
@@ -475,16 +483,16 @@ def adv_messages_page():
         messageBeenProcessed21 = Message.query.filter_by(edited_sender=other_name[1], edited_recipient = other_name[0], adv_processed=True,game=current_game.id).all()
         for msg in messageToBeProcessed12:
             decrypt_button_show_for_adv(msg,current_user.username)
-            editMessage.append((msg,msg.time_sent, True))
+            editMessage.append((msg,msg.time_recieved, True))
         for msg in messageToBeProcessed21:
             decrypt_button_show_for_adv(msg,current_user.username)
-            editMessage.append((msg,msg.time_sent,False))
+            editMessage.append((msg,msg.time_recieved,False))
         for msg in messageBeenProcessed12:
             decrypt_button_show_for_adv(msg,current_user.username)
-            editMessage.append((msg,msg.time_sent, True))
+            editMessage.append((msg,msg.time_recieved, True))
         for msg in messageBeenProcessed21:
             decrypt_button_show_for_adv(msg,current_user.username)
-            editMessage.append((msg,msg.time_sent,False))
+            editMessage.append((msg,msg.time_recieved,False))
 
         editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H:%M:%S"),reverse=False) 
     elif is_delete_msg: #if the delete message button is clicked
@@ -493,7 +501,7 @@ def adv_messages_page():
         display_message.adv_processed = True
         display_message.is_edited = True
         display_message.is_deleted = True
-        display_message.time_sent = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
+        display_message.time_recieved = datetime.now(pytz.timezone("US/Central")).strftime("%b.%d.%Y-%H:%M:%S")
         db.session.commit()
     
     is_submit_edits = False
