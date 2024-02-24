@@ -494,7 +494,7 @@ def adv_messages_page():
             decrypt_button_show_for_adv(msg,current_user.username)
             editMessage.append((msg,msg.time_recieved,False))
 
-        editMessage =sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H:%M:%S"),reverse=False) 
+        editMessage = sorted(editMessage, key=lambda x: datetime.strptime(x[1], "%b.%d.%Y-%H:%M:%S"),reverse=False) 
     elif is_delete_msg: #if the delete message button is clicked
         #flag the message as edited and deleted
         display_message = Message.query.filter_by(id=adv_msg_edit_form.msg_num.data).first()

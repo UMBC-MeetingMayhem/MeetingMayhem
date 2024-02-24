@@ -527,13 +527,8 @@
 					</div> <br/>
 					<div class="form-group" style="margin-bottom: -50px">
 						{{ adv_msg_edit_form.edited_content.label(class="form-control-label") }} <!-- i think this tells jinja to put a form box in here -->
-						{% if adv_msg_edit_form.edited_content.errors %} <!-- if there are errors in the form... -->
-							{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-								{% for errors in adv_msg_edit_form.edited_content.errors %}
-									<span>{{ errors }}</span> <!-- display the errors -->
-								{% endfor %}
-							</div>
+						{% if adv_msg_edit_form.errors %} <!-- if there are errors in the form... -->
+							{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value='Please select a message to edit!',disabled=true,style="width:400px") }}
 						{% else %} <!-- if there aren't errors, just display normally -->
 							{% if message.edited_content %} <!-- if the message has been edited, display the edited parts-->
 								{{ adv_msg_edit_form.edited_content(id="adv_msg_edit_form", class="form-control form-control-lg",value=message.edited_content) }}
