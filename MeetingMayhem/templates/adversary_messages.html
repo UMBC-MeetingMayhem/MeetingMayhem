@@ -231,10 +231,9 @@
 		
 		   <div class="column" style="background-color: #000000; color: #fff9f9; border-style: solid; border-color: rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 678px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
 			  <h2>{{name}}</h2>
-			  <p style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large;">Message Information</p>
-			  <input class="form-check-input" type="checkbox" id="{{name}}_pretend" name="Pretend"
+			  <input class="form-check-input" style = "margin-left: 30%;"type="checkbox" id="{{name}}_pretend" name="Pretend"
 			  value="{{ pname }}" >
-			  <label class="form-check-label"> Pretend as {{ pname }}</label>
+			  <label class="form-check-label" style="color:aliceblue; text-shadow: 2px 2px 2px #0dcaf0; font-size: large;"> Pretend as {{ pname }}</label>
 				</br>
 				</br>
 			  {% set  id_loc= "locations_" + name %}
