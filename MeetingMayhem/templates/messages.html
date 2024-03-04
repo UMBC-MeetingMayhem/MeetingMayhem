@@ -103,7 +103,7 @@ function onlyOne(checkbox) {
                }
             </style>
             {% set profile = image_url[index] %}
-            <h2>{{name}} <img src="{{profile}}" alt="profile_img"  style ="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-right: 10px; background-color: #0dcaf0;" /> </h2>
+            <h2><img src="{{profile}}" alt="profile_img"  style ="margin-left: 1%; width: 60px; height: 60px; object-fit: cover; border-radius: 50%;  background-color: #0dcaf0; margin-bottom: 2%" /> {{name}} </h2>
             <!-- Msg can be displayed-->
             {% if msgs_flag[index] %}
                {% for message in msgs_tuple[index] %}
@@ -224,7 +224,7 @@ function onlyOne(checkbox) {
             </div> -->     
          </div>
          <div class="column" style="background-color: #000000; color: #fff9f9; border-style: solid; border-color: rgb(201, 191, 12); padding: 0.5cm; width: 40%; height: 678px; overflow-y: auto; overflow-x: auto; margin-top: 30px; border-radius: 25px;">
-            <h2>{{name}}</h2>
+            <h2 style="margin-left: 40%; margin-top: 2%">{{name}}</h2>
             </br>
             {% set  id_loc= "locations_" + name %}
             {% set  id_time= "time_" + name %}
