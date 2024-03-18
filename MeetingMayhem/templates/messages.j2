@@ -229,3 +229,100 @@ function decrypt(id_button){
         {% endfor %}
     {% endif %}
 {%- endmacro -%}
+
+{% macro timer() -%}
+<style>
+        #duration {
+            width: 60px; /* Adjust the width as needed */
+        }
+</style>
+<div id="inputBox">
+        <label for="duration">Duration (minutes):</label>
+        <input type="number" id="duration" min="0.1" step="0.1" value="1"> <!-- Input field for countdown duration in minutes -->
+        <button id="startBtn">Start</button> <!-- Start/Stop button -->
+    </div>
+    <button id="resetBtn" style="display:none;">Reset</button> <!-- Reset button -->
+
+    <div id="timer" style="display:none;">00:00</div> <!-- Initial display for the timer -->
+
+    <script>
+        let timerInterval;
+
+        function startTimer(duration, display) {
+            var timer = duration * 60, minutes, seconds;
+            var startTime = new Date().getTime();
+
+            timerInterval = setInterval(function () {
+                var now = new Date().getTime();
+                var elapsedTime = (now - startTime) / 1000;
+                timer = duration * 60 - elapsedTime;
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    timer = 0;
+                    document.getElementById("startBtn").style.display = "block"; // Show the start button
+                    document.getElementById("resetBtn").style.display = "none"; // Hide the reset button
+                }
+
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+                localStorage.setItem('remainingTime', timer);
+            }, 1000);
+
+            document.getElementById("startBtn").style.display = "none"; // Hide the start button
+            document.getElementById("resetBtn").style.display = "block"; // Show the reset button
+            document.getElementById("inputBox").style.display = "none"; // Hide the input box
+            document.getElementById("timer").style.display = "block"; // Show the timer display
+        }
+
+        window.onload = function () {
+            var display = document.querySelector('#timer');
+            var startBtn = document.querySelector('#startBtn');
+            var resetBtn = document.querySelector('#resetBtn');
+            var durationInput = document.querySelector('#duration');
+
+            var storedDuration = localStorage.getItem('duration');
+            if (storedDuration) {
+                durationInput.value = storedDuration;
+            }
+
+            var storedRemainingTime = localStorage.getItem('remainingTime');
+            if (storedRemainingTime && storedRemainingTime > 0) {
+                startTimer(parseFloat(storedRemainingTime/60), display);
+            }
+
+            startBtn.addEventListener('click', function() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    startBtn.textContent = "Start";
+                } else {
+                    var duration = parseFloat(durationInput.value);
+                    localStorage.setItem('duration', duration);
+                    console.log("eeee");
+                    localStorage.removeItem('remainingTime');
+                    startTimer(duration, display);
+                    startBtn.textContent = "Stop";
+                }
+            });
+
+            resetBtn.addEventListener('click', function() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                display.textContent = "00:00";
+                startBtn.textContent = "Start";
+                document.getElementById("startBtn").style.display = "block"; // Show the start button
+                document.getElementById("resetBtn").style.display = "none"; // Hide the reset button
+                document.getElementById("inputBox").style.display = "block"; // Show the input box
+                document.getElementById("timer").style.display = "none"; // Hide the timer display
+                localStorage.removeItem('remainingTime');
+            });
+        };
+    </script>
+     
+{%- endmacro -%}
