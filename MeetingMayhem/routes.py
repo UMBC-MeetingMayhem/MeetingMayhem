@@ -240,7 +240,7 @@ def messages():
 @app.route('/multilevelmessages', methods=['GET', 'POST']) #POST is enabled here so that users can give the website information to create messages with
 @login_required
 def multiLevelMessages():
-    pass
+    return render_template('MultilevelSample.html', title='Messages')
 
 def adv_messages_page():
     #setup the current_game so that we can pull information from it
